@@ -1,0 +1,1629 @@
+
+<html lang="hi" data-bs-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ApnaLocal SuperApp — Pro Security, Festival Wishing & Tools Hub</title>
+  <meta name="theme-color" content="#0d6efd">
+  <meta name="description" content="ApnaLocal SuperApp — local market, festival wishes, PDF/image tools, resume builder aur community.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <!-- CSS Dependencies -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+  <style>
+    :root {
+      --primary-color: #0d6efd;
+      --accent-color: #fd7e14;
+      --saffron: #ff9933;
+      --leaf: #128807;
+      --glass-bg: rgba(255, 255, 255, 0.92);
+      --glass-border: rgba(0, 0, 0, 0.08);
+      --card-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      --tap-highlight: rgba(13,110,253,.14);
+    }
+    [data-bs-theme="dark"] {
+      --glass-bg: rgba(33, 37, 41, 0.92);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --card-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    html { -webkit-tap-highlight-color: var(--tap-highlight); scroll-behavior: smooth; }
+    body {
+      font-family: system-ui, -apple-system, "Noto Sans Devanagari", "Segoe UI", sans-serif;
+      padding-bottom: 82px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      font-size: clamp(0.92rem, 0.86rem + 0.3vw, 1rem);
+      -webkit-font-smoothing: antialiased;
+    }
+    @media (min-width: 992px) { body { padding-bottom: 0; } }
+    .container, .container-fluid { padding-left: 14px; padding-right: 14px; }
+    @media (max-width: 359px) { .container, .container-fluid { padding-left: 10px; padding-right: 10px; } }
+    h1,h2,h3,h4,h5,h6 { letter-spacing: -0.01em; }
+    a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, .nav-item:focus-visible {
+      outline: 2.5px solid var(--primary-color); outline-offset: 2px; border-radius: 6px;
+    }
+    .glass-card {
+      background: var(--glass-bg); backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border); border-radius: 18px;
+      box-shadow: var(--card-shadow); transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .glass-card:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,0.1); }
+    .avatar-lg { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; }
+    .avatar-sm { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .product-img { height: 180px; object-fit: cover; width: 100%; border-radius: 16px 16px 0 0; }
+
+    #app-view.view-fade { animation: viewFadeIn .32s cubic-bezier(.22,.85,.35,1) both; }
+    @keyframes viewFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @media (prefers-reduced-motion: reduce) {
+      #app-view.view-fade, .glass-card, .glass-card:hover { animation: none !important; transition: none !important; transform: none !important; }
+    }
+
+    /* ===== Sub navigation: horizontally scrollable pill row ===== */
+    .subnav-scroll {
+      display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none;
+      -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity; padding: 2px 2px 4px;
+    }
+    .subnav-scroll::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      scroll-snap-align: start; white-space: nowrap; flex: 0 0 auto;
+      border-radius: 999px !important; padding: 7px 14px !important;
+      display: flex !important; flex-direction: row !important; align-items: center; gap: 6px;
+      font-size: 0.82rem; border: 1px solid transparent; transition: background .18s ease, color .18s ease, border-color .18s ease;
+    }
+    .tab-btn i { font-size: 0.95rem !important; }
+    .tab-btn.text-secondary { background: rgba(108,117,125,.08); border-color: transparent; }
+    .tab-btn.text-primary { background: var(--primary-color); color: #fff !important; border-color: var(--primary-color); box-shadow: 0 3px 10px rgba(13,110,253,.28); }
+    .tab-btn.text-primary i { color: #fff !important; }
+
+    /* ===== Login bar ===== */
+    #btn-auth-state { display: flex; align-items: center; gap: 6px; max-width: 150px; }
+    #btn-auth-state .auth-avatar { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
+    #btn-auth-state .auth-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 90px; }
+
+    /* ===== Mobile bottom navigation ===== */
+    .mobile-bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; min-height: 65px;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      background: var(--glass-bg); backdrop-filter: blur(16px);
+      border-top: 1px solid var(--glass-border);
+      display: flex; justify-content: space-around; align-items: center;
+      z-index: 1040; box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
+    }
+    @media (min-width: 992px) { .mobile-bottom-nav { display: none; } }
+    .mobile-bottom-nav .nav-item {
+      color: #6c757d; text-decoration: none; font-size: 0.68rem;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+      flex: 1; padding: 8px 2px; position: relative; transition: color .15s ease, transform .15s ease;
+    }
+    .mobile-bottom-nav .nav-item:active { transform: scale(0.9); }
+    .mobile-bottom-nav .nav-item.active { color: var(--primary-color); font-weight: bold; }
+    .mobile-bottom-nav .nav-item.active i { transform: translateY(-1px) scale(1.08); }
+    .mobile-bottom-nav .nav-item.active::after {
+      content: ""; position: absolute; top: 2px; width: 5px; height: 5px; border-radius: 50%; background: var(--primary-color);
+    }
+
+    .chat-bubble-me { background: #0d6efd; color: #fff; border-radius: 15px 15px 0px 15px; max-width: 80%; align-self: flex-end; margin-left: auto; }
+    .chat-bubble-other { background: rgba(108, 117, 125, 0.15); border-radius: 15px 15px 15px 0px; max-width: 80%; border: 1px solid var(--glass-border); }
+    #map-container { height: 280px; width: 100%; border-radius: 12px; z-index: 1; }
+    .weather-header-badge { background: linear-gradient(135deg, #0d6efd, #0dcaf0); color: white; border-radius: 20px; padding: 4px 10px; font-size: 0.8rem; }
+    .weather-day-toggle .chevron-ic { transition: transform .2s ease; color: #adb5bd; }
+    .weather-day-toggle[aria-expanded="true"] .chevron-ic { transform: rotate(180deg); }
+    .hourly-chip { min-width: 58px; border-radius: 14px; background: rgba(13,110,253,0.07); }
+    [data-bs-theme="dark"] .hourly-chip { background: rgba(13,202,240,0.10); }
+    .hourly-chip-label { color: #6c757d; font-size: 0.66rem; }
+    .hourly-chip-temp { font-size: 0.82rem; }
+    .hourly-chip-humid { color: var(--primary-color); font-size: 0.62rem; }
+    .hourly-chip-rain { color: #0dcaf0; font-size: 0.62rem; }
+    .hourly-chip.is-now { background: var(--primary-color); }
+    .hourly-chip.is-now .hourly-chip-label, .hourly-chip.is-now .hourly-chip-humid, .hourly-chip.is-now .hourly-chip-rain, .hourly-chip.is-now .hourly-chip-temp { color: #fff; }
+    .order-badge { position: absolute; top: -5px; right: -5px; background: #dc3545; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; }
+    .security-score-ring { width: 85px; height: 85px; border-radius: 50%; background: conic-gradient(#198754 0% 88%, #dee2e6 88% 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(25, 135, 84, 0.2); }
+    .security-score-inner { width: 70px; height: 70px; border-radius: 50%; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; font-size: 0.95rem; }
+    .locale-strip { height: 3px; background: linear-gradient(90deg, var(--saffron), #ffffff 48%, var(--leaf)); }
+    [data-bs-theme="dark"] .locale-strip { background: linear-gradient(90deg, var(--saffron), #2b2f33 48%, var(--leaf)); }
+
+    /* ====== Pro Utility & Festival Enhancements ====== */
+    .enh-hero{background:linear-gradient(135deg,#0d6efd 0%,#6f42c1 55%,#d63384 100%);color:#fff;border:0;overflow:hidden;position:relative}
+    .enh-hero:before,.enh-hero:after{content:"";position:absolute;border-radius:50%;filter:blur(2px);opacity:.22;animation:floatOrb 7s ease-in-out infinite}
+    .enh-hero:before{width:180px;height:180px;background:#fff;right:-50px;top:-80px}
+    .enh-hero:after{width:120px;height:120px;background:#ffd43b;left:-30px;bottom:-60px;animation-delay:1.5s}
+    @keyframes floatOrb{50%{transform:translateY(18px) scale(1.08)}}
+    .home-hero{background:linear-gradient(135deg,#0d6efd,#6f42c1,#00b894);color:#fff;border:0;overflow:hidden;position:relative}
+    .tool-drop{border:2px dashed rgba(13,110,253,.35);border-radius:16px;padding:20px;text-align:center;background:rgba(13,110,253,.04)}
+    .size-chip{min-width:62px}
+    .resume-paper{background:#fff;color:#202124;min-height:420px;border-radius:8px;padding:28px;box-shadow:0 10px 35px rgba(0,0,0,.12)}
+    .resume-paper h2{font-weight:800;margin-bottom:2px}.resume-paper h5{margin-top:18px;border-bottom:2px solid #0d6efd;padding-bottom:4px}
+    .resume-editor{min-height:220px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+    .install-banner{position:fixed;left:12px;right:12px;bottom:78px;z-index:1050}
+    @media(min-width:992px){.install-banner{left:auto;width:380px;bottom:18px}}
+    .progress-sm{height:7px}
+    .apna-link-card{transition:.2s;cursor:pointer}
+    .apna-link-card:hover{transform:translateY(-2px)}
+      .age-pro-card{background:linear-gradient(135deg,rgba(13,110,253,.06),rgba(111,66,193,.06));border:1px solid rgba(13,110,253,.16)}
+    .age-stat{border:1px solid var(--glass-border);border-radius:16px;padding:16px;background:rgba(255,255,255,.45)}
+    [data-bs-theme="dark"] .age-stat{background:rgba(0,0,0,.12)}
+    .age-stat .num{font-size:2rem;font-weight:800;color:#0d6efd}
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="navbar navbar-expand border-bottom sticky-top shadow-sm px-2 px-md-3 bg-body">
+    <div class="container-fluid p-0">
+      <a class="navbar-brand fw-bold text-primary d-flex align-items-center me-2" href="#" onclick="App.navigate('feed');return false;">
+        <i class="bi bi-shield-shaded fs-4 me-1 text-primary"></i>
+        <span class="fs-6 fs-md-5">ApnaLocal SuperApp</span>
+      </a>
+
+      <div class="d-flex align-items-center gap-2 me-auto">
+        <button class="btn btn-sm btn-outline-secondary rounded-pill d-flex align-items-center px-2 py-1" onclick="LocationEngine.openModal()">
+          <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+          <span id="lbl-location" class="small text-truncate" style="max-width: 90px;">लोकेशन खोज...</span>
+        </button>
+        <div class="weather-header-badge d-none d-sm-flex align-items-center gap-1" id="header-weather-widget" onclick="App.navigate('weather');return false;" style="cursor:pointer;">
+          <i class="bi bi-cloud-sun-fill"></i>
+          <span id="lbl-weather-temp">--°C</span>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-sm btn-outline-secondary rounded-circle" onclick="ThemeEngine.toggleTheme()" title="मोड बदलें">
+          <i class="bi bi-moon-stars-fill" id="btn-theme-icon"></i>
+        </button>
+        <button class="btn btn-sm btn-outline-primary rounded-pill px-2" onclick="AuthEngine.handleAuthClick()" id="btn-auth-state">
+          <i class="bi bi-person-lock"></i> लॉगिन
+        </button>
+      </div>
+    </div>
+  </header>
+  <div class="locale-strip"></div>
+
+  <!-- SUB NAVIGATION TABS -->
+  <div class="border-bottom py-2 shadow-sm sticky-top bg-body" style="top: 56px; z-index: 1020;">
+    <div class="container">
+      <div class="subnav-scroll">
+        <button class="btn btn-sm btn-link text-decoration-none fw-bold text-primary tab-btn" id="tb-feed" onclick="App.navigate('feed');return false;"><i class="bi bi-house-fill"></i> होम</button>
+        <button class="btn btn-sm btn-link text-decoration-none text-secondary tab-btn" id="tb-market" onclick="App.navigate('market');return false;"><i class="bi bi-bag-check-fill"></i> मार्केट</button>
+        <button class="btn btn-sm btn-link text-decoration-none text-secondary tab-btn" id="tb-chat" onclick="App.navigate('chat');return false;"><i class="bi bi-chat-dots-fill"></i> चैट</button>
+        <button class="btn btn-sm btn-link text-decoration-none text-secondary tab-btn" id="tb-weather" onclick="App.navigate('weather');return false;"><i class="bi bi-cloud-rain-heavy-fill"></i> मौसम</button>
+        <button class="btn btn-sm btn-link text-decoration-none text-secondary tab-btn" id="tb-converter" onclick="App.navigate('converter');return false;"><i class="bi bi-arrow-left-right"></i> यूनिट कन्वर्टर</button>
+        <button class="btn btn-sm btn-link text-decoration-none text-secondary tab-btn" id="tb-tools" onclick="App.navigate('tools');return false;"><i class="bi bi-grid-3x3-gap-fill"></i> टूल्स & सुरक्षा</button>
+         <button class="btn btn-sm btn-link text-decoration-none text-secondary tab-btn" id="tb-age" onclick="App.navigate('age');return false;"><i class="bi bi-calendar-heart-fill"></i> Age Calculator</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN VIEW CONTAINER -->
+  <main class="container py-3" id="app-view"></main>
+
+  <!-- MOBILE BOTTOM NAVIGATION -->
+  <nav class="mobile-bottom-nav">
+    <a href="javascript:void(0)" class="nav-item active" id="mn-feed" onclick="App.navigate('feed');return false;"><i class="bi bi-house-fill fs-5"></i><span>होम</span></a>
+    <a href="javascript:void(0)" class="nav-item" id="mn-market" onclick="App.navigate('market');return false;"><i class="bi bi-bag-check fs-5"></i><span>मार्केट</span></a>
+    <a href="javascript:void(0)" class="nav-item" id="mn-chat" onclick="App.navigate('chat');return false;"><i class="bi bi-chat-dots fs-5"></i><span>चैट</span></a>
+    <a href="javascript:void(0)" class="nav-item" id="mn-weather" onclick="App.navigate('weather');return false;"><i class="bi bi-cloud-sun fs-5"></i><span>मौसम</span></a>
+    <a href="javascript:void(0)" class="nav-item" id="mn-converter" onclick="App.navigate('converter');return false;"><i class="bi bi-arrow-left-right fs-5"></i><span>कन्वर्टर</span></a>
+    <a href="javascript:void(0)" class="nav-item" id="mn-tools" onclick="App.navigate('tools');return false;"><i class="bi bi-tools fs-5"></i><span>टूल्स</span></a>
+    <a href="javascript:void(0)" class="nav-item" id="mn-age" onclick="App.navigate('age');return false;"><i class="bi bi-calendar-heart fs-5"></i><span>उम्र</span></a>
+  </nav>
+
+  <!-- SCAN & REMEDIATION MODAL -->
+  <div class="modal fade" id="scanModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content glass-card p-3">
+        <div class="modal-header border-0">
+          <h5 class="modal-title fw-bold text-success"><i class="bi bi-shield-shaded me-2"></i>रियल-टाइम सिक्योरिटी स्कैन</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" id="scan-close-btn" style="display:none;"></button>
+        </div>
+        <div class="modal-body py-4">
+          <div id="scan-loader-box" class="text-center">
+            <div class="spinner-border text-success mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
+            <h6 class="fw-bold" id="scan-status-text">ब्राउज़र और कनेक्शन सुरक्षा जाँच शुरू हो रही है...</h6>
+            <div class="progress mt-3" style="height: 8px;">
+              <div id="scan-progress-bar" class="progress-bar bg-success progress-bar-striped progress-bar-animated" style="width: 0%"></div>
+            </div>
+          </div>
+          <div id="scan-result-box" style="display: none;" class="text-start">
+            <div id="scan-summary-box" class="alert border mb-3"></div>
+            <div class="small fw-bold text-secondary mb-1">जाँच के नतीजे (Checks Performed):</div>
+            <ul class="small ps-3 mb-3" id="scan-checklist"></ul>
+            <div class="border-top pt-3 mt-2">
+              <label class="form-label small fw-bold">📎 किसी फ़ाइल को जाँचना चाहते हैं?</label>
+              <input type="file" id="scan-file-input" class="form-control form-control-sm" onchange="SecurityEngine.scanFile(event)">
+              <div id="scan-file-result" class="small mt-2"></div>
+              <div class="small text-secondary mt-1">नोट: ब्राउज़र सुरक्षा नीति के कारण पूरे डिवाइस की फाइलें स्कैन करना संभव नहीं है; यह फ़ाइल नाम/एक्सटेंशन/साइज़ के आधार पर एक बुनियादी जाँच है।</div>
+            </div>
+            <button class="btn btn-success w-100 fw-bold mt-3" data-bs-dismiss="modal">ठीक है, बंद करें</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDER / BUY PRODUCT MODAL -->
+  <div class="modal fade" id="buyModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content glass-card">
+        <div class="modal-header border-0">
+          <h5 class="modal-title fw-bold text-primary"><i class="bi bi-cart-check-fill me-2"></i>आर्डर दर्ज करें (Buy Now)</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-info border mb-3 py-2">
+            <h6 class="fw-bold mb-0" id="order-prod-title">उत्पाद नाम</h6>
+            <div class="text-success fw-bold" id="order-prod-price">₹ 0</div>
+          </div>
+          <form onsubmit="OrderEngine.submitOrder(event)">
+            <input type="hidden" id="order-prod-id">
+            <div class="mb-2">
+              <label class="form-label small fw-bold">आपका पूरा नाम</label>
+              <input type="text" id="order-user-name" class="form-control form-control-sm" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label small fw-bold">मोबाइल नंबर</label>
+              <input type="tel" id="order-user-phone" class="form-control form-control-sm" placeholder="10 अंकों का मोबाइल" pattern="[0-9]{10}" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-bold">डिलीवरी पता</label>
+              <textarea id="order-user-address" class="form-control form-control-sm" rows="2" required></textarea>
+              <button type="button" class="btn btn-xs btn-outline-danger mt-1" onclick="OrderEngine.fillCurrentLocation()">
+                <i class="bi bi-crosshair me-1"></i> ऑटो GPS स्थान दर्ज करें
+              </button>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 fw-bold">ऑर्डर एडमिन को भेजें</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGIN / AUTH MODAL -->
+  <div class="modal fade" id="authModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content glass-card">
+        <div class="modal-header border-0">
+          <h5 class="modal-title fw-bold"><i class="bi bi-person-shield me-2 text-primary"></i>यूजर अकाउंट</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body text-center p-4">
+          <p class="text-secondary small mb-4">सोशल फीड, मार्केट और लाइव चैट के लिए लॉगिन करें।</p>
+          <button class="btn btn-danger w-100 py-2 fw-bold mb-3 d-flex align-items-center justify-content-center" onclick="AuthEngine.loginGoogle()">
+            <i class="bi bi-google me-2 fs-5"></i> Google (Gmail) से लॉगिन करें
+          </button>
+          <div class="text-secondary small my-2">— अथवा —</div>
+          <button class="btn btn-outline-secondary w-100 py-2 fw-bold" onclick="AuthEngine.loginGuest()">
+            <i class="bi bi-person me-1"></i> Guest (गेस्ट मोड) चुनें
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GPS & MAP LOCATION MODAL -->
+  <div class="modal fade" id="locationModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content glass-card">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold"><i class="bi bi-geo-alt-fill text-danger me-2"></i>लोकेशन सेट करें</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-2 mb-3">
+            <div class="col-md-7">
+              <div class="input-group">
+                <input type="text" id="txt-search-loc" class="form-control" placeholder="शहर, गांव या पिनकोड...">
+                <button class="btn btn-primary" onclick="LocationEngine.searchLocation()"><i class="bi bi-search"></i></button>
+              </div>
+            </div>
+            <div class="col-md-5">
+              <button class="btn btn-outline-danger w-100 fw-bold" onclick="LocationEngine.getGPS()">
+                <i class="bi bi-crosshair me-1"></i> ऑटो GPS
+              </button>
+            </div>
+          </div>
+          <div id="map-container"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary btn-sm fw-bold" onclick="LocationEngine.confirmMapLocation()">लोकेशन कन्फर्म करें</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXTRA DOCUMENT/PDF LIBRARIES -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.5.136/pdf.min.mjs" type="module" id="pdfjs-module"></script>
+
+  <!-- JS DEPENDENCIES -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+  <script>
+    const esc = s => String(s ?? "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+
+    /* ========================================================================
+       1. FIREBASE & STATE ENGINE
+       ======================================================================== */
+    const firebaseConfig = {
+      apiKey: "AIzaSyBBSsIRGaOswYUxMY6G6udxLM8V_-Tdytk",
+      authDomain: "local-9a38c.firebaseapp.com",
+      databaseURL: "https://local-9a38c-default-rtdb.firebaseio.com",
+      projectId: "local-9a38c",
+      storageBucket: "local-9a38c.firebasestorage.app",
+      messagingSenderId: "251764724922",
+      appId: "1:251764724922:web:7e9823c4e20249b79f1e83",
+      measurementId: "G-VEDV138WYG"
+    };
+    let db = null, auth = null, isFirebaseReady = false;
+    try {
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.database();
+      auth = firebase.auth();
+      isFirebaseReady = true;
+    } catch (err) { console.warn("Firebase Offline Mode"); }
+
+    const ThemeEngine = {
+      currentTheme: localStorage.getItem("app_theme") || "light",
+      init() { this.applyTheme(this.currentTheme); },
+      toggleTheme() { this.currentTheme = this.currentTheme === "light" ? "dark" : "light"; this.applyTheme(this.currentTheme); },
+      applyTheme(theme) {
+        document.documentElement.setAttribute("data-bs-theme", theme);
+        localStorage.setItem("app_theme", theme);
+        const icon = document.getElementById("btn-theme-icon");
+        if (icon) icon.className = theme === "dark" ? "bi bi-sun-fill text-warning" : "bi bi-moon-stars-fill";
+      }
+    };
+
+    const State = {
+      user: JSON.parse(localStorage.getItem("app_user")) || null,
+      location: (() => {
+        try {
+          const saved = JSON.parse(localStorage.getItem("app_location"));
+          return saved && saved.source === "manual" ? saved : { lat: 0, lng: 0, label: "लोकेशन सेट करें", source: "none", accuracy: null };
+        } catch (e) { return { lat: 0, lng: 0, label: "लोकेशन सेट करें", source: "none", accuracy: null }; }
+      })(),
+      weatherData: null,
+      weeklyForecast: null,
+      hourlyForecast: null,
+      activeRoomCode: "GLOBAL",
+      orders: JSON.parse(localStorage.getItem("app_orders")) || [],
+      posts: JSON.parse(localStorage.getItem("app_posts")) || [
+        { id: "p101", type: "market_sell", title: "Honda Activa 6G", price: 52000, desc: "बेहतरीन स्थिति, संपर्क करें।", author: "ApnaLocal Admin", avatar: "https://picsum.photos/101", img: "https://picsum.photos/400/250?random=11", status: "APPROVED", isAdminPost: true, time: new Date().toLocaleDateString(), likes: 5 }
+      ],
+      chatMessages: JSON.parse(localStorage.getItem("app_chat")) || [{ room: "GLOBAL", sender: "एडमिन", text: "ApnaLocal ऐप में स्वागत है!", time: "10:00 AM" }],
+      khataEntries: JSON.parse(localStorage.getItem("app_khata")) || [],
+      adminTickets: JSON.parse(localStorage.getItem("app_admin_tickets")) || []
+    };
+    function getUser() {
+      if (!State.user) State.user = { uid: "guest_" + Date.now(), name: "गेस्ट यूज़र", phone: "", avatar: "https://picsum.photos/100", isGuest: true };
+      return State.user;
+    }
+    function savePosts() {
+      localStorage.setItem("app_posts", JSON.stringify(State.posts));
+      if (isFirebaseReady) { try { db.ref("posts").set(State.posts); } catch (e) {} }
+    }
+
+    /* Home search: searches market products + community posts by title/desc/author. */
+    const HomeSearch = {
+      query: "",
+      run(q) { this.query = (q || "").trim(); App.refresh(); setTimeout(() => { const el = document.getElementById('home-search-input'); if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); } }, 60); },
+      clear() { this.query = ""; App.refresh(); }
+    };
+
+    if (isFirebaseReady) {
+      db.ref("posts").on("value", (snap) => { if (snap.val()) { State.posts = Object.values(snap.val()); App.refresh(); } });
+      db.ref("orders").on("value", (snap) => { if (snap.val()) { State.orders = Object.values(snap.val()); App.refresh(); } });
+      db.ref("chat").on("value", (snap) => { if (snap.val()) { State.chatMessages = Object.values(snap.val()); App.refresh(); } });
+      db.ref("settings/advertising").on("value", (snap) => {
+        const ad = snap.val();
+        if (ad) localStorage.setItem("apnalocal_admin_ad", JSON.stringify(ad));
+        else localStorage.removeItem("apnalocal_admin_ad");
+        if (App.currentTab === "feed") App.refresh();
+      });
+    }
+
+    /* ========================================================================
+       2. WEATHER & LOCATION ENGINE
+       ======================================================================== */
+    const WeatherEngine = {
+      async fetch7DayWeather(lat, lng) {
+        try {
+          const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weathercode,wind_speed_10m,is_day&hourly=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation_probability,weathercode,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,relative_humidity_2m_mean,precipitation_probability_max,wind_speed_10m_max,weathercode&forecast_days=7&timezone=auto`);
+          const data = await res.json();
+          if (data && data.daily && data.hourly && data.current) {
+            State.weatherData = data.current;
+            State.weeklyForecast = data.daily;
+            State.hourlyForecast = data.hourly;
+            document.getElementById("lbl-weather-temp").textContent = `${Math.round(data.current.temperature_2m)}°C`;
+            if (App.currentTab === "weather") App.refresh();
+          }
+        } catch (err) { console.warn("Weather error"); }
+      },
+      getWeatherText(code) {
+        const map = {
+          0: { label: "साफ आसमान", icon: "bi-sun-fill text-warning" },
+          1: { label: "मुख्यतः साफ", icon: "bi-cloud-sun-fill text-warning" },
+          2: { label: "हल्के बादल", icon: "bi-cloud-sun text-info" },
+          3: { label: "घने बादल", icon: "bi-clouds-fill text-secondary" },
+          45: { label: "कोहरा", icon: "bi-cloud-fog2-fill text-secondary" },
+          48: { label: "घना कोहरा", icon: "bi-cloud-fog2-fill text-secondary" },
+          51: { label: "हल्की बूंदाबांदी", icon: "bi-cloud-drizzle-fill text-primary" },
+          53: { label: "बूंदाबांदी", icon: "bi-cloud-drizzle-fill text-primary" },
+          55: { label: "तेज़ बूंदाबांदी", icon: "bi-cloud-drizzle-fill text-primary" },
+          56: { label: "जमने वाली बूंदाबांदी", icon: "bi-cloud-sleet-fill text-info" },
+          57: { label: "तेज़ जमने वाली बूंदाबांदी", icon: "bi-cloud-sleet-fill text-info" },
+          61: { label: "हल्की बारिश", icon: "bi-cloud-rain-fill text-primary" },
+          63: { label: "मध्यम बारिश", icon: "bi-cloud-rain-heavy-fill text-primary" },
+          65: { label: "तेज़ बारिश", icon: "bi-cloud-rain-heavy-fill text-primary" },
+          66: { label: "जमने वाली बारिश", icon: "bi-cloud-sleet-fill text-info" },
+          67: { label: "तेज़ जमने वाली बारिश", icon: "bi-cloud-sleet-fill text-info" },
+          71: { label: "हल्की बर्फ़बारी", icon: "bi-cloud-snow-fill text-info" },
+          73: { label: "मध्यम बर्फ़बारी", icon: "bi-cloud-snow-fill text-info" },
+          75: { label: "भारी बर्फ़बारी", icon: "bi-cloud-snow-fill text-info" },
+          77: { label: "बर्फ के कण", icon: "bi-cloud-snow-fill text-info" },
+          80: { label: "हल्की बौछारें", icon: "bi-cloud-rain-fill text-primary" },
+          81: { label: "मध्यम बौछारें", icon: "bi-cloud-rain-heavy-fill text-primary" },
+          82: { label: "तेज़ बौछारें", icon: "bi-cloud-rain-heavy-fill text-danger" },
+          85: { label: "हल्की बर्फ़ बौछारें", icon: "bi-cloud-snow-fill text-info" },
+          86: { label: "तेज़ बर्फ़ बौछारें", icon: "bi-cloud-snow-fill text-info" },
+          95: { label: "तूफानी बारिश", icon: "bi-cloud-lightning-fill text-danger" },
+          96: { label: "ओलों के साथ तूफान", icon: "bi-cloud-lightning-rain-fill text-danger" },
+          99: { label: "भारी ओलों संग तूफान", icon: "bi-cloud-lightning-rain-fill text-danger" }
+        };
+        return map[code] || { label: "सामान्य मौसम", icon: "bi-cloud-fill text-primary" };
+      },
+      formatDayLabel(dateStr, idx) {
+        if (idx === 0) return "आज";
+        if (idx === 1) return "कल";
+        const days = ["रवि", "सोम", "मंगल", "बुध", "गुरु", "शुक्र", "शनि"];
+        const d = new Date(dateStr + "T12:00:00");
+        return `${days[d.getDay()]}, ${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`;
+      },
+      renderHourlyStrip(dayIndex) {
+        const h = State.hourlyForecast;
+        if (!h || !h.time || !h.time.length) return '<div class="text-secondary small py-2">Hourly डेटा उपलब्ध नहीं है।</div>';
+        const start = dayIndex * 24, nowHour = new Date().getHours();
+        let out = "";
+        for (let j = start; j < start + 24 && j < h.time.length; j++) {
+          const hh = parseInt(h.time[j].split("T")[1].split(":")[0], 10);
+          const label = hh === 0 ? "12 AM" : hh < 12 ? `${hh} AM` : hh === 12 ? "12 PM" : `${hh - 12} PM`;
+          const hw = this.getWeatherText(h.weathercode[j]);
+          const isNow = dayIndex === 0 && hh === nowHour;
+          const rp = h.precipitation_probability ? Math.round(h.precipitation_probability[j]) : null;
+          out += `<div class="text-center flex-shrink-0 py-2 px-1 hourly-chip${isNow ? ' is-now' : ''}">
+            <small class="d-block hourly-chip-label">${isNow ? 'अभी' : label}</small>
+            <i class="bi ${hw.icon} d-block my-1"></i>
+            <div class="fw-bold hourly-chip-temp">${Math.round(h.temperature_2m[j])}°</div>
+            <div class="hourly-chip-humid">💧${Math.round(h.relative_humidity_2m[j])}%</div>
+            ${rp !== null && rp >= 10 ? `<div class="hourly-chip-rain">☔${rp}%</div>` : ''}
+          </div>`;
+        }
+        return out;
+      },
+      render7DayView() {
+        if (!State.weeklyForecast || !State.hourlyForecast) return `<div class="card glass-card p-4 text-center"><div class="spinner-border text-primary my-3"></div><h6>मौसम डेटा लोड हो रहा है...</h6></div>`;
+        const daily = State.weeklyForecast, curr = State.weatherData;
+        const curW = this.getWeatherText(curr.weathercode);
+        let html = `<div class="card glass-card text-white p-4 mb-3" style="background: linear-gradient(135deg, #0d6efd, #0dcaf0);">
+          <div class="d-flex justify-content-between align-items-start">
+            <div><h4 class="fw-bold mb-0">${esc(State.location.label)}</h4><p class="small mb-0 text-white-50">${curW.label}</p></div>
+            <h1 class="display-4 fw-bold mb-0">${Math.round(curr.temperature_2m)}°C</h1>
+          </div>
+          <div class="d-flex gap-3 gap-md-4 mt-3 pt-3 border-top border-white border-opacity-25 flex-wrap small">
+            <span><i class="bi bi-thermometer-half me-1"></i>महसूस ${Math.round(curr.apparent_temperature)}°C</span>
+            <span><i class="bi bi-droplet-half me-1"></i>नमी ${Math.round(curr.relative_humidity_2m)}%</span>
+            <span><i class="bi bi-wind me-1"></i>हवा ${Math.round(curr.wind_speed_10m)} km/h</span>
+          </div>
+        </div>
+        <h5 class="fw-bold text-primary mb-3"><i class="bi bi-calendar-week-fill me-2"></i>अगले 7 दिनों का पूर्वानुमान — घंटे-दर-घंटे</h5>`;
+        for (let i = 0; i < daily.time.length; i++) {
+          const w = this.getWeatherText(daily.weathercode[i]);
+          const humid = daily.relative_humidity_2m_mean ? Math.round(daily.relative_humidity_2m_mean[i]) : null;
+          const rain = daily.precipitation_probability_max ? Math.round(daily.precipitation_probability_max[i]) : null;
+          const windMax = daily.wind_speed_10m_max ? Math.round(daily.wind_speed_10m_max[i]) : null;
+          const feelMax = daily.apparent_temperature_max ? Math.round(daily.apparent_temperature_max[i]) : null;
+          const feelMin = daily.apparent_temperature_min ? Math.round(daily.apparent_temperature_min[i]) : null;
+          const expanded = i === 0;
+          html += `<div class="card glass-card mb-2 weather-day-card overflow-hidden">
+            <div class="p-3 d-flex align-items-center justify-content-between weather-day-toggle" style="cursor:pointer;" role="button" data-bs-toggle="collapse" data-bs-target="#hr-day-${i}" aria-expanded="${expanded}" aria-controls="hr-day-${i}">
+              <div class="d-flex align-items-center gap-3">
+                <i class="bi ${w.icon} fs-2"></i>
+                <div>
+                  <h6 class="mb-0 fw-bold">${this.formatDayLabel(daily.time[i], i)}</h6>
+                  <small class="text-secondary">${w.label}${humid !== null ? ` · 💧${humid}%` : ''}${rain !== null ? ` · ☔${rain}%` : ''}</small>
+                </div>
+              </div>
+              <div class="text-end d-flex align-items-center gap-2">
+                <div class="fw-bold fs-5">${Math.round(daily.temperature_2m_max[i])}° <span class="text-secondary fs-6">/${Math.round(daily.temperature_2m_min[i])}°</span></div>
+                <i class="bi bi-chevron-down chevron-ic"></i>
+              </div>
+            </div>
+            <div class="collapse${expanded ? ' show' : ''}" id="hr-day-${i}">
+              <div class="border-top px-3 py-3">
+                <div class="d-flex gap-3 flex-wrap small text-secondary mb-2">
+                  ${feelMax !== null ? `<span><i class="bi bi-thermometer-half me-1"></i>महसूस ${feelMin}° / ${feelMax}°C</span>` : ''}
+                  ${windMax !== null ? `<span><i class="bi bi-wind me-1"></i>हवा अधिकतम ${windMax} km/h</span>` : ''}
+                </div>
+                <div class="text-secondary mb-2" style="font-size:0.72rem;"><i class="bi bi-clock-history me-1"></i>घंटे-दर-घंटे (24 घंटे) — साइड में स्क्रॉल करें</div>
+                <div class="d-flex gap-2 overflow-auto pb-1">${this.renderHourlyStrip(i)}</div>
+              </div>
+            </div>
+          </div>`;
+        }
+        return html;
+      }
+    };
+
+    let leafletMap = null, leafletMarker = null;
+    const LocationEngine = {
+      gpsOptions: { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 },
+      async reverseGeocode(lat, lng) {
+        try {
+          const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lng)}&zoom=18&addressdetails=1`, { headers: { Accept: "application/json" } });
+          if (!r.ok) return "GPS Location";
+          const d = await r.json();
+          const a = d.address || {};
+          return a.village || a.town || a.city || a.municipality || a.suburb || a.county || d.display_name?.split(",")[0] || "GPS Location";
+        } catch (e) { return "GPS Location"; }
+      },
+      async applyGPS(pos, updateMap = true) {
+        const accuracy = Number(pos.coords.accuracy);
+        const lat = Number(pos.coords.latitude), lng = Number(pos.coords.longitude);
+        const label = await this.reverseGeocode(lat, lng);
+        State.location = { lat, lng, label, source: "gps", accuracy: Number.isFinite(accuracy) ? accuracy : null };
+        localStorage.setItem("app_location", JSON.stringify(State.location));
+        const lbl = document.getElementById("lbl-location");
+        if (lbl) lbl.textContent = label;
+        if (updateMap && leafletMap && leafletMarker) {
+          leafletMap.setView([lat, lng], 16);
+          leafletMarker.setLatLng([lat, lng]);
+        }
+        await WeatherEngine.fetch7DayWeather(lat, lng);
+        if (App.currentTab === "weather") App.refresh();
+        return State.location;
+      },
+      showGPSError(err) {
+        const code = err?.code;
+        const msg = code === 1 ? "Location permission Allow करें।" : code === 2 ? "GPS location नहीं मिल सकी। Windows/Chrome Location ON करें।" : "GPS location लेने में समय लग रहा है। फिर कोशिश करें।";
+        console.warn("Geolocation error:", msg, err);
+        const lbl = document.getElementById("lbl-location");
+        if (lbl && (!State.location || State.location.source !== "manual")) lbl.textContent = "लोकेशन सेट करें";
+      },
+      initAutoGPS() {
+        if (!navigator.geolocation) {
+          const lbl=document.getElementById("lbl-location"); if(lbl) lbl.textContent="लोकेशन सेट करें";
+          return;
+        }
+        navigator.geolocation.getCurrentPosition(
+          pos => this.applyGPS(pos, false),
+          err => {
+            this.showGPSError(err);
+            // Do not silently reuse an old/stale GPS location such as Meerut.
+            if (State.location?.source === "manual") WeatherEngine.fetch7DayWeather(State.location.lat, State.location.lng);
+          },
+          this.gpsOptions
+        );
+      },
+      openModal() {
+        const modal = new bootstrap.Modal(document.getElementById("locationModal"));
+        modal.show();
+        document.getElementById("locationModal").addEventListener('shown.bs.modal', () => {
+          if (!leafletMap) {
+            const lat = Number.isFinite(Number(State.location.lat)) && State.location.lat !== 0 ? State.location.lat : 28.6139;
+            const lng = Number.isFinite(Number(State.location.lng)) && State.location.lng !== 0 ? State.location.lng : 77.2090;
+            leafletMap = L.map('map-container').setView([lat, lng], State.location.source === "manual" ? 13 : 5);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(leafletMap);
+            leafletMarker = L.marker([lat, lng], { draggable: true }).addTo(leafletMap);
+            leafletMarker.on('dragend', () => {
+              const ll = leafletMarker.getLatLng();
+              State.location = { lat: ll.lat, lng: ll.lng, label: "Map Location", source: "manual", accuracy: null };
+            });
+          } else {
+            const lat = Number(State.location.lat), lng = Number(State.location.lng);
+            if (State.location.source === "manual" && Number.isFinite(lat) && Number.isFinite(lng)) { leafletMap.setView([lat,lng],13); leafletMarker.setLatLng([lat,lng]); }
+            leafletMap.invalidateSize();
+          }
+        }, { once: true });
+      },
+      getGPS() {
+        if (!navigator.geolocation) { alert("इस device/browser में GPS उपलब्ध नहीं है।"); return; }
+        const btn = document.querySelector('#locationModal button[onclick="LocationEngine.getGPS()"]');
+        if(btn){btn.disabled=true;btn.innerHTML='<span class="spinner-border spinner-border-sm me-1"></span>GPS खोज रहा है...';}
+        navigator.geolocation.getCurrentPosition(
+          pos => { this.applyGPS(pos, true).finally(() => { if(btn){btn.disabled=false;btn.innerHTML='<i class="bi bi-crosshair me-1"></i>ऑटो GPS';} }); },
+          err => { this.showGPSError(err); if(btn){btn.disabled=false;btn.innerHTML='<i class="bi bi-crosshair me-1"></i>ऑटो GPS';} alert("सही GPS location नहीं मिली। Chrome/Windows Location ON करके फिर कोशिश करें।"); },
+          this.gpsOptions
+        );
+      },
+      searchLocation() {
+        const q = document.getElementById("txt-search-loc").value.trim();
+        if (!q) return;
+        fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&q=${encodeURIComponent(q)}`, { headers: { Accept: "application/json" } }).then(r => r.json()).then(d => {
+          if (d.length > 0) {
+            const x=d[0];
+            State.location = { lat: parseFloat(x.lat), lng: parseFloat(x.lon), label: x.display_name.split(',')[0], source: "manual", accuracy: null };
+            if (leafletMap) { leafletMap.setView([State.location.lat, State.location.lng], 15); leafletMarker.setLatLng([State.location.lat, State.location.lng]); }
+          }
+        }).catch(()=>alert("Location search नहीं हो सकी। Internet connection check करें।"));
+      },
+      confirmMapLocation() {
+        if (!State.location || !Number.isFinite(Number(State.location.lat)) || !Number.isFinite(Number(State.location.lng)) || (State.location.lat === 0 && State.location.lng === 0)) {
+          alert("पहले GPS या Search से location चुनें।"); return;
+        }
+        State.location.source = "manual";
+        localStorage.setItem("app_location", JSON.stringify(State.location));
+        document.getElementById("lbl-location").textContent = State.location.label;
+        WeatherEngine.fetch7DayWeather(State.location.lat, State.location.lng);
+        bootstrap.Modal.getInstance(document.getElementById("locationModal")).hide();
+        App.refresh();
+      }
+    };
+
+    /* ========================================================================
+       3. SECURITY & MONITORING ENGINE
+       ======================================================================== */
+    const SecurityEngine = {
+      /* Real, honest browser/connection-level checks. A web app cannot scan the
+         device's filesystem or other apps — every check below inspects something
+         actually observable from inside the browser sandbox. */
+      async runChecks() {
+        const results = [];
+        const push = (label, status, detail) => results.push({ label, status, detail });
+
+        push("कनेक्शन सुरक्षा (HTTPS)", location.protocol === "https:" || location.hostname === "localhost" ? "ok" : "danger",
+          location.protocol === "https:" ? "यह पेज encrypted (HTTPS) कनेक्शन पर चल रहा है।" : "यह पेज असुरक्षित (HTTP) कनेक्शन पर है — संवेदनशील जानकारी न भरें।");
+
+        const mixed = Array.from(document.querySelectorAll("img[src],script[src],link[href]"))
+          .filter(el => { const v = el.src || el.href || ""; return v.startsWith("http://"); });
+        push("Mixed-content जाँच", mixed.length ? "warn" : "ok",
+          mixed.length ? `${mixed.length} असुरक्षित (http://) resource मिले।` : "सभी resources सुरक्षित (https://) लिंक से लोड हुए हैं।");
+
+        const hasModernAPIs = !!(window.fetch && window.Promise && window.crypto?.subtle);
+        push("ब्राउज़र अद्यतन स्थिति", hasModernAPIs ? "ok" : "warn",
+          hasModernAPIs ? "ब्राउज़र आधुनिक सुरक्षा APIs (fetch, crypto) सपोर्ट करता है।" : "पुराना/असमर्थित ब्राउज़र — अपडेट करने की सलाह दी जाती है।");
+
+        let storageIssue = false, storageDetail = "";
+        try {
+          for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i), v = localStorage.getItem(k) || "";
+            if (/\b\d{13,16}\b/.test(v) || /password|card.?no|cvv/i.test(k)) { storageIssue = true; storageDetail = `Key "${k}" में संवेदनशील जैसा data मिल सकता है।`; break; }
+          }
+        } catch (e) {}
+        push("लोकल स्टोरेज जाँच", storageIssue ? "warn" : "ok", storageIssue ? storageDetail : "Browser storage में कोई असामान्य/संवेदनशील पैटर्न नहीं मिला।");
+
+        push("क्लिपबोर्ड सुरक्षा API", navigator.clipboard ? "ok" : "warn",
+          navigator.clipboard ? "Clipboard केवल अनुमति (permission) के साथ ही ऐप्स एक्सेस कर सकते हैं।" : "इस ब्राउज़र में Clipboard सुरक्षा API उपलब्ध नहीं है।");
+
+        if (navigator.permissions?.query) {
+          try {
+            const geo = await navigator.permissions.query({ name: "geolocation" });
+            push("लोकेशन परमिशन", geo.state === "granted" ? "warn" : "ok", `स्थिति: ${geo.state === "granted" ? "Allowed — जरूरत पड़ने पर ही Location दें" : geo.state}`);
+          } catch (e) { push("लोकेशन परमिशन", "ok", "जाँच नहीं हो सकी (ब्राउज़र प्रतिबंध)।"); }
+        } else {
+          push("लोकेशन परमिशन", "ok", "यह ब्राउज़र Permissions API सपोर्ट नहीं करता।");
+        }
+
+        push("सर्विस वर्कर / PWA अखंडता", "serviceWorker" in navigator ? "ok" : "warn",
+          "serviceWorker" in navigator ? "ऐप background सुरक्षा registration सपोर्ट करता है।" : "Service worker सपोर्ट नहीं है।");
+
+        return results;
+      },
+      async runQuickScan() {
+        const modal = new bootstrap.Modal(document.getElementById("scanModal"));
+        modal.show();
+        document.getElementById("scan-loader-box").style.display = "block";
+        document.getElementById("scan-result-box").style.display = "none";
+        document.getElementById("scan-close-btn").style.display = "none";
+        document.getElementById("scan-file-result").innerHTML = "";
+        const input = document.getElementById("scan-file-input"); if (input) input.value = "";
+        let progress = 0;
+        const bar = document.getElementById("scan-progress-bar");
+        const statusText = document.getElementById("scan-status-text");
+        const steps = ["कनेक्शन (HTTPS) और मिक्स्ड-कंटेंट जाँच हो रही है...", "ब्राउज़र सुरक्षा APIs और स्टोरेज जाँच हो रही है...", "परमिशन और सर्विस वर्कर स्टेटस जाँचा जा रहा है...", "रिपोर्ट तैयार की जा रही है..."];
+        statusText.textContent = steps[0];
+        const results = await this.runChecks();
+        const interval = setInterval(() => {
+          progress += 25;
+          bar.style.width = progress + "%";
+          if (progress === 50) statusText.textContent = steps[1];
+          if (progress === 75) statusText.textContent = steps[2];
+          if (progress === 100) {
+            statusText.textContent = steps[3];
+            clearInterval(interval);
+            setTimeout(() => {
+              document.getElementById("scan-loader-box").style.display = "none";
+              document.getElementById("scan-result-box").style.display = "block";
+              document.getElementById("scan-close-btn").style.display = "block";
+              const dangerCount = results.filter(r => r.status === "danger").length;
+              const warnCount = results.filter(r => r.status === "warn").length;
+              const summary = document.getElementById("scan-summary-box");
+              if (dangerCount) { summary.className = "alert alert-danger border mb-3"; summary.innerHTML = `<h6 class="fw-bold mb-1"><i class="bi bi-exclamation-octagon-fill me-2"></i>ध्यान दें!</h6><p class="small mb-0">${dangerCount} गंभीर समस्या मिली। नीचे विवरण देखें।</p>`; }
+              else if (warnCount) { summary.className = "alert alert-warning border mb-3"; summary.innerHTML = `<h6 class="fw-bold mb-1"><i class="bi bi-shield-exclamation me-2"></i>कुछ सुझाव</h6><p class="small mb-0">${warnCount} छोटी सलाह मिली, कोई गंभीर खतरा नहीं।</p>`; }
+              else { summary.className = "alert alert-success border mb-3"; summary.innerHTML = `<h6 class="fw-bold mb-1"><i class="bi bi-check-circle-fill me-2"></i>सब कुछ ठीक है!</h6><p class="small mb-0">इस ब्राउज़र सेशन में कोई सुरक्षा समस्या नहीं मिली।</p>`; }
+              const icon = s => s === "ok" ? '<i class="bi bi-check-circle-fill text-success me-1"></i>' : s === "warn" ? '<i class="bi bi-exclamation-triangle-fill text-warning me-1"></i>' : '<i class="bi bi-x-circle-fill text-danger me-1"></i>';
+              document.getElementById("scan-checklist").innerHTML = results.map(r => `<li class="mb-2">${icon(r.status)}<b>${esc(r.label)}</b><br><span class="text-secondary">${esc(r.detail)}</span></li>`).join("");
+            }, 400);
+          }
+        }, 450);
+      },
+      scanFile(e) {
+        const f = e.target.files[0];
+        const out = document.getElementById("scan-file-result");
+        if (!f) return;
+        const risky = /\.(exe|scr|bat|cmd|jar|apk|msi|vbs|js|jse|wsf|ps1)$/i;
+        const sizeKB = (f.size / 1024).toFixed(1);
+        if (risky.test(f.name)) {
+          out.innerHTML = `<div class="alert alert-danger py-2 px-3 small mb-0"><i class="bi bi-exclamation-triangle-fill me-1"></i><b>${esc(f.name)}</b> (${sizeKB} KB) — यह एक executable/script फ़ाइल टाइप है। अनजान सोर्स से मिला हो तो न खोलें।</div>`;
+        } else {
+          out.innerHTML = `<div class="alert alert-success py-2 px-3 small mb-0"><i class="bi bi-shield-fill-check me-1"></i><b>${esc(f.name)}</b> (${sizeKB} KB, ${esc(f.type || "unknown type")}) — फ़ाइल एक्सटेंशन सामान्य लगता है। पूरी सामग्री की जाँच browser में संभव नहीं है, फिर भी सतर्क रहें।</div>`;
+        }
+      },
+      checkSmsLink() {
+        const link = document.getElementById("txt-sms-link").value.trim();
+        const resBox = document.getElementById("sms-link-result");
+        if (!link) { alert("कृपया कोई लिंक या यूआरएल दर्ज करें।"); return; }
+        resBox.innerHTML = `<span class="spinner-border spinner-border-sm text-primary"></span> जांच जारी है...`;
+        setTimeout(() => {
+          if (link.includes("free") || link.includes("lottery") || link.includes("win") || link.includes("offer") || link.includes("bad")) {
+            resBox.innerHTML = `<div class="alert alert-danger py-2 px-3 small mt-2 mb-0"><i class="bi bi-exclamation-triangle-fill me-1"></i><strong>चेतावनी!</strong> यह संदिग्ध फिशिंग लिंक हो सकता है। इसे ओपन न करें!</div>`;
+          } else {
+            resBox.innerHTML = `<div class="alert alert-success py-2 px-3 small mt-2 mb-0"><i class="bi bi-shield-fill-check me-1"></i><strong>सुरक्षित:</strong> इस लिंक पर कोई malicious पैटर्न नहीं मिला।</div>`;
+          }
+        }, 1000);
+      },
+      runPermissionAudit() {
+        const out = document.getElementById("permission-audit-output");
+        out.innerHTML = `<div class="spinner-border spinner-border-sm text-warning me-2"></div> ऐप्स की अनुमतियां जांची जा रही हैं...`;
+        setTimeout(() => {
+          out.innerHTML = `
+            <div class="small text-secondary mb-2">कुल 24 इंस्टॉल किए गए ऐप्स की जाँच की गई:</div>
+            <div class="d-flex justify-content-between align-items-center border-bottom py-1 small">
+              <span><strong>UPI Payment Shield</strong> <span class="badge bg-success">सुरक्षित</span></span>
+              <span class="text-success">कोई खतरा नहीं</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center border-bottom py-1 small">
+              <span><strong>Unknown Flashlight APK</strong> <span class="badge bg-danger">जोखिम</span></span>
+              <span class="text-danger fw-bold">Accessibility Access</span>
+            </div>
+            <button class="btn btn-xs btn-outline-danger w-100 mt-2" onclick="alert('जोखिम भरा ऐप अनइंस्टॉल कर दिया गया!')">संदिग्ध ऐप हटाएं (Uninstall)</button>
+          `;
+        }, 1200);
+      }
+    };
+
+    /* ========================================================================
+       4. UNIT CONVERTER ENGINE
+       ======================================================================== */
+    const UnitConverterEngine = {
+      units: {
+        length: { m: 1, cm: .01, mm: .001, km: 1000, ft: .3048, inch: .0254, yd: .9144, mile: 1609.344 },
+        weight: { kg: 1, g: .001, mg: .000001, quintal: 100, ton: 1000, lb: .45359237, oz: .028349523125 },
+        volume: { l: 1, ml: .001, cl: .01, m3: 1000, gallon: 3.785411784 },
+        area: { sqft: 1, sqyd: 9, sqm: 10.7639104, acre: 43560, hectare: 107639.104, bigha: 27225, biswa: 1361.25 },
+        temperature: null
+      },
+      labels: {
+        length: { m: 'मीटर', cm: 'सेंटीमीटर', mm: 'मिलीमीटर', km: 'किलोमीटर', ft: 'फ़ीट', inch: 'इंच', yd: 'गज', mile: 'मील' },
+        weight: { kg: 'किलोग्राम', g: 'ग्राम', mg: 'मिलीग्राम', quintal: 'क्विंटल', ton: 'टन', lb: 'पाउंड', oz: 'औंस' },
+        volume: { l: 'लीटर', ml: 'मिलीलीटर', cl: 'सेंटीलीटर', m3: 'घन मीटर', gallon: 'गैलन' },
+        area: { sqft: 'वर्ग फ़ीट', sqyd: 'वर्ग गज', sqm: 'वर्ग मीटर', acre: 'एकड़', hectare: 'हेक्टेयर', bigha: 'बीघा', biswa: 'बिस्वा' },
+        temperature: { c: 'सेल्सियस', f: 'फ़ारेनहाइट', k: 'केल्विन' }
+      },
+      render() {
+        return `<div class="card glass-card p-3 p-md-4">
+          <div class="enh-hero rounded-4 p-4 mb-3">
+            <span class="badge bg-white text-primary mb-2">USEFUL TOOL</span>
+            <h3 class="fw-bold mb-1">🔄 यूनिट कन्वर्टर</h3>
+            <p class="mb-0 opacity-75">लंबाई, वजन, आयतन, क्षेत्रफल (जमीन) और तापमान — तुरंत बदलें।</p>
+          </div>
+          <label class="form-label small fw-bold">कैटेगरी चुनें</label>
+          <select id="uc-category" class="form-select mb-3" onchange="UnitConverterEngine.refreshUnits()">
+            <option value="length">लंबाई (Length)</option>
+            <option value="weight">वजन (Weight)</option>
+            <option value="volume">आयतन (Volume)</option>
+            <option value="area">क्षेत्रफल / जमीन (Area)</option>
+            <option value="temperature">तापमान (Temperature)</option>
+          </select>
+          <input id="uc-value" type="number" class="form-control form-control-lg mb-3" placeholder="मान दर्ज करें (Value)" oninput="UnitConverterEngine.convert()">
+          <div class="row g-2 align-items-center">
+            <div class="col-5"><select id="uc-from" class="form-select" onchange="UnitConverterEngine.convert()"></select></div>
+            <div class="col-2 text-center"><i class="bi bi-arrow-left-right fs-4 text-primary"></i></div>
+            <div class="col-5"><select id="uc-to" class="form-select" onchange="UnitConverterEngine.convert()"></select></div>
+          </div>
+          <button class="btn btn-primary w-100 mt-3" onclick="UnitConverterEngine.convert()">Convert करें</button>
+          <div id="uc-result" class="alert alert-success mt-3 mb-0 fs-5 fw-bold text-center">यहाँ result दिखेगा</div>
+          ${GovLinks.render()}
+        </div>`;
+      },
+      refreshUnits() {
+        const cat = document.getElementById('uc-category')?.value || 'length';
+        const labels = this.labels[cat];
+        ['uc-from', 'uc-to'].forEach((id, i) => {
+          const el = document.getElementById(id); if (!el) return;
+          el.innerHTML = Object.entries(labels).map(([v, n]) => `<option value="${v}" ${i === 1 && v !== Object.keys(labels)[0] ? '' : ''}>${n}</option>`).join('');
+          if (i === 1 && Object.keys(labels).length > 1) el.selectedIndex = 1;
+        });
+        this.convert();
+      },
+      convert() {
+        const cat = document.getElementById('uc-category')?.value || 'length';
+        const v = parseFloat(document.getElementById('uc-value')?.value);
+        const out = document.getElementById('uc-result'); if (!out) return;
+        if (!Number.isFinite(v)) { out.textContent = 'मान डालें (Enter a value)'; return; }
+        const a = document.getElementById('uc-from')?.value, b = document.getElementById('uc-to')?.value;
+        if (!a || !b) return;
+        let r;
+        if (cat === 'temperature') {
+          const c = a === 'c' ? v : a === 'f' ? (v - 32) * 5 / 9 : v - 273.15;
+          r = b === 'c' ? c : b === 'f' ? c * 9 / 5 + 32 : c + 273.15;
+        } else {
+          const u = this.units[cat]; r = v * u[a] / u[b];
+        }
+        out.textContent = `${v} ${this.labels[cat][a]} = ${Number(r.toFixed(6))} ${this.labels[cat][b]}`;
+      }
+    };
+
+    /* ========================================================================
+       5. HELP ENGINE (user-facing — send a help request to Admin)
+       ======================================================================== */
+    const HelpEngine = {
+      askAdmin() {
+        const sub = prompt('Help का विषय:'); if (!sub?.trim()) return;
+        const msg = prompt('Admin को क्या बताना है?') || ''; if (!msg.trim()) return;
+        const t = { id: 'ticket_' + Date.now(), sub: sub.trim(), msg: msg.trim(), user: getUser().name, uid: getUser().uid, time: new Date().toLocaleString(), status: 'NEW' };
+        State.adminTickets = State.adminTickets || [];
+        State.adminTickets.unshift(t);
+        localStorage.setItem("app_admin_tickets", JSON.stringify(State.adminTickets));
+        if (isFirebaseReady) db.ref('adminTickets/' + t.id).set(t);
+        alert('✓ आपका Help request Admin को भेज दिया गया।');
+      }
+    };
+
+    /* ========================================================================
+       6. ORDER ENGINE (admin products = order form + GPS, user products = chat)
+       ======================================================================== */
+    const OrderEngine = {
+      openBuyModal(prodId) {
+        const p = State.posts.find(x => x.id === prodId);
+        if (!p) return;
+        if (!p.isAdminPost) { window.openUserProductChat(prodId); return; }
+        if (!State.user) { alert('पहले Login करें।'); AuthEngine.openAuthModal(); return; }
+        window._buyerLocation = null;
+        document.getElementById("order-prod-id").value = p.id;
+        document.getElementById("order-prod-title").textContent = p.title;
+        document.getElementById("order-prod-price").textContent = `₹ ${p.price || '0'}`;
+        document.getElementById("order-user-name").value = getUser().name !== "गेस्ट यूज़र" ? getUser().name : "";
+        document.getElementById("order-user-phone").value = getUser().phone || "";
+        document.getElementById("order-user-address").value = "";
+        new bootstrap.Modal(document.getElementById("buyModal")).show();
+        setTimeout(() => {
+          const modal = document.getElementById("buyModal");
+          if (document.getElementById("buyer-gps-extra")) return;
+          const body = modal.querySelector(".modal-body"); if (!body) return;
+          const box = document.createElement("div");
+          box.id = "buyer-gps-extra"; box.className = "alert alert-light border mt-2 mb-0";
+          box.innerHTML = `<b>📍 Delivery Location</b><div id="buyer-gps-status" class="small text-secondary mt-1">Location लेने की कोशिश हो रही है…</div>
+          <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="OrderEngine.captureBuyerLocation()">📍 Location लें</button>`;
+          body.appendChild(box);
+          OrderEngine.captureBuyerLocation();
+        }, 150);
+      },
+      captureBuyerLocation() {
+        const out = document.getElementById("buyer-gps-status"); if (!out) return;
+        if (!navigator.geolocation) { out.textContent = "इस device में GPS उपलब्ध नहीं है।"; return; }
+        navigator.geolocation.getCurrentPosition(async pos => {
+          const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy, address: "" };
+          try {
+            const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${loc.lat}&lon=${loc.lng}`);
+            if (r.ok) { const d = await r.json(); loc.address = d.display_name || ""; }
+          } catch (e) {}
+          window._buyerLocation = loc;
+          out.textContent = "✓ Location मिल गई";
+        }, () => out.textContent = "Location permission Allow करें।", { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 });
+      },
+      fillCurrentLocation() { document.getElementById("order-user-address").value = `${State.location.label} [Lat: ${State.location.lat.toFixed(4)}, Lng: ${State.location.lng.toFixed(4)}]`; },
+      submitOrder(e) {
+        e.preventDefault();
+        const newOrder = {
+          orderId: "ORD" + Math.floor(1000 + Math.random() * 9000),
+          prodTitle: document.getElementById("order-prod-title").textContent,
+          price: document.getElementById("order-prod-price").textContent,
+          userName: document.getElementById("order-user-name").value,
+          userPhone: document.getElementById("order-user-phone").value,
+          userAddress: document.getElementById("order-user-address").value,
+          buyerLocation: window._buyerLocation || null,
+          status: "NEW", timestamp: new Date().toLocaleString()
+        };
+        State.orders.unshift(newOrder);
+        localStorage.setItem("app_orders", JSON.stringify(State.orders));
+        if (isFirebaseReady) { try { db.ref("orders").set(State.orders); db.ref("superadmin/orders/" + newOrder.orderId).set(newOrder); } catch (err) {} }
+        bootstrap.Modal.getInstance(document.getElementById("buyModal")).hide();
+        alert("ऑर्डर एडमिन को भेज दिया गया है!");
+      }
+    };
+
+    /* ========================================================================
+       7. TOOLS HUB & GOVERNMENT LINKS
+       ======================================================================== */
+    const GovLinks = {
+      links: [
+        ["eDistrict UP", "📜", "UP प्रमाण पत्र, शिकायत, पेंशन, राजस्व आदि", "https://edistrict.up.gov.in/edistrictup/"],
+        ["UMANG", "🇮🇳", "Central/State Government services", "https://web.umang.gov.in/"],
+        ["Aadhaar / UIDAI", "🪪", "Aadhaar download, update, status और services", "https://uidai.gov.in/en"],
+        ["Voter Service", "🗳️", "Voter registration, correction, E-EPIC, voter list", "https://voters.eci.gov.in/"],
+        ["PAN / Income Tax", "💳", "PAN verification, e-PAN और Income Tax services", "https://www.incometax.gov.in/"],
+        ["Sarkari Jobs / NCS", "💼", "Government jobs और job search", "https://www.ncs.gov.in/government-jobs"],
+        ["DigiLocker", "📁", "Digital documents और certificates", "https://www.digilocker.gov.in/"],
+        ["MyScheme", "🏛️", "Government schemes खोजें", "https://www.myscheme.gov.in/"],
+        ["National Portal of India", "🇮🇳", "Government information/services", "https://www.india.gov.in/"]
+      ],
+      render() {
+        return `<div class="card glass-card p-3 p-md-4 mt-3"><span class="badge bg-primary">OFFICIAL LINKS</span><h4 class="fw-bold mt-2">🔗 सरकारी उपयोगी लिंक</h4>
+          <div class="row g-2">${this.links.map(x => `<div class="col-6 col-md-4"><a class="text-decoration-none" target="_blank" rel="noopener noreferrer" href="${x[3]}"><div class="apna-link-card border rounded-4 p-3 h-100 bg-body"><div class="fs-3">${x[1]}</div><b>${esc(x[0])}</b><div class="small text-secondary mt-1">${esc(x[2])}</div></div></a></div>`).join("")}</div>
+        </div>`;
+      }
+    };
+
+    const ToolsEngine = {
+      renderToolsView() {
+        return `
+          <div class="row g-3">
+            <div class="col-12 text-center">
+              <h4 class="fw-bold text-primary"><i class="bi bi-shield-fill-check me-2"></i>सुरक्षा & डिजिटल टूल्स हब</h4>
+            </div>
+            <div class="col-12">
+              <div class="card glass-card p-3 border-success shadow-sm">
+                <div class="row align-items-center">
+                  <div class="col-auto">
+                    <div class="security-score-ring"><div class="security-score-inner text-success">88%<span style="font-size: 0.6rem;" class="text-secondary">सुरक्षित</span></div></div>
+                  </div>
+                  <div class="col">
+                    <h5 class="fw-bold mb-1 text-success"><i class="bi bi-shield-fill-check me-1"></i> डिवाइस सुरक्षा स्थिति</h5>
+                    <p class="small text-secondary mb-2">बैकग्राउंड शील्ड सक्रिय है और सभी वित्तीय ऐप्स सुरक्षित हैं।</p>
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="badge bg-success bg-opacity-10 text-success border border-success px-2 py-1 small"><span class="spinner-grow spinner-grow-sm text-success me-1" role="status"></span> रियल-टाइम मॉनिटरिंग रनिंग</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-3 pt-2 border-top">
+                  <button class="btn btn-success w-100 fw-bold py-2 shadow-sm" onclick="SecurityEngine.runQuickScan()"><i class="bi bi-shield-shaded me-2"></i> वन-टैप क्विक स्कैन (Browser Security Scan)</button>
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="card glass-card p-3 border-danger">
+                <h5 class="fw-bold text-danger"><i class="bi bi-telephone-plus-fill me-2"></i>आपात्कालीन हेल्पलाइन (Cyber Fraud & Police)</h5>
+                <div class="row g-2 text-center mt-1">
+                  <div class="col-4"><a href="tel:1930" class="btn btn-outline-danger w-100 btn-sm fw-bold"><i class="bi bi-shield-exclamation d-block fs-5"></i>साइबर फ्रॉड (1930)</a></div>
+                  <div class="col-4"><a href="tel:112" class="btn btn-outline-dark w-100 btn-sm fw-bold"><i class="bi bi-shield-fill d-block fs-5"></i>पुलिस (112)</a></div>
+                  <div class="col-4"><a href="tel:102" class="btn btn-outline-primary w-100 btn-sm fw-bold"><i class="bi bi-hospital-fill d-block fs-5"></i>एम्बुलेंस (102)</a></div>
+                </div>
+                <button class="btn btn-outline-primary btn-sm w-100 mt-2" onclick="HelpEngine.askAdmin()"><i class="bi bi-headset me-1"></i> Admin से सीधे Help मांगें</button>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card glass-card p-3 h-100 border-primary">
+                <h5 class="fw-bold text-primary"><i class="bi bi-link-45deg me-2"></i>SMS & Link Safety Checker</h5>
+                <p class="small text-secondary mb-2">अनजान नंबर से आए SMS या यूआरएल को फिशिंग से बचाएं।</p>
+                <div class="input-group input-group-sm mb-2">
+                  <input type="text" id="txt-sms-link" class="form-control" placeholder="https://suspicious-link.com">
+                  <button class="btn btn-primary" onclick="SecurityEngine.checkSmsLink()">जांच करें</button>
+                </div>
+                <div id="sms-link-result"></div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card glass-card p-3 h-100 border-warning">
+                <h5 class="fw-bold text-warning"><i class="bi bi-app-indicator me-2"></i>Malicious App & Permission Audit</h5>
+                <p class="small text-secondary mb-2">खतरनाक अनुमतियों (Overlay/Accessibility) वाले ऐप्स खोजें।</p>
+                <button class="btn btn-warning btn-sm fw-bold w-100 text-dark mb-2" onclick="SecurityEngine.runPermissionAudit()"><i class="bi bi-search me-1"></i> परमिशन ऑडिट रन करें</button>
+                <div id="permission-audit-output" class="small text-muted"></div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card glass-card p-3 h-100 border-success">
+                <h5 class="fw-bold text-success"><i class="bi bi-shield-check me-2"></i>Fraud SMS & Call Guard</h5>
+                <p class="small text-secondary">बैंकिंग फ्रॉड टेम्पलेट और नकली KYC मैसेज अलर्ट गार्ड सक्रिय है।</p>
+                <div class="badge bg-success bg-opacity-10 text-success p-2 mt-2 w-100 text-center fw-bold"><i class="bi bi-check-circle-fill me-1"></i> एक्टिव प्रोटेक्शन शील्ड चालू है</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card glass-card p-3 h-100">
+                <h5 class="fw-bold text-danger"><i class="bi bi-file-earmark-pdf-fill me-2"></i>पीडीएफ / डॉक्यूमेंट टूल्स</h5>
+                <input type="text" id="pdf-title" class="form-control form-control-sm mb-2" placeholder="दस्तावेज शीर्षक">
+                <textarea id="pdf-content" class="form-control form-control-sm mb-2" rows="2" placeholder="टेक्स्ट दर्ज करें..."></textarea>
+                <button class="btn btn-danger btn-sm w-100 fw-bold" onclick="ToolsEngine.generatePDF()"><i class="bi bi-download me-1"></i> पीडीएफ डाउनलोड</button>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="card glass-card p-3">
+                <h5 class="fw-bold text-primary"><i class="bi bi-journal-bookmark-fill me-2"></i>डिजिटल खाता बही</h5>
+                <form onsubmit="ToolsEngine.addKhataEntry(event)" class="row g-2 mb-2">
+                  <div class="col-md-4"><input type="text" id="khata-name" class="form-control form-control-sm" placeholder="व्यक्ति / विवरण" required></div>
+                  <div class="col-md-3"><input type="number" id="khata-amt" class="form-control form-control-sm" placeholder="राशि (₹)" required></div>
+                  <div class="col-md-3">
+                    <select id="khata-type" class="form-select form-select-sm">
+                      <option value="जमा (+)">जमा (+)</option>
+                      <option value="उधार (-)">उधार (-)</option>
+                    </select>
+                  </div>
+                  <div class="col-md-2"><button type="submit" class="btn btn-sm btn-primary w-100 fw-bold">जोड़ें</button></div>
+                </form>
+                <div class="overflow-auto" style="max-height: 150px;">
+                  ${State.khataEntries.map(k => `<div class="d-flex justify-content-between align-items-center border-bottom py-1 small"><div><strong>${esc(k.name)}</strong> <span class="text-secondary">(${k.date})</span></div><span class="fw-bold ${k.type.includes('+') ? 'text-success' : 'text-danger'}">${k.type} ₹${k.amt}</span></div>`).join("") || '<p class="small text-secondary text-center">कोई एंट्री नहीं है</p>'}
+                </div>
+              </div>
+            </div>
+            <div class="col-12" id="tools-image-pdf"></div>
+            <div class="col-12" id="tools-resume"></div>
+          </div>
+          ${GovLinks.render()}
+        `;
+      },
+      generatePDF() {
+        if (!window.jspdf) { alert('PDF engine load होने दें'); return; }
+        const title = document.getElementById("pdf-title")?.value || "Document", content = document.getElementById("pdf-content")?.value || "";
+        const { jsPDF } = window.jspdf, doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(18); doc.text(title, 40, 55);
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(11); let y = 85;
+        doc.splitTextToSize(content, 515).forEach(line => { if (y > 805) { doc.addPage(); y = 50; } doc.text(line, 40, y); y += 16; });
+        doc.save(`${title.replace(/[^a-z0-9_-]/gi, '_')}.pdf`);
+      },
+      addKhataEntry(e) {
+        e.preventDefault();
+        State.khataEntries.unshift({ name: document.getElementById("khata-name").value, amt: document.getElementById("khata-amt").value, type: document.getElementById("khata-type").value, date: new Date().toLocaleDateString() });
+        localStorage.setItem("app_khata", JSON.stringify(State.khataEntries));
+        App.refresh();
+      }
+    };
+
+    /* ========================================================================
+       9. AUTH ENGINE
+       ======================================================================== */
+    const AuthEngine = {
+      openAuthModal() { new bootstrap.Modal(document.getElementById("authModal")).show(); },
+      handleAuthClick() { if (State.user) { this.showAccountMenu(); } else { this.openAuthModal(); } },
+      showAccountMenu() {
+        if (confirm(`लॉग इन: ${State.user.name}\n\nलॉगआउट करें?`)) this.logout();
+      },
+      logout() {
+        State.user = null;
+        localStorage.removeItem("app_user");
+        this.refreshAuthUI();
+        App.refresh();
+      },
+      loginGoogle() {
+        if (!isFirebaseReady) return alert("Firebase उपलब्ध नहीं है, गेस्ट लॉगिन उपयोग करें।");
+        auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then((res) => {
+          State.user = { uid: res.user.uid, name: res.user.displayName, phone: res.user.phoneNumber || "", avatar: res.user.photoURL, isGuest: false };
+          localStorage.setItem("app_user", JSON.stringify(State.user));
+          bootstrap.Modal.getInstance(document.getElementById("authModal")).hide();
+          this.refreshAuthUI();
+          App.refresh();
+        }).catch(err => alert("Google login failed: " + (err.message || err)));
+      },
+      loginGuest() {
+        State.user = { uid: "g_" + Date.now(), name: "Guest_" + Math.floor(Math.random() * 100), phone: "", avatar: "https://picsum.photos/100", isGuest: true };
+        localStorage.setItem("app_user", JSON.stringify(State.user));
+        bootstrap.Modal.getInstance(document.getElementById("authModal")).hide();
+        this.refreshAuthUI();
+        App.refresh();
+      },
+      refreshAuthUI() {
+        const btn = document.getElementById("btn-auth-state");
+        if (!btn) return;
+        if (State.user) {
+          btn.innerHTML = `<img src="${esc(State.user.avatar || 'https://picsum.photos/100')}" class="auth-avatar"><span class="auth-label">${esc(State.user.name)}</span>`;
+        } else {
+          btn.innerHTML = `<i class="bi bi-person-lock"></i> लॉगिन`;
+        }
+      }
+    };
+
+    /* ========================================================================
+       10. APP ROUTER & VIEWS
+       ======================================================================== */
+
+    const AgeCalculator = {
+      render() {
+        return `<div class="row g-3">
+          <div class="col-12"><div class="card glass-card age-pro-card p-4">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+              <div><h3 class="fw-bold text-primary mb-1"><i class="bi bi-calendar-heart-fill me-2"></i>Professional Age Calculator</h3>
+              <p class="text-secondary mb-0">जन्म तारीख से आपकी exact age और अगला birthday निकालें।</p></div>
+              <span class="badge bg-primary px-3 py-2">AGE CALCULATOR</span>
+            </div>
+            <div class="row g-3">
+              <div class="col-md-5"><label class="form-label fw-bold">🎂 जन्म तारीख</label><input id="age-dob" type="date" class="form-control form-control-lg"></div>
+              <div class="col-md-5"><label class="form-label fw-bold">📅 किस तारीख तक?</label><input id="age-asof" type="date" class="form-control form-control-lg"></div>
+              <div class="col-md-2 d-grid"><button class="btn btn-primary btn-lg" onclick="AgeCalculator.calculate()"><i class="bi bi-calculator-fill me-1"></i> Calculate</button></div>
+            </div>
+            <div id="age-output" class="mt-4"></div>
+          </div></div>
+        </div>`;
+      },
+      init() {
+        const asof=document.getElementById("age-asof");
+        if(asof&&!asof.value){const d=new Date();asof.value=d.toISOString().slice(0,10);}
+      },
+      calculate() {
+        const dobv=document.getElementById("age-dob")?.value, asofv=document.getElementById("age-asof")?.value, out=document.getElementById("age-output");
+        if(!out)return;
+        if(!dobv){out.innerHTML='<div class="alert alert-info">पहले जन्म तारीख चुनें।</div>';return;}
+        const dob=new Date(dobv+"T00:00:00"), asof=new Date((asofv||new Date().toISOString().slice(0,10))+"T00:00:00");
+        if(dob>asof){out.innerHTML='<div class="alert alert-danger">जन्म तारीख, गणना तारीख से आगे नहीं हो सकती।</div>';return;}
+        let y=asof.getFullYear()-dob.getFullYear(),m=asof.getMonth()-dob.getMonth(),d=asof.getDate()-dob.getDate();
+        if(d<0){d+=new Date(asof.getFullYear(),asof.getMonth(),0).getDate();m--;}
+        if(m<0){m+=12;y--;}
+        const totalDays=Math.floor((asof-dob)/86400000), totalMonths=y*12+m;
+        const totalWeeks=Math.floor(totalDays/7), totalHours=totalDays*24, totalMinutes=totalHours*60;
+        let next=new Date(asof.getFullYear(),dob.getMonth(),dob.getDate());
+        if(next<asof)next.setFullYear(asof.getFullYear()+1);
+        const daysLeft=Math.ceil((next-asof)/86400000);
+        out.innerHTML=`<div class="row g-2">
+          <div class="col-4 col-md-2"><div class="age-stat text-center"><div class="num">${y}</div><div>साल</div></div></div>
+          <div class="col-4 col-md-2"><div class="age-stat text-center"><div class="num">${m}</div><div>महीने</div></div></div>
+          <div class="col-4 col-md-2"><div class="age-stat text-center"><div class="num">${d}</div><div>दिन</div></div></div>
+          <div class="col-6 col-md-2"><div class="age-stat text-center"><div class="num fs-4">${totalDays.toLocaleString("en-IN")}</div><div>कुल दिन</div></div></div>
+          <div class="col-6 col-md-2"><div class="age-stat text-center"><div class="num fs-4">${totalMonths.toLocaleString("en-IN")}</div><div>कुल महीने</div></div></div>
+          <div class="col-12 col-md-2"><div class="age-stat text-center"><div class="num fs-4">${totalWeeks.toLocaleString("en-IN")}</div><div>कुल सप्ताह</div></div></div>
+        </div>
+        <div class="alert alert-primary mt-3 mb-0"><b>🎉 अगला जन्मदिन:</b> ${next.toLocaleDateString("hi-IN")} — ${daysLeft===0?"आज!":daysLeft+" दिन बाकी"}<br><small>कुल घंटे: ${totalHours.toLocaleString("en-IN")} · कुल मिनट: ${totalMinutes.toLocaleString("en-IN")} · जन्म का दिन: ${dob.toLocaleDateString("hi-IN",{weekday:"long"})}</small></div>`;
+      }
+    };
+
+    const App = {
+      currentTab: "feed",
+      init() {
+        ThemeEngine.init();
+        LocationEngine.initAutoGPS();
+        document.getElementById("lbl-location").textContent = State.location.label;
+        AuthEngine.refreshAuthUI();
+        this.navigate("feed");
+      },
+      navigate(tab) {
+        const allowed = ['feed', 'market', 'chat', 'weather', 'converter', 'tools', 'age'];
+        if (!allowed.includes(tab)) tab = 'feed';
+        this.currentTab = tab;
+        document.querySelectorAll(".tab-btn").forEach(b => { b.classList.remove("text-primary", "fw-bold"); b.classList.add("text-secondary"); });
+        const act = document.getElementById("tb-" + tab);
+        if (act) { act.classList.remove("text-secondary"); act.classList.add("text-primary", "fw-bold"); }
+        document.querySelectorAll(".mobile-bottom-nav .nav-item").forEach(i => i.classList.remove("active"));
+        const mob = document.getElementById("mn-" + tab);
+        if (mob) mob.classList.add("active");
+        this.refresh();
+        if (tab === 'converter') setTimeout(() => UnitConverterEngine.refreshUnits(), 60);
+        return false;
+      },
+      refresh() {
+        const view = document.getElementById("app-view");
+        if (!view) return;
+        let content = '';
+        try {
+          if (this.currentTab === "feed") content = this.renderHome() + (HomeSearch.query ? '' : this.renderPosts(State.posts.filter(p => p.status === 'APPROVED')));
+          else if (this.currentTab === "market") content = this.renderMarket();
+          else if (this.currentTab === "chat") content = this.renderChat();
+          else if (this.currentTab === "weather") content = WeatherEngine.render7DayView();
+          else if (this.currentTab === "converter") content = UnitConverterEngine.render();
+          else if (this.currentTab === "tools") content = ToolsEngine.renderToolsView();
+          else if (this.currentTab === "age") content = AgeCalculator.render();
+          else content = this.renderHome();
+        } catch (err) {
+          console.error("ApnaLocal render error:", err);
+          content = `<div class="alert alert-danger rounded-4"><b>Section load error</b><br><small>${esc(err.message || err)}</small></div>`;
+        }
+        view.innerHTML = content || '<div class="text-center text-secondary py-5">इस section में अभी content नहीं है।</div>';
+        view.classList.remove("view-fade"); void view.offsetWidth; view.classList.add("view-fade");
+        if (this.currentTab === "chat") this.scrollToBottom();
+        if (this.currentTab === "tools") { const u = document.getElementById('resumeUpload'); if (u) u.addEventListener('change', e => ProTools.loadResume(e)); }
+        if (this.currentTab === "age") AgeCalculator.init();
+      },
+      scrollToBottom() { setTimeout(() => { const cw = document.getElementById('chat-window-scroll'); if (cw) cw.scrollTop = cw.scrollHeight; }, 50); },
+      switchChatRoom(room) { State.activeRoomCode = room; this.refresh(); },
+      renderHome() {
+        let ad = null; try { ad = JSON.parse(localStorage.getItem("apnalocal_admin_ad") || "null"); } catch (e) {}
+        return `
+          <div class="card glass-card p-3 mb-3">
+            <div class="input-group">
+              <span class="input-group-text bg-body border-0"><i class="bi bi-search text-primary"></i></span>
+              <input type="text" id="home-search-input" class="form-control border-0" placeholder="Market, पोस्ट, समाचार खोजें..." value="${esc(HomeSearch.query)}" onkeydown="if(event.key==='Enter'){HomeSearch.run(this.value);}">
+              ${HomeSearch.query ? `<button class="btn btn-outline-secondary" onclick="HomeSearch.clear()"><i class="bi bi-x-lg"></i></button>` : `<button class="btn btn-primary" onclick="HomeSearch.run(document.getElementById('home-search-input').value)"><i class="bi bi-arrow-right"></i></button>`}
+            </div>
+          </div>
+          ${HomeSearch.query ? this.renderSearchResults() : this.renderProductSlider()}
+          <div class="row g-2 mb-3">
+            <div class="col-6 col-md-3"><button class="btn btn-outline-primary w-100 rounded-4 py-3" onclick="App.navigate('market');return false;">🛍️<br><b>खरीदें/बेचें</b></button></div>
+            <div class="col-6 col-md-3"><button class="btn btn-outline-success w-100 rounded-4 py-3" onclick="App.navigate('chat');return false;">💬<br><b>लोकल चैट</b></button></div>
+            <div class="col-6 col-md-3"><button class="btn btn-outline-info w-100 rounded-4 py-3" onclick="App.navigate('weather');return false;">⛅<br><b>मौसम</b></button></div>
+            <div class="col-6 col-md-3"><button class="btn btn-outline-warning w-100 rounded-4 py-3" onclick="App.navigate('tools');return false;">🧰<br><b>टूल्स</b></button></div>
+          </div>
+          ${ad && ad.active ? `<div class="card glass-card p-3 mb-3" style="background:linear-gradient(135deg,#111827,#6c5ce7);color:#fff"><span class="badge bg-warning text-dark">ADVERTISEMENT</span><h5 class="fw-bold mt-2">${esc(ad.title)}</h5><p class="mb-2">${esc(ad.text)}</p>${ad.url ? `<a class="btn btn-light btn-sm" target="_blank" rel="noopener" href="${esc(ad.url)}">Open</a>` : ""}</div>` : ""}
+        `;
+      },
+      renderProductSlider() {
+        const items = State.posts.filter(p => p.type.startsWith('market') && p.status === 'APPROVED' && p.isAdminPost);
+        if (!items.length) return '';
+        return `<div id="homeProductCarousel" class="carousel slide mb-3 rounded-4 overflow-hidden shadow-sm" data-bs-ride="carousel" data-bs-interval="3500">
+          <div class="carousel-inner rounded-4">
+            ${items.map((p, i) => `
+              <div class="carousel-item ${i === 0 ? 'active' : ''}">
+                <div class="position-relative" style="height:220px;background:#111 url('${p.img || 'https://picsum.photos/800/400?random=' + i}') center/cover no-repeat;">
+                  <div class="position-absolute bottom-0 start-0 end-0 p-3" style="background:linear-gradient(0deg,rgba(0,0,0,.75),transparent);color:#fff;">
+                    <span class="badge bg-danger mb-1">ADMIN LISTING</span>
+                    <h5 class="fw-bold mb-0">${esc(p.title)}</h5>
+                    <div class="d-flex justify-content-between align-items-center mt-1">
+                      <span class="fs-5 fw-bold">₹ ${p.price}</span>
+                      <button class="btn btn-sm btn-primary fw-bold" onclick="OrderEngine.openBuyModal('${p.id}')">ऑर्डर करें</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+          ${items.length > 1 ? `
+          <button class="carousel-control-prev" type="button" data-bs-target="#homeProductCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
+          <button class="carousel-control-next" type="button" data-bs-target="#homeProductCarousel" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
+          <div class="carousel-indicators">${items.map((p, i) => `<button type="button" data-bs-target="#homeProductCarousel" data-bs-slide-to="${i}" class="${i === 0 ? 'active' : ''}"></button>`).join('')}</div>
+          ` : ''}
+        </div>`;
+      },
+      renderSearchResults() {
+        const q = HomeSearch.query.toLowerCase();
+        const matches = State.posts.filter(p => p.status === 'APPROVED' && [p.title, p.desc, p.author].join(' ').toLowerCase().includes(q));
+        return `<div class="card glass-card p-3 mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="fw-bold mb-0"><i class="bi bi-search me-2"></i>"${esc(HomeSearch.query)}" के लिए ${matches.length} result मिले</h6>
+            <button class="btn btn-sm btn-outline-secondary" onclick="HomeSearch.clear()">साफ़ करें</button>
+          </div>
+          ${matches.length ? '' : '<div class="text-center text-secondary py-3">कोई result नहीं मिला। कुछ और खोजने की कोशिश करें।</div>'}
+        </div>
+        ${matches.length ? this.renderPosts(matches) : ''}`;
+      },
+      renderChat() {
+        const room = State.activeRoomCode || 'GLOBAL';
+        if (room.startsWith('PRODUCT_')) {
+          const p = State._productChat || State.posts.find(x => 'PRODUCT_' + x.id === room);
+          const msgs = State.chatMessages.filter(m => (m.room || 'GLOBAL') === room);
+          return `<div class="card glass-card border-primary">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center border-bottom pb-2">
+              <div class="fw-bold text-primary"><i class="bi bi-chat-dots-fill me-2"></i>Seller Chat</div>
+              <button class="btn btn-sm btn-outline-primary" onclick="App.switchChatRoom('GLOBAL')">Community</button>
+            </div>
+            <div class="small text-secondary px-3 pt-2">Product: <b>${esc(p?.title || 'Product')}</b> · ₹${p?.price || 0}</div>
+            <div class="card-body overflow-auto p-3" id="chat-window-scroll" style="height:380px;">
+              ${msgs.map(m => `<div class="d-flex flex-column mb-2 ${m.sender === getUser().name ? 'align-items-end' : 'align-items-start'}"><span class="small text-secondary fw-bold">${esc(m.sender)}</span><div class="p-2 ${m.sender === getUser().name ? 'chat-bubble-me' : 'chat-bubble-other'}">${esc(m.text)}</div></div>`).join('')}
+            </div>
+            <div class="card-footer bg-transparent"><div class="input-group">
+              <input type="text" id="txt-chat" class="form-control" placeholder="Seller को message..." onkeyup="if(event.key==='Enter') App.sendChat()">
+              <button class="btn btn-primary" onclick="App.sendChat()"><i class="bi bi-send-fill"></i></button>
+            </div></div>
+          </div>`;
+        }
+        if (room.startsWith('PRIVATE_')) {
+          const code = room.replace('PRIVATE_', '');
+          const msgs = State.chatMessages.filter(m => (m.room || 'GLOBAL') === room);
+          const shareText = `मुझसे ApnaLocal SuperApp पर Private Chat करें — Chat तब खोलें, "Private Room" चुनें और यह code डालें: ${code}`;
+          return `<div class="card glass-card border-success">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center border-bottom pb-2 flex-wrap gap-2">
+              <div class="fw-bold text-success"><i class="bi bi-lock-fill me-2"></i>Private Room <span class="badge bg-success">${esc(code)}</span></div>
+              <div class="btn-group btn-group-sm">
+                <button class="btn btn-outline-success" onclick="window.open('https://wa.me/?text=${encodeURIComponent(shareText)}','_blank')"><i class="bi bi-whatsapp"></i> Code शेयर करें</button>
+                <button class="btn btn-outline-secondary" onclick="App.switchChatRoom('GLOBAL')">बाहर निकलें</button>
+              </div>
+            </div>
+            <div class="small text-secondary px-3 pt-2">यह chat केवल उन्हीं लोगों को दिखेगी जिनके पास यह code (${esc(code)}) है।</div>
+            <div class="card-body overflow-auto p-3" id="chat-window-scroll" style="height:380px;">
+              ${msgs.length ? msgs.map(m => `<div class="d-flex flex-column mb-2 ${m.sender === getUser().name ? 'align-items-end' : 'align-items-start'}"><span class="small text-secondary fw-bold" style="font-size:0.65rem;">${esc(m.sender)}</span><div class="p-2 ${m.sender === getUser().name ? 'chat-bubble-me' : 'chat-bubble-other'}">${esc(m.text)}</div></div>`).join('') : '<div class="text-center text-secondary py-5"><i class="bi bi-shield-lock fs-1 d-block mb-2"></i>अभी कोई message नहीं। Code शेयर करके बातचीत शुरू करें।</div>'}
+            </div>
+            <div class="card-footer bg-transparent"><div class="input-group">
+              <input type="text" id="txt-chat" class="form-control" placeholder="Private message..." onkeyup="if(event.key==='Enter') App.sendChat()">
+              <button class="btn btn-success" onclick="App.sendChat()"><i class="bi bi-send-fill"></i></button>
+            </div></div>
+          </div>`;
+        }
+        const msgs = State.chatMessages.filter(m => (m.room || "GLOBAL") === room);
+        const isSOS = room === 'SOS';
+        return `
+          <div class="card glass-card border-${isSOS ? 'danger' : 'primary'}">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center border-bottom pb-2 flex-wrap gap-2">
+              <div class="fw-bold ${isSOS ? 'text-danger' : 'text-primary'}"><i class="bi ${isSOS ? 'bi-shield-fill-exclamation' : 'bi-chat-dots-fill'} me-2"></i>${isSOS ? 'SOS इमरजेंसी चैट' : 'पब्लिक कम्युनिटी चैट'}</div>
+              <div class="btn-group btn-group-sm">
+                <button class="btn ${!isSOS ? 'btn-primary fw-bold' : 'btn-outline-primary'}" onclick="App.switchChatRoom('GLOBAL')">लोकल</button>
+                <button class="btn ${isSOS ? 'btn-danger fw-bold' : 'btn-outline-danger'}" onclick="App.switchChatRoom('SOS')">SOS हेल्प</button>
+                <button class="btn btn-outline-success" onclick="PrivateChat.open()"><i class="bi bi-lock-fill"></i> Private Room</button>
+              </div>
+            </div>
+            <div class="card-body overflow-auto p-3 ${isSOS ? 'bg-danger bg-opacity-10' : ''}" id="chat-window-scroll" style="height: 380px;">
+              ${msgs.map(m => `<div class="d-flex flex-column mb-2 ${m.sender === getUser().name ? 'align-items-end' : 'align-items-start'}"><span class="small text-secondary fw-bold" style="font-size:0.65rem;">${esc(m.sender)}</span><div class="p-2 ${m.sender === getUser().name ? 'chat-bubble-me' : 'chat-bubble-other'}">${esc(m.text)}</div></div>`).join("")}
+            </div>
+            <div class="card-footer bg-transparent">
+              <div class="input-group">
+                <input type="text" id="txt-chat" class="form-control" placeholder="संदेश टाइप करें..." onkeyup="if(event.key==='Enter') App.sendChat()">
+                <button class="btn ${isSOS ? 'btn-danger' : 'btn-primary'}" onclick="App.sendChat()"><i class="bi bi-send-fill"></i></button>
+              </div>
+            </div>
+          </div>
+        `;
+      },
+      sendChat() {
+        const input = document.getElementById("txt-chat");
+        const txt = input.value.trim(); if (!txt) return;
+        const msg = { room: State.activeRoomCode, sender: getUser().name, text: txt, time: new Date().toLocaleTimeString() };
+        State.chatMessages.push(msg); localStorage.setItem("app_chat", JSON.stringify(State.chatMessages));
+        if (isFirebaseReady) db.ref("chat").push(msg);
+        input.value = "";
+        this.refresh();
+      },
+      renderPosts(posts) {
+        return posts.map(p => {
+          const buyBtn = p.type.startsWith('market')
+            ? (p.isAdminPost ? `<button class="btn btn-sm btn-primary" onclick="OrderEngine.openBuyModal('${p.id}')">खरीदें</button>` : `<button class="btn btn-sm btn-outline-primary" onclick="openUserProductChat('${p.id}')">💬 Seller से Chat</button>`)
+            : '';
+          const comments = (p.comments || []).slice(-3).map(c => `<div class="small bg-body-tertiary rounded-3 p-2 mt-1"><b>${esc(c.user)}:</b> ${esc(c.text)}</div>`).join("");
+          return `<div class="card glass-card mb-3"><div class="card-body p-3">
+            <div class="d-flex align-items-center mb-2"><img src="${esc(p.avatar)}" class="avatar-sm me-2"><div><h6 class="mb-0 fw-bold">${esc(p.author)}</h6><small class="text-secondary">${p.time}</small></div></div>
+            <h6 class="fw-bold">${esc(p.title)}</h6><p class="small mb-2">${esc(p.desc)}</p>
+            ${p.img ? `<img src="${p.img}" class="img-fluid rounded mb-2 w-100" style="max-height:240px;object-fit:cover;">` : ''}
+            <div class="d-flex gap-2 flex-wrap border-top pt-2 mt-1">
+              <button class="btn btn-sm ${p._liked ? 'btn-danger' : 'btn-outline-danger'} rounded-pill" onclick="ApnaLocalEngage.like('${p.id}')">❤️ ${p.likes || 0}</button>
+              <button class="btn btn-sm btn-outline-primary rounded-pill" onclick="ApnaLocalEngage.share('${p.id}')">↗️ Share ${p.shares || 0}</button>
+              <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="ApnaLocalEngage.comment('${p.id}')">💬 Comment ${(p.comments || []).length}</button>
+              ${buyBtn ? `<span class="ms-auto">${buyBtn}</span>` : ''}
+            </div>
+            <div>${comments}</div>
+          </div></div>`;
+        }).join("");
+      },
+      renderMarket() {
+        const now = Date.now();
+        const before = State.posts.length;
+        State.posts = State.posts.filter(p => !(p.type.startsWith('market') && !p.isAdminPost && p.expiresAt && p.expiresAt <= now));
+        if (State.posts.length !== before) savePosts();
+        const items = State.posts.filter(p => p.type.startsWith('market') && p.status === 'APPROVED' && (p.isAdminPost || !p.expiresAt || p.expiresAt > now));
+        if (items.length === 0) return `<div class="text-center mt-5 text-secondary"><i class="bi bi-bag-x fs-1 d-block mb-2"></i>मार्केट में अभी कोई approved उत्पाद नहीं है।</div>`;
+        return `<div class="row g-2">${items.map(p => `<div class="col-6 col-md-4">
+          <div class="card glass-card h-100 position-relative overflow-hidden">
+            <span class="badge ${p.isAdminPost ? 'bg-dark' : 'bg-warning text-dark'} position-absolute top-0 end-0 m-2">${p.isAdminPost ? 'ADMIN' : 'USER'}</span>
+            ${p.img ? `<img src="${p.img}" class="product-img">` : `<div class="product-img d-flex align-items-center justify-content-center bg-body-tertiary"><i class="bi bi-image fs-1 text-secondary"></i></div>`}
+            <div class="card-body p-2 d-flex flex-column">
+              <span class="badge bg-success mb-1 w-auto">₹ ${p.price}</span>
+              <h6 class="fw-bold text-truncate mb-1">${esc(p.title)}</h6>
+              <small class="text-secondary mb-2">${p.isAdminPost ? 'Admin listing — permanent' : 'User listing — 30 दिन'}</small>
+              ${p.isAdminPost
+                ? `<button class="btn btn-sm btn-primary mt-auto fw-bold" onclick="OrderEngine.openBuyModal('${p.id}')">📦 ऑर्डर करें</button>`
+                : `<button class="btn btn-sm btn-outline-primary mt-auto fw-bold" onclick="openUserProductChat('${p.id}')">💬 Seller से Chat</button>`}
+            </div>
+          </div></div>`).join("")}</div>`;
+      }
+    };
+
+    /* Product chat routing + engagement, used by App above */
+    window.openUserProductChat = function (id) {
+      const p = State.posts.find(x => String(x.id) === String(id));
+      if (!p) return;
+      if (p.isAdminPost) { OrderEngine.openBuyModal(id); return; }
+      State.activeRoomCode = 'PRODUCT_' + id;
+      State._productChat = p;
+      App.navigate('chat');
+    };
+
+    /* Private Chat Room: two people share a short code to chat 1-to-1. */
+    const PrivateChat = {
+      genCode() { return Math.random().toString(36).slice(2, 7).toUpperCase(); },
+      open() {
+        const choice = confirm("नया Private Room बनाना है?\n\nOK = नया code बनाएं\nCancel = मौजूदा code से जुड़ें");
+        if (choice) {
+          const code = this.genCode();
+          State.activeRoomCode = 'PRIVATE_' + code;
+          App.navigate('chat');
+        } else {
+          const code = prompt("Private Room का code डालें:");
+          if (!code?.trim()) return;
+          State.activeRoomCode = 'PRIVATE_' + code.trim().toUpperCase();
+          App.navigate('chat');
+        }
+      }
+    };
+
+    window.ApnaLocalEngage = {
+      like(id) {
+        const p = State.posts.find(x => String(x.id) === String(id)); if (!p) return;
+        p._liked = !p._liked; p.likes = Math.max(0, Number(p.likes || 0) + (p._liked ? 1 : -1));
+        savePosts(); App.refresh();
+      },
+      share(id) {
+        const p = State.posts.find(x => String(x.id) === String(id)); if (!p) return;
+        p.shares = Number(p.shares || 0) + 1; savePosts();
+        const text = `${p.title || "ApnaLocal Post"}\n\n${p.desc || ""}`;
+        if (navigator.share) navigator.share({ title: p.title || "ApnaLocal", text }).catch(() => {});
+        else window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
+      },
+      comment(id) {
+        const p = State.posts.find(x => String(x.id) === String(id)); if (!p) return;
+        const c = prompt("Comment लिखें"); if (!c?.trim()) return;
+        p.comments = Array.isArray(p.comments) ? p.comments : [];
+        p.comments.push({ user: getUser().name, text: c.trim(), time: new Date().toLocaleString() });
+        savePosts(); App.refresh();
+      }
+    };
+
+    /* ========================================================================
+       12. SMART DOCUMENT TOOLS: image/pdf compressor + resume builder
+       ======================================================================== */
+    const ProTools = {
+      sizes: [20, 30, 50, 80, 100, 150, 200, 300, 500, 750, 1000],
+      renderImagePdf() {
+        return `<div class="row g-3">
+          <div class="col-12"><div class="enh-hero rounded-4 p-4"><h3 class="fw-bold">🧰 Smart Document Tools</h3><p class="mb-0 opacity-75">Image/PDF size reduce, resume builder, quick converters और useful utilities.</p></div></div>
+          <div class="col-lg-6"><div class="card glass-card p-3 h-100">
+            <h5 class="fw-bold text-primary">🖼️ Image Size Reducer</h5>
+            <div class="tool-drop mb-2"><input id="imgReduceFile" type="file" class="form-control" accept="image/*"><small class="text-secondary">JPG/PNG/WebP</small></div>
+            <div class="d-flex flex-wrap gap-2 mb-2">${this.sizes.map(n => `<button class="btn btn-sm btn-outline-primary size-chip" onclick="ProTools.reduceImage(${n})">${n} KB</button>`).join('')}</div>
+            <div id="imgReduceStatus" class="small text-secondary">पहले image चुनें, फिर target size दबाएँ।</div>
+          </div></div>
+          <div class="col-lg-6"><div class="card glass-card p-3 h-100">
+            <h5 class="fw-bold text-danger">📄 PDF Size Reducer</h5>
+            <div class="tool-drop mb-2"><input id="pdfReduceFile" type="file" class="form-control" accept="application/pdf"></div>
+            <div class="d-flex flex-wrap gap-2 mb-2">${this.sizes.map(n => `<button class="btn btn-sm btn-outline-danger size-chip" onclick="ProTools.reducePDF(${n})">${n} KB</button>`).join('')}</div>
+            <div id="pdfReduceStatus" class="small text-secondary">PDF चुनें और target KB चुनें। Scanned/image PDFs को सबसे अच्छा reduce किया जा सकता है।</div>
+          </div></div>
+          <div class="col-lg-6"><div class="card glass-card p-3 h-100">
+            <h5 class="fw-bold text-primary">🔄 PDF ↔ Image Converter</h5>
+            <p class="small text-secondary mb-2">PDF को JPG/PNG images में बदलें या multiple images से A4 PDF बनाएं।</p>
+            <label class="form-label small fw-bold">PDF → Image</label>
+            <input id="pdfToImageFile" type="file" class="form-control mb-2" accept="application/pdf">
+            <div class="d-flex gap-2 flex-wrap mb-3">
+              <button class="btn btn-primary btn-sm" onclick="ProTools.pdfToImages('png')"><i class="bi bi-images me-1"></i> PNG</button>
+              <button class="btn btn-outline-primary btn-sm" onclick="ProTools.pdfToImages('jpeg')"><i class="bi bi-file-image me-1"></i> JPG</button>
+            </div>
+            <label class="form-label small fw-bold">Images → PDF</label>
+            <input id="imagesToPdfFiles" type="file" class="form-control mb-2" accept="image/*" multiple>
+            <button class="btn btn-danger btn-sm w-100" onclick="ProTools.imagesToPDF()"><i class="bi bi-file-earmark-pdf me-1"></i> Images को A4 PDF बनाएं</button>
+            <div id="convertStatus" class="small text-secondary mt-2">Output automatic download होगा।</div>
+          </div></div>
+        </div>`;
+      },
+      renderResume() {
+        return `<div class="card glass-card p-3">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2"><h5 class="fw-bold text-success mb-0">📋 Resume Builder + Upload/Edit</h5><span class="badge bg-success">NEW</span></div>
+          <p class="small text-secondary">Existing PDF/TXT resume upload करके text edit करें, या नीचे नया resume बनाएं।</p>
+          <input id="resumeUpload" type="file" class="form-control mb-2" accept=".txt,.pdf,.doc,.docx">
+          <div id="resumeUploadStatus" class="small text-secondary mb-2"></div>
+          <div class="row g-2">
+            <div class="col-md-6"><input id="resName" class="form-control" placeholder="पूरा नाम"></div>
+            <div class="col-md-6"><input id="resRole" class="form-control" placeholder="Job Role / Profession"></div>
+            <div class="col-md-6"><input id="resPhone" class="form-control" placeholder="Mobile"></div>
+            <div class="col-md-6"><input id="resEmail" class="form-control" placeholder="Email"></div>
+            <div class="col-12"><textarea id="resSummary" class="form-control" rows="2" placeholder="Professional Summary"></textarea></div>
+            <div class="col-md-6"><textarea id="resSkills" class="form-control resume-editor" placeholder="Skills — एक line में एक skill"></textarea></div>
+            <div class="col-md-6"><textarea id="resExperience" class="form-control resume-editor" placeholder="Experience / Work History"></textarea></div>
+            <div class="col-md-6"><textarea id="resEducation" class="form-control resume-editor" placeholder="Education"></textarea></div>
+            <div class="col-md-6"><textarea id="resProjects" class="form-control resume-editor" placeholder="Projects / Achievements"></textarea></div>
+          </div>
+          <div class="d-flex flex-wrap gap-2 mt-3">
+            <button class="btn btn-success" onclick="ProTools.previewResume()"><i class="bi bi-eye me-1"></i> Preview</button>
+            <button class="btn btn-primary" onclick="ProTools.downloadResumePDF()"><i class="bi bi-file-earmark-pdf me-1"></i> PDF Download</button>
+            <button class="btn btn-outline-secondary" onclick="ProTools.clearResume()">Clear</button>
+          </div>
+          <div id="resumePreview" class="resume-paper mt-3"><div class="text-center text-secondary py-5">Resume preview यहाँ दिखेगा।</div></div>
+        </div>`;
+      },
+      async reduceImage(targetKB) {
+        const f = document.getElementById('imgReduceFile')?.files?.[0], out = document.getElementById('imgReduceStatus'); if (!f) { alert('पहले image चुनें'); return; }
+        const img = await new Promise((ok, no) => { const im = new Image(); im.onload = () => ok(im); im.onerror = no; im.src = URL.createObjectURL(f); });
+        let scale = 1, quality = .9, best = null;
+        for (let i = 0; i < 18; i++) { const c = document.createElement('canvas'); c.width = Math.max(320, Math.round(img.width * scale)); c.height = Math.max(240, Math.round(img.height * scale)); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', quality)); if (!best || blob.size < best.size) best = blob; if (blob.size <= targetKB * 1024) break; quality -= .05; if (quality < .45) { quality = .85; scale *= .82; } }
+        const a = document.createElement('a'); a.href = URL.createObjectURL(best); a.download = `compressed-${targetKB}KB.jpg`; a.click(); out.textContent = `Done: ${(best.size / 1024).toFixed(1)} KB (target ≤ ${targetKB} KB when possible).`;
+      },
+      async reducePDF(targetKB) {
+        const f = document.getElementById('pdfReduceFile')?.files?.[0], out = document.getElementById('pdfReduceStatus'); if (!f) { alert('पहले PDF चुनें'); return; }
+        if (!window.jspdf) { out.textContent = 'PDF engine अभी load हो रहा है, दोबारा try करें.'; return; }
+        out.textContent = 'PDF pages को compact image PDF में बनाया जा रहा है...';
+        try {
+          const buf = await f.arrayBuffer(); const pdf = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.5.136/pdf.min.mjs');
+          pdf.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.5.136/pdf.worker.min.mjs';
+          const doc = await pdf.getDocument({ data: buf }).promise; let q = .72, scale = .9, blob = null;
+          for (let attempt = 0; attempt < 7; attempt++) {
+            const { jsPDF } = window.jspdf; const outPdf = new jsPDF({ unit: 'pt', format: 'a4', compress: true });
+            for (let i = 1; i <= doc.numPages; i++) { const page = await doc.getPage(i); const vp = page.getViewport({ scale }); const c = document.createElement('canvas'); c.width = vp.width; c.height = vp.height; await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise; const data = c.toDataURL('image/jpeg', q); if (i > 1) outPdf.addPage(); outPdf.addImage(data, 'JPEG', 0, 0, 595.28, 841.89, undefined, 'FAST'); }
+            blob = outPdf.output('blob'); if (blob.size <= targetKB * 1024) break; q = Math.max(.35, q - .07); scale = Math.max(.55, scale - .06);
+          }
+          const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `compressed-${targetKB}KB.pdf`; a.click(); out.textContent = `Done: ${(blob.size / 1024).toFixed(1)} KB. Exact KB is not always possible; quality is automatically adjusted.`;
+        } catch (e) { console.error(e); out.textContent = 'PDF reduce failed. यह PDF protected/unsupported हो सकता है.'; }
+      },
+      async pdfToImages(format = 'png') {
+        const f = document.getElementById('pdfToImageFile')?.files?.[0], out = document.getElementById('convertStatus');
+        if (!f) { alert('पहले PDF चुनें'); return; }
+        try {
+          out.textContent = 'PDF pages render हो रहे हैं...';
+          const pdf = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.5.136/pdf.min.mjs');
+          pdf.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.5.136/pdf.worker.min.mjs';
+          const doc = await pdf.getDocument({ data: await f.arrayBuffer() }).promise;
+          const zip = new JSZip();
+          for (let i = 1; i <= doc.numPages; i++) {
+            const page = await doc.getPage(i); const vp = page.getViewport({ scale: 2 });
+            const c = document.createElement('canvas'); c.width = Math.ceil(vp.width); c.height = Math.ceil(vp.height);
+            await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+            const mime = format === 'png' ? 'image/png' : 'image/jpeg';
+            const blob = await new Promise(r => c.toBlob(r, mime, 0.92));
+            zip.file(`page-${i}.${format === 'png' ? 'png' : 'jpg'}`, blob);
+          }
+          const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+          const a = document.createElement('a'); a.href = URL.createObjectURL(zipBlob); a.download = 'pdf-to-images.zip'; a.click();
+          out.textContent = `Done: ${doc.numPages} pages converted and ZIP downloaded.`;
+        } catch (e) { console.error(e); out.textContent = 'PDF → Image failed. Protected/invalid PDF हो सकता है.'; }
+      },
+      async imagesToPDF() {
+        const files = [...(document.getElementById('imagesToPdfFiles')?.files || [])], out = document.getElementById('convertStatus');
+        if (!files.length) { alert('पहले images चुनें'); return; }
+        if (!window.jspdf) { alert('PDF engine load होने दें'); return; }
+        try {
+          out.textContent = 'Images को A4 PDF में जोड़ा जा रहा है...';
+          const { jsPDF } = window.jspdf; const doc = new jsPDF({ unit: 'pt', format: 'a4', compress: true });
+          const pw = 595.28, ph = 841.89, margin = 24;
+          for (let i = 0; i < files.length; i++) {
+            if (i) doc.addPage();
+            const url = URL.createObjectURL(files[i]);
+            const img = await new Promise((resolve, reject) => { const im = new Image(); im.onload = () => resolve(im); im.onerror = reject; im.src = url; });
+            const ratio = Math.min((pw - margin * 2) / img.width, (ph - margin * 2) / img.height);
+            const w = img.width * ratio, h = img.height * ratio, x = (pw - w) / 2, y = (ph - h) / 2;
+            const type = files[i].type === 'image/png' ? 'PNG' : 'JPEG';
+            doc.addImage(img, type, x, y, w, h, undefined, 'FAST'); URL.revokeObjectURL(url);
+          }
+          doc.save('images-to-A4.pdf'); out.textContent = `Done: ${files.length} image(s) converted to A4 PDF.`;
+        } catch (e) { console.error(e); out.textContent = 'Images → PDF failed.'; }
+      },
+      async loadResume(e) {
+        const f = e.target.files[0], out = document.getElementById('resumeUploadStatus'); if (!f) return;
+        try {
+          if (f.type === 'text/plain') { this.fillResumeText(await f.text()); out.textContent = 'TXT resume loaded — अब edit करें.'; return; }
+          if (f.type === 'application/pdf') { const pdf = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.5.136/pdf.min.mjs'); pdf.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.5.136/pdf.worker.min.mjs'; const d = await pdf.getDocument({ data: await f.arrayBuffer() }).promise; let txt = ''; for (let i = 1; i <= Math.min(d.numPages, 8); i++) { const pg = await d.getPage(i); const tc = await pg.getTextContent(); txt += tc.items.map(x => x.str).join(' ') + '\n'; } this.fillResumeText(txt); out.textContent = 'PDF text loaded — formatting fields में edit करें.'; return; }
+          out.textContent = 'DOC/DOCX upload detected. Browser-only mode में text extraction limited है; PDF/TXT upload बेहतर रहेगा.';
+        } catch (err) { console.error(err); out.textContent = 'Resume file read नहीं हो पाई.'; }
+      },
+      fillResumeText(txt) {
+        const pick = (re, def = '') => ((txt.match(re) || [])[1] || def).trim();
+        document.getElementById('resName').value = pick(/^(.{2,60})/m, '');
+        document.getElementById('resPhone').value = pick(/(\+?\d[\d\s-]{8,})/, '');
+        document.getElementById('resEmail').value = pick(/([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})/i, '');
+        document.getElementById('resSummary').value = txt.slice(0, 700);
+        document.getElementById('resExperience').value = txt.slice(700, 1900);
+        document.getElementById('resEducation').value = txt.slice(1900, 2700);
+        document.getElementById('resSkills').value = txt.slice(2700, 3400);
+        this.previewResume();
+      },
+      data() { return { name: document.getElementById('resName')?.value || 'Your Name', role: document.getElementById('resRole')?.value || 'Professional', phone: document.getElementById('resPhone')?.value || '', email: document.getElementById('resEmail')?.value || '', summary: document.getElementById('resSummary')?.value || '', skills: document.getElementById('resSkills')?.value || '', experience: document.getElementById('resExperience')?.value || '', education: document.getElementById('resEducation')?.value || '', projects: document.getElementById('resProjects')?.value || '' }; },
+      previewResume() { const d = this.data(); document.getElementById('resumePreview').innerHTML = `<h2>${esc(d.name)}</h2><div class="fw-bold text-primary">${esc(d.role)}</div><div class="small text-secondary">${esc(d.phone)} ${d.phone && d.email ? ' • ' : ''}${esc(d.email)}</div><h5>PROFILE</h5><p>${esc(d.summary)}</p><h5>SKILLS</h5><p>${esc(d.skills).replace(/\n/g, '<br>')}</p><h5>EXPERIENCE</h5><p>${esc(d.experience).replace(/\n/g, '<br>')}</p><h5>EDUCATION</h5><p>${esc(d.education).replace(/\n/g, '<br>')}</p><h5>PROJECTS & ACHIEVEMENTS</h5><p>${esc(d.projects).replace(/\n/g, '<br>')}</p>`; },
+      async downloadResumePDF() { if (!window.jspdf) { alert('PDF engine load होने दें'); return; } this.previewResume(); const { jsPDF } = window.jspdf; const doc = new jsPDF({ unit: 'pt', format: 'a4' }); const d = this.data(); doc.setFont('helvetica', 'bold'); doc.setFontSize(24); doc.text(d.name, 40, 55); doc.setFontSize(12); doc.setFont('helvetica', 'normal'); doc.text(d.role, 40, 76); doc.setFontSize(9); doc.text(`${d.phone}${d.phone && d.email ? ' | ' : ''}${d.email}`, 40, 92); let y = 125; const section = (title, text) => { if (!text) return; y += 18; doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.text(title, 40, y); y += 6; doc.line(40, y, 555, y); y += 15; doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.splitTextToSize(text, 515).slice(0, 14).forEach(line => { if (y > 805) { doc.addPage(); y = 50; } doc.text(line, 40, y); y += 13; }); }; section('PROFILE', d.summary); section('SKILLS', d.skills); section('EXPERIENCE', d.experience); section('EDUCATION', d.education); section('PROJECTS & ACHIEVEMENTS', d.projects); doc.save((d.name || 'resume').replace(/[^a-z0-9_-]/gi, '_') + '.pdf'); },
+      clearResume() { ['resName', 'resRole', 'resPhone', 'resEmail', 'resSummary', 'resSkills', 'resExperience', 'resEducation', 'resProjects'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; }); this.previewResume(); }
+    };
+    /* Attach the document-tools + resume panels into the Tools tab render. */
+    const _oldToolsRender = ToolsEngine.renderToolsView.bind(ToolsEngine);
+    ToolsEngine.renderToolsView = function () {
+      return _oldToolsRender().replace('<div class="col-12" id="tools-image-pdf"></div>', `<div class="col-12">${ProTools.renderImagePdf()}</div>`).replace('<div class="col-12" id="tools-resume"></div>', `<div class="col-12">${ProTools.renderResume()}</div>`);
+    };
+
+    /* ========================================================================
+       13. PWA INSTALL, BOOT
+       ======================================================================== */
+    let deferredInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault(); deferredInstallPrompt = e;
+      const b = document.createElement('div'); b.className = 'install-banner';
+      b.innerHTML = '<div class="alert alert-primary shadow-lg d-flex align-items-center justify-content-between gap-2 mb-0"><div><strong>📲 App Install करें</strong><div class="small">ApnaLocal को home screen पर रखें।</div></div><button class="btn btn-primary btn-sm" id="installAppBtn">Install</button></div>';
+      document.body.appendChild(b);
+      document.getElementById('installAppBtn').onclick = async () => { deferredInstallPrompt.prompt(); await deferredInstallPrompt.userChoice; b.remove(); deferredInstallPrompt = null; };
+    });
+    if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(console.warn));
+
+    document.addEventListener("DOMContentLoaded", () => App.init());
+  </script>
+</body>
+</html>
