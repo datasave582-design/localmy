@@ -1,0 +1,24 @@
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": "auth != null && (auth.uid === 'PASTE_YOUR_ADMIN_FIREBASE_UID_HERE')",
+    "users": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || auth.uid === 'PASTE_YOUR_ADMIN_FIREBASE_UID_HERE')",
+        ".write": "auth != null && (auth.uid === $uid || auth.uid === 'PASTE_YOUR_ADMIN_FIREBASE_UID_HERE')"
+      }
+    },
+    "posts": {
+      ".read": "auth != null",
+      "$id": {
+        ".write": "auth != null && (auth.uid === 'PASTE_YOUR_ADMIN_FIREBASE_UID_HERE' || (data.exists() && data.child('uid').val() === auth.uid) || (newData.exists() && newData.child('uid').val() === auth.uid))"
+      }
+    },
+    "messages": { "$id": { ".read": "auth != null", ".write": "auth != null" } },
+    "chat": { "$id": { ".read": "auth != null", ".write": "auth != null" } },
+    "orders": { "$id": { ".read": "auth != null && (auth.uid === 'PASTE_YOUR_ADMIN_FIREBASE_UID_HERE' || data.child('uid').val() === auth.uid || data.child('userId').val() === auth.uid)", ".write": "auth != null" } },
+    "adminTickets": { "$id": { ".read": "auth != null && auth.uid === 'PASTE_YOUR_ADMIN_FIREBASE_UID_HERE'", ".write": "auth != null" } },
+    "settings": { ".read": "auth != null", ".write": "auth != null && auth.uid === 'PASTE_YOUR_ADMIN_FIREBASE_UID_HERE'" },
+    "superadmin": { ".read": "auth != null && auth.uid === 'PASTE_YOUR_ADMIN_FIREBASE_UID_HERE'", ".write": "auth != null && auth.uid === 'PASTE_YOUR_ADMIN_FIREBASE_UID_HERE'" }
+  }
+}
