@@ -1,13 +1,14 @@
 
 <html lang="hi" data-bs-theme="light">
 <head>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+  <link rel="apple-touch-icon" href="./icon-192.png">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ApnaLocal SuperApp — Pro Security, Festival Wishing & Tools Hub</title>
+  <title>MyLocal — अपना Local Super App</title>
   <meta name="theme-color" content="#0d6efd">
-  <meta name="description" content="ApnaLocal SuperApp — local market, festival wishes, PDF/image tools, resume builder aur community.">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="description" content="MyLocal — अपना लोकल सुपर ऐप — local market, jobs, chat, weather aur security tools.">
 
   <!-- CSS Dependencies -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -109,16 +110,6 @@
     .chat-bubble-other { background: rgba(108, 117, 125, 0.15); border-radius: 15px 15px 15px 0px; max-width: 80%; border: 1px solid var(--glass-border); }
     #map-container { height: 280px; width: 100%; border-radius: 12px; z-index: 1; }
     .weather-header-badge { background: linear-gradient(135deg, #0d6efd, #0dcaf0); color: white; border-radius: 20px; padding: 4px 10px; font-size: 0.8rem; }
-    .weather-day-toggle .chevron-ic { transition: transform .2s ease; color: #adb5bd; }
-    .weather-day-toggle[aria-expanded="true"] .chevron-ic { transform: rotate(180deg); }
-    .hourly-chip { min-width: 58px; border-radius: 14px; background: rgba(13,110,253,0.07); }
-    [data-bs-theme="dark"] .hourly-chip { background: rgba(13,202,240,0.10); }
-    .hourly-chip-label { color: #6c757d; font-size: 0.66rem; }
-    .hourly-chip-temp { font-size: 0.82rem; }
-    .hourly-chip-humid { color: var(--primary-color); font-size: 0.62rem; }
-    .hourly-chip-rain { color: #0dcaf0; font-size: 0.62rem; }
-    .hourly-chip.is-now { background: var(--primary-color); }
-    .hourly-chip.is-now .hourly-chip-label, .hourly-chip.is-now .hourly-chip-humid, .hourly-chip.is-now .hourly-chip-rain, .hourly-chip.is-now .hourly-chip-temp { color: #fff; }
     .order-badge { position: absolute; top: -5px; right: -5px; background: #dc3545; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; }
     .security-score-ring { width: 85px; height: 85px; border-radius: 50%; background: conic-gradient(#198754 0% 88%, #dee2e6 88% 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(25, 135, 84, 0.2); }
     .security-score-inner { width: 70px; height: 70px; border-radius: 50%; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; font-size: 0.95rem; }
@@ -142,20 +133,30 @@
     .progress-sm{height:7px}
     .apna-link-card{transition:.2s;cursor:pointer}
     .apna-link-card:hover{transform:translateY(-2px)}
-      .age-pro-card{background:linear-gradient(135deg,rgba(13,110,253,.06),rgba(111,66,193,.06));border:1px solid rgba(13,110,253,.16)}
-    .age-stat{border:1px solid var(--glass-border);border-radius:16px;padding:16px;background:rgba(255,255,255,.45)}
-    [data-bs-theme="dark"] .age-stat{background:rgba(0,0,0,.12)}
-    .age-stat .num{font-size:2rem;font-weight:800;color:#0d6efd}
   </style>
 </head>
 <body>
+
+  <!-- AREA LOCK GATE: full-screen overlay shown until the user's location is verified -->
+  <div id="area-gate" style="position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#0d6efd,#1a1a2e);color:#fff;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;">
+    <div id="area-gate-content" style="max-width:420px;">
+      <i class="bi bi-shield-shaded" style="font-size:2.5rem;"></i>
+      <h4 class="fw-bold mt-2 mb-3">MyLocal</h4>
+      <div class="spinner-border text-light mb-3" style="width:2.5rem;height:2.5rem;"></div>
+      <h6 class="fw-bold">आपका स्थान जांचा जा रहा है...</h6>
+      <p class="small opacity-75 mb-0">यह ऐप केवल एक तय स्थानीय क्षेत्र के लिए उपलब्ध है।</p>
+    </div>
+  </div>
 
   <!-- HEADER -->
   <header class="navbar navbar-expand border-bottom sticky-top shadow-sm px-2 px-md-3 bg-body">
     <div class="container-fluid p-0">
       <a class="navbar-brand fw-bold text-primary d-flex align-items-center me-2" href="#" onclick="App.navigate('feed');return false;">
         <i class="bi bi-shield-shaded fs-4 me-1 text-primary"></i>
-        <span class="fs-6 fs-md-5">ApnaLocal SuperApp</span>
+        <span class="d-flex flex-column lh-1">
+          <span class="fs-6 fs-md-5">MyLocal</span>
+          <span class="d-none d-sm-inline text-secondary fw-normal" style="font-size:0.62rem;">अपना Local Super App</span>
+        </span>
       </a>
 
       <div class="d-flex align-items-center gap-2 me-auto">
@@ -190,8 +191,10 @@
         <button class="btn btn-sm btn-link text-decoration-none text-secondary tab-btn" id="tb-chat" onclick="App.navigate('chat');return false;"><i class="bi bi-chat-dots-fill"></i> चैट</button>
         <button class="btn btn-sm btn-link text-decoration-none text-secondary tab-btn" id="tb-weather" onclick="App.navigate('weather');return false;"><i class="bi bi-cloud-rain-heavy-fill"></i> मौसम</button>
         <button class="btn btn-sm btn-link text-decoration-none text-secondary tab-btn" id="tb-converter" onclick="App.navigate('converter');return false;"><i class="bi bi-arrow-left-right"></i> यूनिट कन्वर्टर</button>
+        <button class="btn btn-sm btn-link text-decoration-none text-secondary tab-btn" id="tb-age" onclick="App.navigate('age');return false;"><i class="bi bi-calendar-heart-fill"></i> आयु कैलकुलेटर</button>
+        <button class="btn btn-sm btn-link text-decoration-none text-secondary tab-btn" id="tb-jobs" onclick="App.navigate('jobs');return false;"><i class="bi bi-briefcase-fill"></i> नौकरी व सरकारी काम</button>
+        <button class="btn btn-sm btn-link text-decoration-none text-secondary tab-btn" id="tb-localjob" onclick="App.navigate('localjob');return false;"><i class="bi bi-person-workspace"></i> लोकल काम-काज</button>
         <button class="btn btn-sm btn-link text-decoration-none text-secondary tab-btn" id="tb-tools" onclick="App.navigate('tools');return false;"><i class="bi bi-grid-3x3-gap-fill"></i> टूल्स & सुरक्षा</button>
-         <button class="btn btn-sm btn-link text-decoration-none text-secondary tab-btn" id="tb-age" onclick="App.navigate('age');return false;"><i class="bi bi-calendar-heart-fill"></i> Age Calculator</button>
       </div>
     </div>
   </div>
@@ -203,11 +206,10 @@
   <nav class="mobile-bottom-nav">
     <a href="javascript:void(0)" class="nav-item active" id="mn-feed" onclick="App.navigate('feed');return false;"><i class="bi bi-house-fill fs-5"></i><span>होम</span></a>
     <a href="javascript:void(0)" class="nav-item" id="mn-market" onclick="App.navigate('market');return false;"><i class="bi bi-bag-check fs-5"></i><span>मार्केट</span></a>
+    <a href="javascript:void(0)" class="nav-item" id="mn-jobs" onclick="App.navigate('jobs');return false;"><i class="bi bi-briefcase fs-5"></i><span>नौकरी</span></a>
+    <a href="javascript:void(0)" class="nav-item" id="mn-localjob" onclick="App.navigate('localjob');return false;"><i class="bi bi-person-workspace fs-5"></i><span>काम-काज</span></a>
     <a href="javascript:void(0)" class="nav-item" id="mn-chat" onclick="App.navigate('chat');return false;"><i class="bi bi-chat-dots fs-5"></i><span>चैट</span></a>
-    <a href="javascript:void(0)" class="nav-item" id="mn-weather" onclick="App.navigate('weather');return false;"><i class="bi bi-cloud-sun fs-5"></i><span>मौसम</span></a>
-    <a href="javascript:void(0)" class="nav-item" id="mn-converter" onclick="App.navigate('converter');return false;"><i class="bi bi-arrow-left-right fs-5"></i><span>कन्वर्टर</span></a>
     <a href="javascript:void(0)" class="nav-item" id="mn-tools" onclick="App.navigate('tools');return false;"><i class="bi bi-tools fs-5"></i><span>टूल्स</span></a>
-    <a href="javascript:void(0)" class="nav-item" id="mn-age" onclick="App.navigate('age');return false;"><i class="bi bi-calendar-heart fs-5"></i><span>उम्र</span></a>
   </nav>
 
   <!-- SCAN & REMEDIATION MODAL -->
@@ -333,6 +335,43 @@
     </div>
   </div>
 
+  <!-- LOCAL JOB POST MODAL -->
+  <div class="modal fade" id="localJobModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content glass-card">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold" id="localJobModalTitle"><i class="bi bi-person-workspace text-primary me-2"></i>पोस्ट करें</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form onsubmit="LocalJobEngine.submitPost(event)">
+            <input type="hidden" id="lj-kind">
+            <div class="mb-2">
+              <label class="form-label small fw-bold">श्रेणी (Category)</label>
+              <select id="lj-category" class="form-select">
+                <option value="मिस्त्री / कारीगर">मिस्त्री / कारीगर</option>
+                <option value="ड्राइवर">ड्राइवर</option>
+                <option value="हाउस हेल्प / मेड">हाउस हेल्प / मेड</option>
+                <option value="डिलीवरी">डिलीवरी</option>
+                <option value="दुकान / सेल्स">दुकान / सेल्स</option>
+                <option value="बागवानी / खेती मजदूर">बागवानी / खेती मजदूर</option>
+                <option value="अन्य">अन्य</option>
+              </select>
+            </div>
+            <div class="mb-2"><input type="text" id="lj-title" class="form-control" placeholder="शीर्षक (जैसे: प्लंबर चाहिए / मुझे ड्राइविंग का काम चाहिए)" required></div>
+            <div class="mb-2"><textarea id="lj-desc" class="form-control" rows="3" placeholder="विवरण..." required></textarea></div>
+            <div class="row g-2 mb-2">
+              <div class="col-6"><input type="text" id="lj-wage" class="form-control" placeholder="मजदूरी/वेतन (वैकल्पिक)"></div>
+              <div class="col-6"><input type="text" id="lj-location" class="form-control" placeholder="इलाका / जगह"></div>
+            </div>
+            <div class="mb-3"><input type="tel" id="lj-phone" class="form-control" placeholder="संपर्क मोबाइल नंबर" pattern="[0-9]{10}" required></div>
+            <button type="submit" class="btn btn-primary w-100 fw-bold">पोस्ट करें</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- EXTRA DOCUMENT/PDF LIBRARIES -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -349,6 +388,11 @@
     const esc = s => String(s ?? "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
 
     /* ========================================================================
+       SELF-CONTAINED PWA SETUP — no separate icon/manifest files needed.
+       Builds the app icon + web manifest in-memory and attaches them so
+       "Add to Home Screen" / install prompts work from this single HTML file.
+       ======================================================================== */
+/* ========================================================================
        1. FIREBASE & STATE ENGINE
        ======================================================================== */
     const firebaseConfig = {
@@ -383,21 +427,16 @@
 
     const State = {
       user: JSON.parse(localStorage.getItem("app_user")) || null,
-      location: (() => {
-        try {
-          const saved = JSON.parse(localStorage.getItem("app_location"));
-          return saved && saved.source === "manual" ? saved : { lat: 0, lng: 0, label: "लोकेशन सेट करें", source: "none", accuracy: null };
-        } catch (e) { return { lat: 0, lng: 0, label: "लोकेशन सेट करें", source: "none", accuracy: null }; }
-      })(),
+      location: JSON.parse(localStorage.getItem("app_location")) || { lat: 28.6139, lng: 77.2090, label: "नई दिल्ली" },
       weatherData: null,
       weeklyForecast: null,
       hourlyForecast: null,
-      activeRoomCode: "GLOBAL",
+      activeRoomCode: null,
       orders: JSON.parse(localStorage.getItem("app_orders")) || [],
       posts: JSON.parse(localStorage.getItem("app_posts")) || [
-        { id: "p101", type: "market_sell", title: "Honda Activa 6G", price: 52000, desc: "बेहतरीन स्थिति, संपर्क करें।", author: "ApnaLocal Admin", avatar: "https://picsum.photos/101", img: "https://picsum.photos/400/250?random=11", status: "APPROVED", isAdminPost: true, time: new Date().toLocaleDateString(), likes: 5 }
+        { id: "p101", type: "market_sell", title: "Honda Activa 6G", price: 52000, desc: "बेहतरीन स्थिति, संपर्क करें।", author: "MyLocal Admin", avatar: "https://picsum.photos/101", img: "https://picsum.photos/400/250?random=11", status: "APPROVED", isAdminPost: true, time: new Date().toLocaleDateString(), likes: 5 }
       ],
-      chatMessages: JSON.parse(localStorage.getItem("app_chat")) || [{ room: "GLOBAL", sender: "एडमिन", text: "ApnaLocal ऐप में स्वागत है!", time: "10:00 AM" }],
+      chatMessages: JSON.parse(localStorage.getItem("app_chat")) || [],
       khataEntries: JSON.parse(localStorage.getItem("app_khata")) || [],
       adminTickets: JSON.parse(localStorage.getItem("app_admin_tickets")) || []
     };
@@ -405,10 +444,22 @@
       if (!State.user) State.user = { uid: "guest_" + Date.now(), name: "गेस्ट यूज़र", phone: "", avatar: "https://picsum.photos/100", isGuest: true };
       return State.user;
     }
-    function savePosts() {
+    /* IMPORTANT: never overwrite the whole "posts"/"orders" collection with a local
+       array — if two people act at the same time, whoever saves last would wipe out
+       everyone else's changes. Always write/remove ONE keyed item at a time. */
+    function savePostsLocal() {
       localStorage.setItem("app_posts", JSON.stringify(State.posts));
-      if (isFirebaseReady) { try { db.ref("posts").set(State.posts); } catch (e) {} }
     }
+    function syncPostUpsert(post) {
+      savePostsLocal();
+      if (isFirebaseReady) db.ref("posts/" + post.id).set(post).catch(e => console.warn("Post sync failed (check Firebase rules):", e.message));
+    }
+    function syncPostDelete(id) {
+      savePostsLocal();
+      if (isFirebaseReady) db.ref("posts/" + id).remove().catch(e => console.warn("Post delete sync failed:", e.message));
+    }
+    // Back-compat alias used in a few places that only need the localStorage write.
+    function savePosts() { savePostsLocal(); }
 
     /* Home search: searches market products + community posts by title/desc/author. */
     const HomeSearch = {
@@ -417,10 +468,92 @@
       clear() { this.query = ""; App.refresh(); }
     };
 
+    let activeChatRef = null;
+    let activeChatValueHandler = null;
+    function detachChatListener() {
+      if (activeChatRef && activeChatValueHandler) {
+        activeChatRef.off("value", activeChatValueHandler);
+      }
+      activeChatRef = null;
+      activeChatValueHandler = null;
+      State.chatMessages = [];
+    }
+    let engagementCache = { likes: {}, shares: {}, comments: {} };
+    function applyEngagementToPosts() {
+      const uid = State.user && !State.user.isGuest ? State.user.uid : null;
+      State.posts.forEach(p => {
+        const likes = engagementCache.likes[p.id] || {};
+        const comments = engagementCache.comments[p.id] || {};
+        p.likes = Object.keys(likes).length;
+        p._liked = !!(uid && likes[uid]);
+        p.shares = Number(engagementCache.shares[p.id] || 0);
+        p.comments = Object.values(comments)
+          .sort((a,b) => Number(a.createdAt||0) - Number(b.createdAt||0))
+          .slice(-10)
+          .map(c => ({uid:c.uid, user:c.user, avatar:c.avatar, text:c.text, time:c.createdAt ? new Date(c.createdAt).toLocaleString('hi-IN') : ''}));
+      });
+      localStorage.setItem('app_posts', JSON.stringify(State.posts));
+      App.refresh();
+    }
+    let engagementListenerAttached = false;
+    function attachEngagementRealtime() {
+      if (!isFirebaseReady || engagementListenerAttached) return;
+      engagementListenerAttached = true;
+      db.ref('engagement').on('value', snap => {
+        const v = snap.val() || {};
+        engagementCache = {likes:v.likes || {}, shares:v.shares || {}, comments:v.comments || {}};
+        applyEngagementToPosts();
+      }, err => console.warn('engagement realtime error:', err.message));
+    }
+
+    async function loadPostEngagement(posts) {
+      if (!isFirebaseReady) return;
+      const uid = State.user && !State.user.isGuest ? State.user.uid : null;
+      await Promise.all(posts.slice(0,80).map(async p => {
+        try {
+          const [likesSnap, sharesSnap, commentsSnap] = await Promise.all([
+            db.ref('engagement/likes/' + p.id).once('value'),
+            db.ref('engagement/shares/' + p.id).once('value'),
+            db.ref('engagement/comments/' + p.id).limitToLast(3).once('value')
+          ]);
+          p.likes = likesSnap.numChildren();
+          p.shares = Number(sharesSnap.val() || 0);
+          p._liked = !!(uid && likesSnap.val() && likesSnap.val()[uid]);
+          p.comments = commentsSnap.val() ? Object.values(commentsSnap.val()).map(c => ({user:c.user,text:c.text,time:c.createdAt})) : [];
+        } catch(e) {}
+      }));
+    }
+
+    function attachChatListener(roomCode) {
+      detachChatListener();
+      if (!isFirebaseReady || !roomCode || !State.user || State.user.isGuest) return;
+      const code = roomCode.replace(/^PRIVATE_/, "");
+      const path = "rooms/" + code + "/messages";
+      activeChatRef = db.ref(path);
+      activeChatValueHandler = snap => {
+        State.chatMessages = snap.val() ? Object.entries(snap.val()).map(([id, m]) => ({ id, ...m })).sort((a,b) => Number(a.createdAt||0)-Number(b.createdAt||0)) : [];
+        App.refresh();
+      };
+      activeChatRef.on("value", activeChatValueHandler, err => {
+        console.warn("Private chat listener error:", err.message);
+        State.chatMessages = [];
+        App.refresh();
+      });
+    }
+
     if (isFirebaseReady) {
-      db.ref("posts").on("value", (snap) => { if (snap.val()) { State.posts = Object.values(snap.val()); App.refresh(); } });
-      db.ref("orders").on("value", (snap) => { if (snap.val()) { State.orders = Object.values(snap.val()); App.refresh(); } });
-      db.ref("chat").on("value", (snap) => { if (snap.val()) { State.chatMessages = Object.values(snap.val()); App.refresh(); } });
+      db.ref("posts").on("value", async (snap) => { State.posts = snap.val() ? Object.values(snap.val()) : []; localStorage.setItem("app_posts", JSON.stringify(State.posts)); App.refresh(); await loadPostEngagement(State.posts); applyEngagementToPosts(); }, (err) => console.warn("posts sync error (check Firebase rules):", err.message));
+      attachEngagementRealtime();
+      let userOrdersRef = null;
+      let userOrdersHandler = null;
+      function attachUserOrdersListener() {
+        if (userOrdersRef && userOrdersHandler) userOrdersRef.off('value', userOrdersHandler);
+        userOrdersRef = null; userOrdersHandler = null;
+        if (!auth.currentUser || !auth.currentUser.uid) return;
+        userOrdersRef = db.ref('orders').orderByChild('buyerUid').equalTo(auth.currentUser.uid);
+        userOrdersHandler = snap => { State.orders = snap.val() ? Object.values(snap.val()) : []; localStorage.setItem('app_orders', JSON.stringify(State.orders)); App.refresh(); };
+        userOrdersRef.on('value', userOrdersHandler, err => console.warn('orders sync error:', err.message));
+      }
       db.ref("settings/advertising").on("value", (snap) => {
         const ad = snap.val();
         if (ad) localStorage.setItem("apnalocal_admin_ad", JSON.stringify(ad));
@@ -433,231 +566,169 @@
        2. WEATHER & LOCATION ENGINE
        ======================================================================== */
     const WeatherEngine = {
+      selectedDay: 0,
       async fetch7DayWeather(lat, lng) {
         try {
-          const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weathercode,wind_speed_10m,is_day&hourly=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation_probability,weathercode,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,relative_humidity_2m_mean,precipitation_probability_max,wind_speed_10m_max,weathercode&forecast_days=7&timezone=auto`);
+          const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current_weather=true&hourly=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation_probability,windspeed_10m,winddirection_10m,weathercode&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode,sunrise,sunset,windspeed_10m_max&timezone=auto&forecast_days=7`);
           const data = await res.json();
-          if (data && data.daily && data.hourly && data.current) {
-            State.weatherData = data.current;
+          if (data && data.daily && data.hourly) {
+            State.weatherData = data.current_weather;
             State.weeklyForecast = data.daily;
             State.hourlyForecast = data.hourly;
-            document.getElementById("lbl-weather-temp").textContent = `${Math.round(data.current.temperature_2m)}°C`;
+            document.getElementById("lbl-weather-temp").textContent = `${Math.round(data.current_weather.temperature)}°C`;
             if (App.currentTab === "weather") App.refresh();
           }
         } catch (err) { console.warn("Weather error"); }
       },
       getWeatherText(code) {
         const map = {
-          0: { label: "साफ आसमान", icon: "bi-sun-fill text-warning" },
-          1: { label: "मुख्यतः साफ", icon: "bi-cloud-sun-fill text-warning" },
-          2: { label: "हल्के बादल", icon: "bi-cloud-sun text-info" },
-          3: { label: "घने बादल", icon: "bi-clouds-fill text-secondary" },
-          45: { label: "कोहरा", icon: "bi-cloud-fog2-fill text-secondary" },
-          48: { label: "घना कोहरा", icon: "bi-cloud-fog2-fill text-secondary" },
-          51: { label: "हल्की बूंदाबांदी", icon: "bi-cloud-drizzle-fill text-primary" },
-          53: { label: "बूंदाबांदी", icon: "bi-cloud-drizzle-fill text-primary" },
-          55: { label: "तेज़ बूंदाबांदी", icon: "bi-cloud-drizzle-fill text-primary" },
-          56: { label: "जमने वाली बूंदाबांदी", icon: "bi-cloud-sleet-fill text-info" },
-          57: { label: "तेज़ जमने वाली बूंदाबांदी", icon: "bi-cloud-sleet-fill text-info" },
-          61: { label: "हल्की बारिश", icon: "bi-cloud-rain-fill text-primary" },
-          63: { label: "मध्यम बारिश", icon: "bi-cloud-rain-heavy-fill text-primary" },
-          65: { label: "तेज़ बारिश", icon: "bi-cloud-rain-heavy-fill text-primary" },
-          66: { label: "जमने वाली बारिश", icon: "bi-cloud-sleet-fill text-info" },
-          67: { label: "तेज़ जमने वाली बारिश", icon: "bi-cloud-sleet-fill text-info" },
-          71: { label: "हल्की बर्फ़बारी", icon: "bi-cloud-snow-fill text-info" },
-          73: { label: "मध्यम बर्फ़बारी", icon: "bi-cloud-snow-fill text-info" },
-          75: { label: "भारी बर्फ़बारी", icon: "bi-cloud-snow-fill text-info" },
-          77: { label: "बर्फ के कण", icon: "bi-cloud-snow-fill text-info" },
-          80: { label: "हल्की बौछारें", icon: "bi-cloud-rain-fill text-primary" },
-          81: { label: "मध्यम बौछारें", icon: "bi-cloud-rain-heavy-fill text-primary" },
-          82: { label: "तेज़ बौछारें", icon: "bi-cloud-rain-heavy-fill text-danger" },
-          85: { label: "हल्की बर्फ़ बौछारें", icon: "bi-cloud-snow-fill text-info" },
-          86: { label: "तेज़ बर्फ़ बौछारें", icon: "bi-cloud-snow-fill text-info" },
-          95: { label: "तूफानी बारिश", icon: "bi-cloud-lightning-fill text-danger" },
-          96: { label: "ओलों के साथ तूफान", icon: "bi-cloud-lightning-rain-fill text-danger" },
-          99: { label: "भारी ओलों संग तूफान", icon: "bi-cloud-lightning-rain-fill text-danger" }
+          0: { label: "साफ आसमान", icon: "bi-sun-fill text-warning" }, 1: { label: "मुख्यतः साफ", icon: "bi-cloud-sun-fill text-warning" },
+          2: { label: "हल्के बादल", icon: "bi-cloud-sun text-info" }, 3: { label: "घने बादल", icon: "bi-clouds-fill text-secondary" },
+          45: { label: "कोहरा", icon: "bi-cloud-fog2-fill text-secondary" }, 48: { label: "घना कोहरा", icon: "bi-cloud-fog2-fill text-secondary" },
+          51: { label: "हल्की बूंदाबांदी", icon: "bi-cloud-drizzle-fill text-info" }, 61: { label: "हल्की बारिश", icon: "bi-cloud-rain-fill text-primary" },
+          63: { label: "मध्यम बारिश", icon: "bi-cloud-rain-heavy-fill text-primary" }, 65: { label: "तेज़ बारिश", icon: "bi-cloud-rain-heavy-fill text-primary" },
+          71: { label: "हल्की बर्फ़बारी", icon: "bi-snow text-info" }, 80: { label: "बौछारें", icon: "bi-cloud-rain-fill text-primary" },
+          95: { label: "तूफानी बारिश", icon: "bi-cloud-lightning-fill text-danger" }, 96: { label: "ओलावृष्टि के साथ तूफान", icon: "bi-cloud-lightning-rain-fill text-danger" }
         };
         return map[code] || { label: "सामान्य मौसम", icon: "bi-cloud-fill text-primary" };
       },
-      formatDayLabel(dateStr, idx) {
-        if (idx === 0) return "आज";
-        if (idx === 1) return "कल";
-        const days = ["रवि", "सोम", "मंगल", "बुध", "गुरु", "शुक्र", "शनि"];
-        const d = new Date(dateStr + "T12:00:00");
-        return `${days[d.getDay()]}, ${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`;
+      windDir(deg) {
+        const dirs = ['उत्तर', 'उत्तर-पूर्व', 'पूर्व', 'दक्षिण-पूर्व', 'दक्षिण', 'दक्षिण-पश्चिम', 'पश्चिम', 'उत्तर-पश्चिम'];
+        return dirs[Math.round(deg / 45) % 8];
       },
-      renderHourlyStrip(dayIndex) {
-        const h = State.hourlyForecast;
-        if (!h || !h.time || !h.time.length) return '<div class="text-secondary small py-2">Hourly डेटा उपलब्ध नहीं है।</div>';
-        const start = dayIndex * 24, nowHour = new Date().getHours();
-        let out = "";
-        for (let j = start; j < start + 24 && j < h.time.length; j++) {
-          const hh = parseInt(h.time[j].split("T")[1].split(":")[0], 10);
-          const label = hh === 0 ? "12 AM" : hh < 12 ? `${hh} AM` : hh === 12 ? "12 PM" : `${hh - 12} PM`;
-          const hw = this.getWeatherText(h.weathercode[j]);
-          const isNow = dayIndex === 0 && hh === nowHour;
-          const rp = h.precipitation_probability ? Math.round(h.precipitation_probability[j]) : null;
-          out += `<div class="text-center flex-shrink-0 py-2 px-1 hourly-chip${isNow ? ' is-now' : ''}">
-            <small class="d-block hourly-chip-label">${isNow ? 'अभी' : label}</small>
-            <i class="bi ${hw.icon} d-block my-1"></i>
-            <div class="fw-bold hourly-chip-temp">${Math.round(h.temperature_2m[j])}°</div>
-            <div class="hourly-chip-humid">💧${Math.round(h.relative_humidity_2m[j])}%</div>
-            ${rp !== null && rp >= 10 ? `<div class="hourly-chip-rain">☔${rp}%</div>` : ''}
-          </div>`;
-        }
-        return out;
-      },
+      selectDay(i) { this.selectedDay = i; App.refresh(); },
       render7DayView() {
         if (!State.weeklyForecast || !State.hourlyForecast) return `<div class="card glass-card p-4 text-center"><div class="spinner-border text-primary my-3"></div><h6>मौसम डेटा लोड हो रहा है...</h6></div>`;
-        const daily = State.weeklyForecast, curr = State.weatherData;
-        const curW = this.getWeatherText(curr.weathercode);
-        let html = `<div class="card glass-card text-white p-4 mb-3" style="background: linear-gradient(135deg, #0d6efd, #0dcaf0);">
-          <div class="d-flex justify-content-between align-items-start">
-            <div><h4 class="fw-bold mb-0">${esc(State.location.label)}</h4><p class="small mb-0 text-white-50">${curW.label}</p></div>
-            <h1 class="display-4 fw-bold mb-0">${Math.round(curr.temperature_2m)}°C</h1>
-          </div>
-          <div class="d-flex gap-3 gap-md-4 mt-3 pt-3 border-top border-white border-opacity-25 flex-wrap small">
-            <span><i class="bi bi-thermometer-half me-1"></i>महसूस ${Math.round(curr.apparent_temperature)}°C</span>
-            <span><i class="bi bi-droplet-half me-1"></i>नमी ${Math.round(curr.relative_humidity_2m)}%</span>
-            <span><i class="bi bi-wind me-1"></i>हवा ${Math.round(curr.wind_speed_10m)} km/h</span>
-          </div>
-        </div>
-        <h5 class="fw-bold text-primary mb-3"><i class="bi bi-calendar-week-fill me-2"></i>अगले 7 दिनों का पूर्वानुमान — घंटे-दर-घंटे</h5>`;
-        for (let i = 0; i < daily.time.length; i++) {
-          const w = this.getWeatherText(daily.weathercode[i]);
-          const humid = daily.relative_humidity_2m_mean ? Math.round(daily.relative_humidity_2m_mean[i]) : null;
-          const rain = daily.precipitation_probability_max ? Math.round(daily.precipitation_probability_max[i]) : null;
-          const windMax = daily.wind_speed_10m_max ? Math.round(daily.wind_speed_10m_max[i]) : null;
-          const feelMax = daily.apparent_temperature_max ? Math.round(daily.apparent_temperature_max[i]) : null;
-          const feelMin = daily.apparent_temperature_min ? Math.round(daily.apparent_temperature_min[i]) : null;
-          const expanded = i === 0;
-          html += `<div class="card glass-card mb-2 weather-day-card overflow-hidden">
-            <div class="p-3 d-flex align-items-center justify-content-between weather-day-toggle" style="cursor:pointer;" role="button" data-bs-toggle="collapse" data-bs-target="#hr-day-${i}" aria-expanded="${expanded}" aria-controls="hr-day-${i}">
-              <div class="d-flex align-items-center gap-3">
-                <i class="bi ${w.icon} fs-2"></i>
-                <div>
-                  <h6 class="mb-0 fw-bold">${this.formatDayLabel(daily.time[i], i)}</h6>
-                  <small class="text-secondary">${w.label}${humid !== null ? ` · 💧${humid}%` : ''}${rain !== null ? ` · ☔${rain}%` : ''}</small>
-                </div>
+        const daily = State.weeklyForecast, hourly = State.hourlyForecast, curr = State.weatherData;
+        const nowIdx = hourly.time.findIndex(t => new Date(t) >= new Date());
+        const nowHumidity = hourly.relative_humidity_2m[nowIdx] ?? hourly.relative_humidity_2m[0];
+        const nowFeels = hourly.apparent_temperature[nowIdx] ?? hourly.apparent_temperature[0];
+        const nowWind = curr.windspeed ?? hourly.windspeed_10m[nowIdx];
+        const nowWindDeg = curr.winddirection ?? hourly.winddirection_10m[nowIdx];
+        const w = this.getWeatherText(curr.weathercode ?? daily.weathercode[0]);
+
+        let html = `
+          <div class="card glass-card text-white p-4 mb-3" style="background: linear-gradient(135deg, #0d6efd, #0dcaf0);">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+              <div>
+                <h4 class="fw-bold mb-0">${esc(State.location.label)}</h4>
+                <p class="small mb-1 text-white-50"><i class="bi ${w.icon}"></i> ${w.label}</p>
+                <p class="small mb-0 text-white-50">महसूस हो रहा है: <b>${Math.round(nowFeels)}°C</b></p>
               </div>
-              <div class="text-end d-flex align-items-center gap-2">
-                <div class="fw-bold fs-5">${Math.round(daily.temperature_2m_max[i])}° <span class="text-secondary fs-6">/${Math.round(daily.temperature_2m_min[i])}°</span></div>
-                <i class="bi bi-chevron-down chevron-ic"></i>
-              </div>
+              <h1 class="display-4 fw-bold mb-0">${Math.round(curr.temperature)}°C</h1>
             </div>
-            <div class="collapse${expanded ? ' show' : ''}" id="hr-day-${i}">
-              <div class="border-top px-3 py-3">
-                <div class="d-flex gap-3 flex-wrap small text-secondary mb-2">
-                  ${feelMax !== null ? `<span><i class="bi bi-thermometer-half me-1"></i>महसूस ${feelMin}° / ${feelMax}°C</span>` : ''}
-                  ${windMax !== null ? `<span><i class="bi bi-wind me-1"></i>हवा अधिकतम ${windMax} km/h</span>` : ''}
-                </div>
-                <div class="text-secondary mb-2" style="font-size:0.72rem;"><i class="bi bi-clock-history me-1"></i>घंटे-दर-घंटे (24 घंटे) — साइड में स्क्रॉल करें</div>
-                <div class="d-flex gap-2 overflow-auto pb-1">${this.renderHourlyStrip(i)}</div>
-              </div>
+            <div class="row g-2 mt-3 pt-3 border-top border-light border-opacity-25 text-center">
+              <div class="col-4"><i class="bi bi-wind d-block fs-5"></i><div class="small">${Math.round(nowWind)} km/h</div><div class="small text-white-50" style="font-size:0.68rem;">${this.windDir(nowWindDeg)} हवा</div></div>
+              <div class="col-4"><i class="bi bi-droplet-half d-block fs-5"></i><div class="small">${Math.round(nowHumidity)}%</div><div class="small text-white-50" style="font-size:0.68rem;">नमी (Humidity)</div></div>
+              <div class="col-4"><i class="bi bi-cloud-rain d-block fs-5"></i><div class="small">${daily.precipitation_probability_max[0]}%</div><div class="small text-white-50" style="font-size:0.68rem;">बारिश की संभावना</div></div>
             </div>
-          </div>`;
-        }
+          </div>
+
+          <h5 class="fw-bold text-primary mb-2"><i class="bi bi-calendar-week-fill me-2"></i>अगले 7 दिन</h5>
+          <div class="subnav-scroll mb-3">
+            ${daily.time.map((d, i) => {
+              const dw = this.getWeatherText(daily.weathercode[i]);
+              const dayLabel = i === 0 ? 'आज' : new Date(d).toLocaleDateString('hi-IN', { weekday: 'short' });
+              return `<button class="btn btn-sm tab-btn ${i === this.selectedDay ? 'text-primary fw-bold' : 'text-secondary'}" onclick="WeatherEngine.selectDay(${i})">
+                <i class="bi ${dw.icon}"></i> ${dayLabel} ${Math.round(daily.temperature_2m_max[i])}°/${Math.round(daily.temperature_2m_min[i])}°
+              </button>`;
+            }).join('')}
+          </div>
+        `;
+
+        const dayDate = daily.time[this.selectedDay];
+        const dw = this.getWeatherText(daily.weathercode[this.selectedDay]);
+        html += `
+          <div class="card glass-card p-3 mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="fw-bold mb-0">${this.selectedDay === 0 ? 'आज' : new Date(dayDate).toLocaleDateString('hi-IN', { weekday: 'long', day: '2-digit', month: 'long' })}</h6>
+              <span class="badge bg-primary bg-opacity-10 text-primary"><i class="bi ${dw.icon}"></i> ${dw.label}</span>
+            </div>
+            <div class="row g-2 small text-secondary mb-2">
+              <div class="col-6"><i class="bi bi-thermometer-half me-1"></i>अधिकतम/न्यूनतम: <b>${Math.round(daily.temperature_2m_max[this.selectedDay])}° / ${Math.round(daily.temperature_2m_min[this.selectedDay])}°C</b></div>
+              <div class="col-6"><i class="bi bi-wind me-1"></i>अधिकतम हवा: <b>${Math.round(daily.windspeed_10m_max[this.selectedDay])} km/h</b></div>
+              <div class="col-6"><i class="bi bi-sunrise me-1"></i>सूर्योदय: <b>${new Date(daily.sunrise[this.selectedDay]).toLocaleTimeString('hi-IN', { hour: '2-digit', minute: '2-digit' })}</b></div>
+              <div class="col-6"><i class="bi bi-sunset me-1"></i>सूर्यास्त: <b>${new Date(daily.sunset[this.selectedDay]).toLocaleTimeString('hi-IN', { hour: '2-digit', minute: '2-digit' })}</b></div>
+            </div>
+          </div>
+          <h6 class="fw-bold text-primary mb-2"><i class="bi bi-clock-history me-2"></i>घंटे-दर-घंटे पूर्वानुमान</h6>
+          <div class="subnav-scroll" style="gap:10px;">
+        `;
+
+        const dayStr = dayDate; // yyyy-mm-dd
+        hourly.time.forEach((t, idx) => {
+          if (!t.startsWith(dayStr)) return;
+          const hw = this.getWeatherText(hourly.weathercode[idx]);
+          const hourLabel = new Date(t).toLocaleTimeString('hi-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+          const isNow = idx === nowIdx;
+          html += `
+            <div class="card glass-card p-2 text-center flex-shrink-0 ${isNow ? 'border-primary' : ''}" style="min-width:92px;scroll-snap-align:start;">
+              <div class="small fw-bold ${isNow ? 'text-primary' : ''}">${isNow ? 'अभी' : hourLabel}</div>
+              <i class="bi ${hw.icon} fs-4 my-1"></i>
+              <div class="fw-bold">${Math.round(hourly.temperature_2m[idx])}°</div>
+              <div class="small text-secondary" style="font-size:0.68rem;">${Math.round(hourly.apparent_temperature[idx])}° feels</div>
+              <div class="small text-secondary" style="font-size:0.65rem;"><i class="bi bi-droplet-half"></i> ${hourly.relative_humidity_2m[idx]}%</div>
+              <div class="small text-secondary" style="font-size:0.65rem;"><i class="bi bi-wind"></i> ${Math.round(hourly.windspeed_10m[idx])}km/h</div>
+              ${hourly.precipitation_probability[idx] > 0 ? `<div class="small text-primary" style="font-size:0.65rem;"><i class="bi bi-cloud-rain"></i> ${hourly.precipitation_probability[idx]}%</div>` : ''}
+            </div>
+          `;
+        });
+        html += `</div>`;
         return html;
       }
     };
 
     let leafletMap = null, leafletMarker = null;
     const LocationEngine = {
-      gpsOptions: { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 },
-      async reverseGeocode(lat, lng) {
-        try {
-          const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lng)}&zoom=18&addressdetails=1`, { headers: { Accept: "application/json" } });
-          if (!r.ok) return "GPS Location";
-          const d = await r.json();
-          const a = d.address || {};
-          return a.village || a.town || a.city || a.municipality || a.suburb || a.county || d.display_name?.split(",")[0] || "GPS Location";
-        } catch (e) { return "GPS Location"; }
-      },
-      async applyGPS(pos, updateMap = true) {
-        const accuracy = Number(pos.coords.accuracy);
-        const lat = Number(pos.coords.latitude), lng = Number(pos.coords.longitude);
-        const label = await this.reverseGeocode(lat, lng);
-        State.location = { lat, lng, label, source: "gps", accuracy: Number.isFinite(accuracy) ? accuracy : null };
-        localStorage.setItem("app_location", JSON.stringify(State.location));
-        const lbl = document.getElementById("lbl-location");
-        if (lbl) lbl.textContent = label;
-        if (updateMap && leafletMap && leafletMarker) {
-          leafletMap.setView([lat, lng], 16);
-          leafletMarker.setLatLng([lat, lng]);
-        }
-        await WeatherEngine.fetch7DayWeather(lat, lng);
-        if (App.currentTab === "weather") App.refresh();
-        return State.location;
-      },
-      showGPSError(err) {
-        const code = err?.code;
-        const msg = code === 1 ? "Location permission Allow करें।" : code === 2 ? "GPS location नहीं मिल सकी। Windows/Chrome Location ON करें।" : "GPS location लेने में समय लग रहा है। फिर कोशिश करें।";
-        console.warn("Geolocation error:", msg, err);
-        const lbl = document.getElementById("lbl-location");
-        if (lbl && (!State.location || State.location.source !== "manual")) lbl.textContent = "लोकेशन सेट करें";
-      },
       initAutoGPS() {
-        if (!navigator.geolocation) {
-          const lbl=document.getElementById("lbl-location"); if(lbl) lbl.textContent="लोकेशन सेट करें";
+        if (window.__gateVerifiedPosition) {
+          const pos = window.__gateVerifiedPosition;
+          State.location = { lat: pos.coords.latitude, lng: pos.coords.longitude, label: "GPS Location" };
+          localStorage.setItem("app_location", JSON.stringify(State.location));
+          document.getElementById("lbl-location").textContent = State.location.label;
+          WeatherEngine.fetch7DayWeather(State.location.lat, State.location.lng);
           return;
         }
-        navigator.geolocation.getCurrentPosition(
-          pos => this.applyGPS(pos, false),
-          err => {
-            this.showGPSError(err);
-            // Do not silently reuse an old/stale GPS location such as Meerut.
-            if (State.location?.source === "manual") WeatherEngine.fetch7DayWeather(State.location.lat, State.location.lng);
-          },
-          this.gpsOptions
-        );
+        if ("geolocation" in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              State.location = { lat: pos.coords.latitude, lng: pos.coords.longitude, label: "GPS Location" };
+              localStorage.setItem("app_location", JSON.stringify(State.location));
+              document.getElementById("lbl-location").textContent = State.location.label;
+              WeatherEngine.fetch7DayWeather(State.location.lat, State.location.lng);
+            },
+            () => WeatherEngine.fetch7DayWeather(State.location.lat, State.location.lng)
+          );
+        } else { WeatherEngine.fetch7DayWeather(State.location.lat, State.location.lng); }
       },
       openModal() {
         const modal = new bootstrap.Modal(document.getElementById("locationModal"));
         modal.show();
         document.getElementById("locationModal").addEventListener('shown.bs.modal', () => {
           if (!leafletMap) {
-            const lat = Number.isFinite(Number(State.location.lat)) && State.location.lat !== 0 ? State.location.lat : 28.6139;
-            const lng = Number.isFinite(Number(State.location.lng)) && State.location.lng !== 0 ? State.location.lng : 77.2090;
-            leafletMap = L.map('map-container').setView([lat, lng], State.location.source === "manual" ? 13 : 5);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(leafletMap);
-            leafletMarker = L.marker([lat, lng], { draggable: true }).addTo(leafletMap);
-            leafletMarker.on('dragend', () => {
-              const ll = leafletMarker.getLatLng();
-              State.location = { lat: ll.lat, lng: ll.lng, label: "Map Location", source: "manual", accuracy: null };
-            });
-          } else {
-            const lat = Number(State.location.lat), lng = Number(State.location.lng);
-            if (State.location.source === "manual" && Number.isFinite(lat) && Number.isFinite(lng)) { leafletMap.setView([lat,lng],13); leafletMarker.setLatLng([lat,lng]); }
-            leafletMap.invalidateSize();
-          }
+            leafletMap = L.map('map-container').setView([State.location.lat, State.location.lng], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(leafletMap);
+            leafletMarker = L.marker([State.location.lat, State.location.lng], { draggable: true }).addTo(leafletMap);
+          } else { leafletMap.setView([State.location.lat, State.location.lng], 13); leafletMarker.setLatLng([State.location.lat, State.location.lng]); leafletMap.invalidateSize(); }
         }, { once: true });
       },
       getGPS() {
-        if (!navigator.geolocation) { alert("इस device/browser में GPS उपलब्ध नहीं है।"); return; }
-        const btn = document.querySelector('#locationModal button[onclick="LocationEngine.getGPS()"]');
-        if(btn){btn.disabled=true;btn.innerHTML='<span class="spinner-border spinner-border-sm me-1"></span>GPS खोज रहा है...';}
-        navigator.geolocation.getCurrentPosition(
-          pos => { this.applyGPS(pos, true).finally(() => { if(btn){btn.disabled=false;btn.innerHTML='<i class="bi bi-crosshair me-1"></i>ऑटो GPS';} }); },
-          err => { this.showGPSError(err); if(btn){btn.disabled=false;btn.innerHTML='<i class="bi bi-crosshair me-1"></i>ऑटो GPS';} alert("सही GPS location नहीं मिली। Chrome/Windows Location ON करके फिर कोशिश करें।"); },
-          this.gpsOptions
-        );
+        navigator.geolocation.getCurrentPosition((pos) => {
+          State.location = { lat: pos.coords.latitude, lng: pos.coords.longitude, label: "GPS Location" };
+          if (leafletMap) { leafletMap.setView([State.location.lat, State.location.lng], 15); leafletMarker.setLatLng([State.location.lat, State.location.lng]); }
+        });
       },
       searchLocation() {
-        const q = document.getElementById("txt-search-loc").value.trim();
+        const q = document.getElementById("txt-search-loc").value;
         if (!q) return;
-        fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&q=${encodeURIComponent(q)}`, { headers: { Accept: "application/json" } }).then(r => r.json()).then(d => {
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`).then(r => r.json()).then(d => {
           if (d.length > 0) {
-            const x=d[0];
-            State.location = { lat: parseFloat(x.lat), lng: parseFloat(x.lon), label: x.display_name.split(',')[0], source: "manual", accuracy: null };
-            if (leafletMap) { leafletMap.setView([State.location.lat, State.location.lng], 15); leafletMarker.setLatLng([State.location.lat, State.location.lng]); }
+            State.location = { lat: parseFloat(d[0].lat), lng: parseFloat(d[0].lon), label: d[0].display_name.split(',')[0] };
+            if (leafletMap) { leafletMap.setView([State.location.lat, State.location.lng], 14); leafletMarker.setLatLng([State.location.lat, State.location.lng]); }
           }
-        }).catch(()=>alert("Location search नहीं हो सकी। Internet connection check करें।"));
+        });
       },
       confirmMapLocation() {
-        if (!State.location || !Number.isFinite(Number(State.location.lat)) || !Number.isFinite(Number(State.location.lng)) || (State.location.lat === 0 && State.location.lng === 0)) {
-          alert("पहले GPS या Search से location चुनें।"); return;
-        }
-        State.location.source = "manual";
         localStorage.setItem("app_location", JSON.stringify(State.location));
         document.getElementById("lbl-location").textContent = State.location.label;
         WeatherEngine.fetch7DayWeather(State.location.lat, State.location.lng);
@@ -871,7 +942,169 @@
     };
 
     /* ========================================================================
-       5. HELP ENGINE (user-facing — send a help request to Admin)
+       5. AGE CALCULATOR ENGINE (professional — full breakdown)
+       ======================================================================== */
+    const AgeCalcEngine = {
+      zodiac(d, m) {
+        const table = [[20,'मकर (Capricorn) ♑'],[19,'कुंभ (Aquarius) ♒'],[21,'मीन (Pisces) ♓'],[20,'मेष (Aries) ♈'],[21,'वृषभ (Taurus) ♉'],[21,'मिथुन (Gemini) ♊'],[23,'कर्क (Cancer) ♋'],[23,'सिंह (Leo) ♌'],[23,'कन्या (Virgo) ♍'],[23,'तुला (Libra) ♎'],[22,'वृश्चिक (Scorpio) ♏'],[22,'धनु (Sagittarius) ♐']];
+        const idx = m - 1;
+        return d <= table[idx][0] ? table[(idx + 11) % 12][1] : table[idx][1];
+      },
+      calculate() {
+        const val = document.getElementById("age-dob")?.value;
+        const out = document.getElementById("age-result");
+        if (!val) { out.innerHTML = `<div class="text-center text-secondary py-4"><i class="bi bi-calendar-event fs-1 d-block mb-2"></i>अपनी जन्मतिथि चुनें</div>`; return; }
+        const dob = new Date(val + "T00:00:00");
+        const today = new Date();
+        if (dob > today) { out.innerHTML = `<div class="alert alert-danger mb-0">जन्मतिथि भविष्य की नहीं हो सकती।</div>`; return; }
+
+        let y = today.getFullYear() - dob.getFullYear();
+        let m = today.getMonth() - dob.getMonth();
+        let d = today.getDate() - dob.getDate();
+        if (d < 0) { m--; d += new Date(today.getFullYear(), today.getMonth(), 0).getDate(); }
+        if (m < 0) { y--; m += 12; }
+
+        const totalDays = Math.floor((today - dob) / 86400000);
+        const totalWeeks = Math.floor(totalDays / 7);
+        const totalMonths = y * 12 + m;
+        const totalHours = totalDays * 24;
+
+        let next = new Date(today.getFullYear(), dob.getMonth(), dob.getDate());
+        if (next < new Date(today.getFullYear(), today.getMonth(), today.getDate())) next.setFullYear(next.getFullYear() + 1);
+        const daysToNext = Math.ceil((next - today) / 86400000);
+        const isBirthdayToday = dob.getDate() === today.getDate() && dob.getMonth() === today.getMonth();
+
+        const dayNames = ['रविवार', 'सोमवार', 'मंगलवार', 'बुधवार', 'गुरुवार', 'शुक्रवार', 'शनिवार'];
+        const bornDay = dayNames[dob.getDay()];
+
+        out.innerHTML = `
+          ${isBirthdayToday ? `<div class="alert alert-warning text-center fw-bold mb-3">🎉 आज आपका जन्मदिन है! जन्मदिन मुबारक हो! 🎂</div>` : ''}
+          <div class="row g-2 text-center mb-3">
+            <div class="col-4"><div class="p-3 rounded-4 bg-primary bg-opacity-10 border border-primary"><div class="fs-2 fw-black text-primary">${y}</div><div class="small text-secondary">वर्ष</div></div></div>
+            <div class="col-4"><div class="p-3 rounded-4 bg-success bg-opacity-10 border border-success"><div class="fs-2 fw-black text-success">${m}</div><div class="small text-secondary">महीने</div></div></div>
+            <div class="col-4"><div class="p-3 rounded-4 bg-warning bg-opacity-10 border border-warning"><div class="fs-2 fw-black text-warning">${d}</div><div class="small text-secondary">दिन</div></div></div>
+          </div>
+          <div class="card glass-card p-3 mb-2">
+            <div class="row g-2 small">
+              <div class="col-6"><i class="bi bi-calendar-week text-primary me-1"></i>जन्म का दिन: <b>${bornDay}</b></div>
+              <div class="col-6"><i class="bi bi-stars text-primary me-1"></i>राशि: <b>${this.zodiac(dob.getDate(), dob.getMonth() + 1)}</b></div>
+              <div class="col-6"><i class="bi bi-hourglass-split text-primary me-1"></i>कुल दिन: <b>${totalDays.toLocaleString('en-IN')}</b></div>
+              <div class="col-6"><i class="bi bi-calendar3 text-primary me-1"></i>कुल हफ्ते: <b>${totalWeeks.toLocaleString('en-IN')}</b></div>
+              <div class="col-6"><i class="bi bi-calendar2-month text-primary me-1"></i>कुल महीने: <b>${totalMonths.toLocaleString('en-IN')}</b></div>
+              <div class="col-6"><i class="bi bi-clock-history text-primary me-1"></i>कुल घंटे: <b>${totalHours.toLocaleString('en-IN')}</b></div>
+            </div>
+          </div>
+          <div class="alert ${isBirthdayToday ? 'alert-success' : 'alert-info'} mb-0 text-center">
+            <i class="bi bi-gift-fill me-1"></i> ${isBirthdayToday ? 'जन्मदिन आज है!' : `अगला जन्मदिन <b>${daysToNext}</b> दिन में (${next.toLocaleDateString('hi-IN', { day: '2-digit', month: 'long' })})`}
+          </div>
+        `;
+      },
+      render() {
+        return `<div class="card glass-card p-3 p-md-4">
+          <div class="enh-hero rounded-4 p-4 mb-3">
+            <span class="badge bg-white text-primary mb-2">PRECISE & INSTANT</span>
+            <h3 class="fw-bold mb-1">🎂 आयु कैलकुलेटर</h3>
+            <p class="mb-0 opacity-75">अपनी सटीक उम्र वर्ष, महीने और दिन में जानें — साथ ही अगला जन्मदिन कब है, यह भी देखें।</p>
+          </div>
+          <label class="form-label small fw-bold">अपनी जन्मतिथि चुनें</label>
+          <div class="input-group mb-3">
+            <span class="input-group-text"><i class="bi bi-calendar-date-fill text-primary"></i></span>
+            <input type="date" id="age-dob" class="form-control form-control-lg" max="${new Date().toISOString().split('T')[0]}" onchange="AgeCalcEngine.calculate()">
+            <button class="btn btn-primary fw-bold" onclick="AgeCalcEngine.calculate()">गणना करें</button>
+          </div>
+          <div id="age-result"><div class="text-center text-secondary py-4"><i class="bi bi-calendar-event fs-1 d-block mb-2"></i>अपनी जन्मतिथि चुनें</div></div>
+        </div>`;
+      }
+    };
+
+    /* ========================================================================
+       6. LOCAL JOB ENGINE (community job board — anyone can search / post)
+       ======================================================================== */
+    const LocalJobEngine = {
+      filter: 'all',
+      query: '',
+      openPostModal(kind) {
+        document.getElementById('lj-kind').value = kind;
+        document.getElementById('localJobModalTitle').innerHTML = kind === 'offer'
+          ? '<i class="bi bi-briefcase-fill text-primary me-2"></i>काम / नौकरी की पेशकश करें'
+          : '<i class="bi bi-person-raised-hand text-success me-2"></i>काम चाहिए — पोस्ट करें';
+        new bootstrap.Modal(document.getElementById('localJobModal')).show();
+      },
+      submitPost(e) {
+        e.preventDefault();
+        const kind = document.getElementById('lj-kind').value;
+        const post = {
+          id: 'lj_' + Date.now(),
+          type: kind === 'offer' ? 'local_job_offer' : 'local_job_seek',
+          title: document.getElementById('lj-title').value,
+          category: document.getElementById('lj-category').value,
+          desc: document.getElementById('lj-desc').value,
+          wage: document.getElementById('lj-wage').value,
+          location: document.getElementById('lj-location').value,
+          phone: document.getElementById('lj-phone').value,
+          author: getUser().name, avatar: getUser().avatar,
+          status: 'APPROVED', isAdminPost: false,
+          time: new Date().toLocaleDateString(), likes: 0
+        };
+        State.posts.unshift(post);
+        syncPostUpsert(post);
+        bootstrap.Modal.getInstance(document.getElementById('localJobModal')).hide();
+        e.target.reset();
+        App.refresh();
+      },
+      setFilter(f) { this.filter = f; App.refresh(); },
+      run(q) { this.query = (q || '').trim(); App.refresh(); },
+      render() {
+        let items = State.posts.filter(p => (p.type === 'local_job_offer' || p.type === 'local_job_seek') && p.status === 'APPROVED');
+        if (this.filter === 'offer') items = items.filter(p => p.type === 'local_job_offer');
+        if (this.filter === 'seek') items = items.filter(p => p.type === 'local_job_seek');
+        if (this.query) { const q = this.query.toLowerCase(); items = items.filter(p => [p.title, p.desc, p.category, p.location].join(' ').toLowerCase().includes(q)); }
+        return `
+          <div class="enh-hero rounded-4 p-4 mb-3">
+            <span class="badge bg-white text-primary mb-2">COMMUNITY JOB BOARD</span>
+            <h3 class="fw-bold mb-1">🧰 लोकल काम-काज</h3>
+            <p class="mb-0 opacity-75">अपने इलाके में काम दें, काम पाएं — कोई भी सर्च और पोस्ट कर सकता है।</p>
+          </div>
+          <div class="card glass-card p-3 mb-3">
+            <div class="input-group mb-3">
+              <span class="input-group-text bg-body border-0"><i class="bi bi-search text-primary"></i></span>
+              <input type="text" id="lj-search-input" class="form-control border-0" placeholder="काम खोजें... (जैसे: ड्राइवर, प्लंबर)" value="${esc(this.query)}" onkeydown="if(event.key==='Enter'){LocalJobEngine.run(this.value);}">
+              <button class="btn btn-primary" onclick="LocalJobEngine.run(document.getElementById('lj-search-input').value)"><i class="bi bi-arrow-right"></i></button>
+            </div>
+            <div class="d-flex gap-2 flex-wrap mb-3">
+              <button class="btn btn-sm ${this.filter === 'all' ? 'btn-primary' : 'btn-outline-primary'} rounded-pill" onclick="LocalJobEngine.setFilter('all')">सभी</button>
+              <button class="btn btn-sm ${this.filter === 'offer' ? 'btn-primary' : 'btn-outline-primary'} rounded-pill" onclick="LocalJobEngine.setFilter('offer')">काम है (Offer)</button>
+              <button class="btn btn-sm ${this.filter === 'seek' ? 'btn-success' : 'btn-outline-success'} rounded-pill" onclick="LocalJobEngine.setFilter('seek')">काम चाहिए (Seeking)</button>
+            </div>
+            <div class="row g-2">
+              <div class="col-6"><button class="btn btn-primary w-100 fw-bold" onclick="LocalJobEngine.openPostModal('offer')"><i class="bi bi-briefcase-fill me-1"></i> काम की पेशकश करें</button></div>
+              <div class="col-6"><button class="btn btn-success w-100 fw-bold" onclick="LocalJobEngine.openPostModal('seek')"><i class="bi bi-person-raised-hand me-1"></i> मुझे काम चाहिए</button></div>
+            </div>
+          </div>
+          ${items.length === 0 ? `<div class="text-center text-secondary py-5"><i class="bi bi-inbox fs-1 d-block mb-2"></i>अभी कोई पोस्ट नहीं है — सबसे पहले आप पोस्ट करें!</div>` : items.map(p => `
+            <div class="card glass-card p-3 mb-2 ${p.type === 'local_job_offer' ? 'border-primary' : 'border-success'}">
+              <div>
+                <span class="badge ${p.type === 'local_job_offer' ? 'bg-primary' : 'bg-success'}">${p.type === 'local_job_offer' ? 'काम है' : 'काम चाहिए'}</span>
+                ${p.category ? `<span class="badge bg-secondary">${esc(p.category)}</span>` : ''}
+                <h6 class="fw-bold mt-1 mb-0">${esc(p.title)}</h6>
+              </div>
+              <p class="small mt-2 mb-2">${esc(p.desc)}</p>
+              <div class="row g-1 small text-secondary">
+                ${p.wage ? `<div class="col-6"><i class="bi bi-cash-coin me-1"></i>${esc(p.wage)}</div>` : ''}
+                ${p.location ? `<div class="col-6"><i class="bi bi-geo-alt-fill me-1"></i>${esc(p.location)}</div>` : ''}
+              </div>
+              <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top flex-wrap gap-2">
+                <span class="small text-secondary">${esc(p.author)} • ${p.time}</span>
+                <a href="tel:${esc(p.phone)}" class="btn btn-sm btn-outline-primary fw-bold"><i class="bi bi-telephone-fill me-1"></i> कॉल करें</a>
+              </div>
+            </div>
+          `).join('')}
+        `;
+      }
+    };
+
+    /* ========================================================================
+       7. HELP ENGINE (user-facing — send a help request to Admin)
        ======================================================================== */
     const HelpEngine = {
       askAdmin() {
@@ -887,7 +1120,7 @@
     };
 
     /* ========================================================================
-       6. ORDER ENGINE (admin products = order form + GPS, user products = chat)
+       7. ORDER ENGINE (admin products = order form + GPS, user products = chat)
        ======================================================================== */
     const OrderEngine = {
       openBuyModal(prodId) {
@@ -932,18 +1165,23 @@
       submitOrder(e) {
         e.preventDefault();
         const newOrder = {
-          orderId: "ORD" + Math.floor(1000 + Math.random() * 9000),
+          orderId: "ORD" + Date.now().toString().slice(-8),
           prodTitle: document.getElementById("order-prod-title").textContent,
           price: document.getElementById("order-prod-price").textContent,
           userName: document.getElementById("order-user-name").value,
           userPhone: document.getElementById("order-user-phone").value,
           userAddress: document.getElementById("order-user-address").value,
+          buyerUid: State.user && !State.user.isGuest ? State.user.uid : null,
+          productId: document.getElementById("order-prod-id").value,
           buyerLocation: window._buyerLocation || null,
           status: "NEW", timestamp: new Date().toLocaleString()
         };
         State.orders.unshift(newOrder);
         localStorage.setItem("app_orders", JSON.stringify(State.orders));
-        if (isFirebaseReady) { try { db.ref("orders").set(State.orders); db.ref("superadmin/orders/" + newOrder.orderId).set(newOrder); } catch (err) {} }
+        if (isFirebaseReady) {
+          db.ref("orders/" + newOrder.orderId).set(newOrder).catch(e => console.warn("Order sync failed:", e.message));
+          db.ref("superadmin/orders/" + newOrder.orderId).set(newOrder).catch(() => {});
+        }
         bootstrap.Modal.getInstance(document.getElementById("buyModal")).hide();
         alert("ऑर्डर एडमिन को भेज दिया गया है!");
       }
@@ -993,7 +1231,7 @@
                   </div>
                 </div>
                 <div class="mt-3 pt-2 border-top">
-                  <button class="btn btn-success w-100 fw-bold py-2 shadow-sm" onclick="SecurityEngine.runQuickScan()"><i class="bi bi-shield-shaded me-2"></i> वन-टैप क्विक स्कैन (Browser Security Scan)</button>
+                  <button class="btn btn-success w-100 fw-bold py-2 shadow-sm" onclick="SecurityEngine.runQuickScan()"><i class="bi bi-shield-shaded me-2"></i> वन-टैप क्विक स्कैन (Quick Virus & Malware Scan)</button>
                 </div>
               </div>
             </div>
@@ -1036,7 +1274,7 @@
             </div>
             <div class="col-md-6">
               <div class="card glass-card p-3 h-100">
-                <h5 class="fw-bold text-danger"><i class="bi bi-file-earmark-pdf-fill me-2"></i>पीडीएफ / डॉक्यूमेंट टूल्स</h5>
+                <h5 class="fw-bold text-danger"><i class="bi bi-file-earmark-pdf-fill me-2"></i>पीडीएफ जनरेटर</h5>
                 <input type="text" id="pdf-title" class="form-control form-control-sm mb-2" placeholder="दस्तावेज शीर्षक">
                 <textarea id="pdf-content" class="form-control form-control-sm mb-2" rows="2" placeholder="टेक्स्ट दर्ज करें..."></textarea>
                 <button class="btn btn-danger btn-sm w-100 fw-bold" onclick="ToolsEngine.generatePDF()"><i class="bi bi-download me-1"></i> पीडीएफ डाउनलोड</button>
@@ -1093,23 +1331,52 @@
       showAccountMenu() {
         if (confirm(`लॉग इन: ${State.user.name}\n\nलॉगआउट करें?`)) this.logout();
       },
-      logout() {
+      async logout() {
+        detachChatListener();
+        try { if (isFirebaseReady && auth) await auth.signOut(); } catch (e) {}
         State.user = null;
+        State.activeRoomCode = null;
         localStorage.removeItem("app_user");
         this.refreshAuthUI();
         App.refresh();
       },
-      loginGoogle() {
-        if (!isFirebaseReady) return alert("Firebase उपलब्ध नहीं है, गेस्ट लॉगिन उपयोग करें।");
-        auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then((res) => {
-          State.user = { uid: res.user.uid, name: res.user.displayName, phone: res.user.phoneNumber || "", avatar: res.user.photoURL, isGuest: false };
+      async loginGoogle() {
+        if (!isFirebaseReady) return alert("Firebase उपलब्ध नहीं है।");
+        if (window.__googleLoginBusy) return;
+        window.__googleLoginBusy = true;
+        try {
+          const provider = new firebase.auth.GoogleAuthProvider();
+          provider.setCustomParameters({ prompt: "select_account" });
+          const res = await auth.signInWithPopup(provider);
+          State.user = {
+            uid: res.user.uid,
+            name: res.user.displayName || "MyLocal User",
+            phone: res.user.phoneNumber || "",
+            avatar: res.user.photoURL || "https://picsum.photos/100",
+            email: res.user.email || "",
+            isGuest: false
+          };
           localStorage.setItem("app_user", JSON.stringify(State.user));
-          bootstrap.Modal.getInstance(document.getElementById("authModal")).hide();
+          await db.ref("users/" + res.user.uid).update({
+            uid: res.user.uid, name: State.user.name, email: State.user.email,
+            avatar: State.user.avatar, lastSeen: firebase.database.ServerValue.TIMESTAMP
+          });
+          applyEngagementToPosts();
+          bootstrap.Modal.getInstance(document.getElementById("authModal"))?.hide();
           this.refreshAuthUI();
           App.refresh();
-        }).catch(err => alert("Google login failed: " + (err.message || err)));
+        } catch (err) {
+          console.error("Google login failed", err);
+          if (err.code !== 'auth/cancelled-popup-request') {
+            const code = err && err.code ? `\nCode: ${err.code}` : "";
+            alert("Google login failed: " + (err.message || err) + code);
+          }
+        } finally {
+          window.__googleLoginBusy = false;
+        }
       },
       loginGuest() {
+        if (typeof attachUserOrdersListener === 'function') { try { attachUserOrdersListener(); } catch(e) {} }
         State.user = { uid: "g_" + Date.now(), name: "Guest_" + Math.floor(Math.random() * 100), phone: "", avatar: "https://picsum.photos/100", isGuest: true };
         localStorage.setItem("app_user", JSON.stringify(State.user));
         bootstrap.Modal.getInstance(document.getElementById("authModal")).hide();
@@ -1130,55 +1397,6 @@
     /* ========================================================================
        10. APP ROUTER & VIEWS
        ======================================================================== */
-
-    const AgeCalculator = {
-      render() {
-        return `<div class="row g-3">
-          <div class="col-12"><div class="card glass-card age-pro-card p-4">
-            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-              <div><h3 class="fw-bold text-primary mb-1"><i class="bi bi-calendar-heart-fill me-2"></i>Professional Age Calculator</h3>
-              <p class="text-secondary mb-0">जन्म तारीख से आपकी exact age और अगला birthday निकालें।</p></div>
-              <span class="badge bg-primary px-3 py-2">AGE CALCULATOR</span>
-            </div>
-            <div class="row g-3">
-              <div class="col-md-5"><label class="form-label fw-bold">🎂 जन्म तारीख</label><input id="age-dob" type="date" class="form-control form-control-lg"></div>
-              <div class="col-md-5"><label class="form-label fw-bold">📅 किस तारीख तक?</label><input id="age-asof" type="date" class="form-control form-control-lg"></div>
-              <div class="col-md-2 d-grid"><button class="btn btn-primary btn-lg" onclick="AgeCalculator.calculate()"><i class="bi bi-calculator-fill me-1"></i> Calculate</button></div>
-            </div>
-            <div id="age-output" class="mt-4"></div>
-          </div></div>
-        </div>`;
-      },
-      init() {
-        const asof=document.getElementById("age-asof");
-        if(asof&&!asof.value){const d=new Date();asof.value=d.toISOString().slice(0,10);}
-      },
-      calculate() {
-        const dobv=document.getElementById("age-dob")?.value, asofv=document.getElementById("age-asof")?.value, out=document.getElementById("age-output");
-        if(!out)return;
-        if(!dobv){out.innerHTML='<div class="alert alert-info">पहले जन्म तारीख चुनें।</div>';return;}
-        const dob=new Date(dobv+"T00:00:00"), asof=new Date((asofv||new Date().toISOString().slice(0,10))+"T00:00:00");
-        if(dob>asof){out.innerHTML='<div class="alert alert-danger">जन्म तारीख, गणना तारीख से आगे नहीं हो सकती।</div>';return;}
-        let y=asof.getFullYear()-dob.getFullYear(),m=asof.getMonth()-dob.getMonth(),d=asof.getDate()-dob.getDate();
-        if(d<0){d+=new Date(asof.getFullYear(),asof.getMonth(),0).getDate();m--;}
-        if(m<0){m+=12;y--;}
-        const totalDays=Math.floor((asof-dob)/86400000), totalMonths=y*12+m;
-        const totalWeeks=Math.floor(totalDays/7), totalHours=totalDays*24, totalMinutes=totalHours*60;
-        let next=new Date(asof.getFullYear(),dob.getMonth(),dob.getDate());
-        if(next<asof)next.setFullYear(asof.getFullYear()+1);
-        const daysLeft=Math.ceil((next-asof)/86400000);
-        out.innerHTML=`<div class="row g-2">
-          <div class="col-4 col-md-2"><div class="age-stat text-center"><div class="num">${y}</div><div>साल</div></div></div>
-          <div class="col-4 col-md-2"><div class="age-stat text-center"><div class="num">${m}</div><div>महीने</div></div></div>
-          <div class="col-4 col-md-2"><div class="age-stat text-center"><div class="num">${d}</div><div>दिन</div></div></div>
-          <div class="col-6 col-md-2"><div class="age-stat text-center"><div class="num fs-4">${totalDays.toLocaleString("en-IN")}</div><div>कुल दिन</div></div></div>
-          <div class="col-6 col-md-2"><div class="age-stat text-center"><div class="num fs-4">${totalMonths.toLocaleString("en-IN")}</div><div>कुल महीने</div></div></div>
-          <div class="col-12 col-md-2"><div class="age-stat text-center"><div class="num fs-4">${totalWeeks.toLocaleString("en-IN")}</div><div>कुल सप्ताह</div></div></div>
-        </div>
-        <div class="alert alert-primary mt-3 mb-0"><b>🎉 अगला जन्मदिन:</b> ${next.toLocaleDateString("hi-IN")} — ${daysLeft===0?"आज!":daysLeft+" दिन बाकी"}<br><small>कुल घंटे: ${totalHours.toLocaleString("en-IN")} · कुल मिनट: ${totalMinutes.toLocaleString("en-IN")} · जन्म का दिन: ${dob.toLocaleDateString("hi-IN",{weekday:"long"})}</small></div>`;
-      }
-    };
-
     const App = {
       currentTab: "feed",
       init() {
@@ -1189,7 +1407,7 @@
         this.navigate("feed");
       },
       navigate(tab) {
-        const allowed = ['feed', 'market', 'chat', 'weather', 'converter', 'tools', 'age'];
+        const allowed = ['feed', 'market', 'chat', 'weather', 'converter', 'age', 'jobs', 'localjob', 'tools'];
         if (!allowed.includes(tab)) tab = 'feed';
         this.currentTab = tab;
         document.querySelectorAll(".tab-btn").forEach(b => { b.classList.remove("text-primary", "fw-bold"); b.classList.add("text-secondary"); });
@@ -1212,21 +1430,27 @@
           else if (this.currentTab === "chat") content = this.renderChat();
           else if (this.currentTab === "weather") content = WeatherEngine.render7DayView();
           else if (this.currentTab === "converter") content = UnitConverterEngine.render();
+          else if (this.currentTab === "age") content = AgeCalcEngine.render();
+          else if (this.currentTab === "jobs") content = this.renderJobs();
+          else if (this.currentTab === "localjob") content = LocalJobEngine.render();
           else if (this.currentTab === "tools") content = ToolsEngine.renderToolsView();
-          else if (this.currentTab === "age") content = AgeCalculator.render();
           else content = this.renderHome();
         } catch (err) {
-          console.error("ApnaLocal render error:", err);
+          console.error("MyLocal render error:", err);
           content = `<div class="alert alert-danger rounded-4"><b>Section load error</b><br><small>${esc(err.message || err)}</small></div>`;
         }
         view.innerHTML = content || '<div class="text-center text-secondary py-5">इस section में अभी content नहीं है।</div>';
         view.classList.remove("view-fade"); void view.offsetWidth; view.classList.add("view-fade");
         if (this.currentTab === "chat") this.scrollToBottom();
         if (this.currentTab === "tools") { const u = document.getElementById('resumeUpload'); if (u) u.addEventListener('change', e => ProTools.loadResume(e)); }
-        if (this.currentTab === "age") AgeCalculator.init();
       },
       scrollToBottom() { setTimeout(() => { const cw = document.getElementById('chat-window-scroll'); if (cw) cw.scrollTop = cw.scrollHeight; }, 50); },
-      switchChatRoom(room) { State.activeRoomCode = room; this.refresh(); },
+      switchChatRoom(room) {
+        detachChatListener(); detachProductChatListener();
+        State.activeRoomCode = room; State._productChat = null;
+        if (room && room.startsWith('PRIVATE_')) attachChatListener(room);
+        this.refresh();
+      },
       renderHome() {
         let ad = null; try { ad = JSON.parse(localStorage.getItem("apnalocal_admin_ad") || "null"); } catch (e) {}
         return `
@@ -1287,40 +1511,44 @@
         ${matches.length ? this.renderPosts(matches) : ''}`;
       },
       renderChat() {
-        const room = State.activeRoomCode || 'GLOBAL';
-        if (room.startsWith('PRODUCT_')) {
+        if (!State.user || State.user.isGuest) {
+          return `<div class="enh-hero rounded-4 p-4 mb-3"><span class="badge bg-white text-primary mb-2">LOGIN REQUIRED</span><h3 class="fw-bold mb-1">🔒 Private Chat</h3><p class="mb-0 opacity-75">Private chat के लिए Google Login जरूरी है। इससे Firebase आपकी chat को सही user के साथ secure रख सकता है।</p></div><div class="card glass-card p-4 text-center"><i class="bi bi-google text-danger" style="font-size:3rem;"></i><h5 class="fw-bold mt-2">पहले Google Login करें</h5><button class="btn btn-danger fw-bold" onclick="AuthEngine.openAuthModal()">Google से Login</button></div>`;
+        }
+        const room = State.activeRoomCode;
+        if (room && room.startsWith('PRODUCT_')) {
           const p = State._productChat || State.posts.find(x => 'PRODUCT_' + x.id === room);
-          const msgs = State.chatMessages.filter(m => (m.room || 'GLOBAL') === room);
+          if (!p) return `<div class=\"alert alert-warning\">Product chat उपलब्ध नहीं है।</div>`;
+          const msgs = State.chatMessages;
           return `<div class="card glass-card border-primary">
             <div class="card-header bg-transparent d-flex justify-content-between align-items-center border-bottom pb-2">
               <div class="fw-bold text-primary"><i class="bi bi-chat-dots-fill me-2"></i>Seller Chat</div>
-              <button class="btn btn-sm btn-outline-primary" onclick="App.switchChatRoom('GLOBAL')">Community</button>
+              <button class="btn btn-sm btn-outline-secondary" onclick="App.switchChatRoom(null)">बाहर निकलें</button>
             </div>
-            <div class="small text-secondary px-3 pt-2">Product: <b>${esc(p?.title || 'Product')}</b> · ₹${p?.price || 0}</div>
+            <div class="small text-secondary px-3 pt-2">Product: <b>${esc(p?.title || 'Product')}</b> · ₹${esc(p?.price || 0)}</div>
             <div class="card-body overflow-auto p-3" id="chat-window-scroll" style="height:380px;">
-              ${msgs.map(m => `<div class="d-flex flex-column mb-2 ${m.sender === getUser().name ? 'align-items-end' : 'align-items-start'}"><span class="small text-secondary fw-bold">${esc(m.sender)}</span><div class="p-2 ${m.sender === getUser().name ? 'chat-bubble-me' : 'chat-bubble-other'}">${esc(m.text)}</div></div>`).join('')}
+              ${msgs.length ? msgs.map(m => { const mine = m.senderUid === getUser().uid; return `<div class="d-flex flex-column mb-2 ${mine ? 'align-items-end' : 'align-items-start'}"><span class="small text-secondary fw-bold">${esc(m.sender)}</span><div class="p-2 ${mine ? 'chat-bubble-me' : 'chat-bubble-other'}">${esc(m.text)}</div></div>`; }).join('') : '<div class="text-center text-secondary py-5">अभी कोई message नहीं।</div>'}
             </div>
             <div class="card-footer bg-transparent"><div class="input-group">
-              <input type="text" id="txt-chat" class="form-control" placeholder="Seller को message..." onkeyup="if(event.key==='Enter') App.sendChat()">
+              <input type="text" id="txt-chat" class="form-control" placeholder="Message लिखें..." onkeyup="if(event.key==='Enter') App.sendChat()">
               <button class="btn btn-primary" onclick="App.sendChat()"><i class="bi bi-send-fill"></i></button>
             </div></div>
           </div>`;
         }
-        if (room.startsWith('PRIVATE_')) {
+        if (room && room.startsWith('PRIVATE_')) {
           const code = room.replace('PRIVATE_', '');
-          const msgs = State.chatMessages.filter(m => (m.room || 'GLOBAL') === room);
-          const shareText = `मुझसे ApnaLocal SuperApp पर Private Chat करें — Chat तब खोलें, "Private Room" चुनें और यह code डालें: ${code}`;
+          const msgs = State.chatMessages;
+          const shareText = `मुझसे MyLocal पर Private Chat करें। Room code: ${code}`;
           return `<div class="card glass-card border-success">
             <div class="card-header bg-transparent d-flex justify-content-between align-items-center border-bottom pb-2 flex-wrap gap-2">
               <div class="fw-bold text-success"><i class="bi bi-lock-fill me-2"></i>Private Room <span class="badge bg-success">${esc(code)}</span></div>
               <div class="btn-group btn-group-sm">
-                <button class="btn btn-outline-success" onclick="window.open('https://wa.me/?text=${encodeURIComponent(shareText)}','_blank')"><i class="bi bi-whatsapp"></i> Code शेयर करें</button>
-                <button class="btn btn-outline-secondary" onclick="App.switchChatRoom('GLOBAL')">बाहर निकलें</button>
+                <button class="btn btn-outline-success" onclick="window.open('https://wa.me/?text=${encodeURIComponent(shareText)}','_blank')"><i class="bi bi-whatsapp"></i> Code शेयर</button>
+                <button class="btn btn-outline-secondary" onclick="App.switchChatRoom(null)">बाहर निकलें</button>
               </div>
             </div>
-            <div class="small text-secondary px-3 pt-2">यह chat केवल उन्हीं लोगों को दिखेगी जिनके पास यह code (${esc(code)}) है।</div>
+            <div class="small text-secondary px-3 pt-2">🔐 इस room के messages केवल room members पढ़ सकते हैं।</div>
             <div class="card-body overflow-auto p-3" id="chat-window-scroll" style="height:380px;">
-              ${msgs.length ? msgs.map(m => `<div class="d-flex flex-column mb-2 ${m.sender === getUser().name ? 'align-items-end' : 'align-items-start'}"><span class="small text-secondary fw-bold" style="font-size:0.65rem;">${esc(m.sender)}</span><div class="p-2 ${m.sender === getUser().name ? 'chat-bubble-me' : 'chat-bubble-other'}">${esc(m.text)}</div></div>`).join('') : '<div class="text-center text-secondary py-5"><i class="bi bi-shield-lock fs-1 d-block mb-2"></i>अभी कोई message नहीं। Code शेयर करके बातचीत शुरू करें।</div>'}
+              ${msgs.length ? msgs.map(m => { const mine = m.senderUid === getUser().uid; return `<div class="d-flex flex-column mb-2 ${mine ? 'align-items-end' : 'align-items-start'}"><span class="small text-secondary fw-bold" style="font-size:.65rem;">${esc(m.sender)}</span><div class="p-2 ${mine ? 'chat-bubble-me' : 'chat-bubble-other'}">${esc(m.text)}</div></div>`; }).join('') : '<div class="text-center text-secondary py-5"><i class="bi bi-shield-lock fs-1 d-block mb-2"></i>अभी कोई message नहीं।</div>'}
             </div>
             <div class="card-footer bg-transparent"><div class="input-group">
               <input type="text" id="txt-chat" class="form-control" placeholder="Private message..." onkeyup="if(event.key==='Enter') App.sendChat()">
@@ -1328,38 +1556,29 @@
             </div></div>
           </div>`;
         }
-        const msgs = State.chatMessages.filter(m => (m.room || "GLOBAL") === room);
-        const isSOS = room === 'SOS';
-        return `
-          <div class="card glass-card border-${isSOS ? 'danger' : 'primary'}">
-            <div class="card-header bg-transparent d-flex justify-content-between align-items-center border-bottom pb-2 flex-wrap gap-2">
-              <div class="fw-bold ${isSOS ? 'text-danger' : 'text-primary'}"><i class="bi ${isSOS ? 'bi-shield-fill-exclamation' : 'bi-chat-dots-fill'} me-2"></i>${isSOS ? 'SOS इमरजेंसी चैट' : 'पब्लिक कम्युनिटी चैट'}</div>
-              <div class="btn-group btn-group-sm">
-                <button class="btn ${!isSOS ? 'btn-primary fw-bold' : 'btn-outline-primary'}" onclick="App.switchChatRoom('GLOBAL')">लोकल</button>
-                <button class="btn ${isSOS ? 'btn-danger fw-bold' : 'btn-outline-danger'}" onclick="App.switchChatRoom('SOS')">SOS हेल्प</button>
-                <button class="btn btn-outline-success" onclick="PrivateChat.open()"><i class="bi bi-lock-fill"></i> Private Room</button>
-              </div>
-            </div>
-            <div class="card-body overflow-auto p-3 ${isSOS ? 'bg-danger bg-opacity-10' : ''}" id="chat-window-scroll" style="height: 380px;">
-              ${msgs.map(m => `<div class="d-flex flex-column mb-2 ${m.sender === getUser().name ? 'align-items-end' : 'align-items-start'}"><span class="small text-secondary fw-bold" style="font-size:0.65rem;">${esc(m.sender)}</span><div class="p-2 ${m.sender === getUser().name ? 'chat-bubble-me' : 'chat-bubble-other'}">${esc(m.text)}</div></div>`).join("")}
-            </div>
-            <div class="card-footer bg-transparent">
-              <div class="input-group">
-                <input type="text" id="txt-chat" class="form-control" placeholder="संदेश टाइप करें..." onkeyup="if(event.key==='Enter') App.sendChat()">
-                <button class="btn ${isSOS ? 'btn-danger' : 'btn-primary'}" onclick="App.sendChat()"><i class="bi bi-send-fill"></i></button>
-              </div>
-            </div>
-          </div>
-        `;
+        return `<div class="enh-hero rounded-4 p-4 mb-3"><span class="badge bg-white text-primary mb-2">100% PRIVATE</span><h3 class="fw-bold mb-1">🔒 प्राइवेट चैट</h3><p class="mb-0 opacity-75">हर room का अलग secure Firebase path है। दूसरे users आपकी room chat नहीं पढ़ सकते।</p></div>
+          <div class="card glass-card p-4 text-center">
+            <i class="bi bi-shield-lock text-success" style="font-size:3rem;"></i>
+            <h5 class="fw-bold mt-2">नई Private Chat शुरू करें</h5>
+            <button class="btn btn-success fw-bold py-2 mb-4" onclick="PrivateChat.createNew()"><i class="bi bi-plus-circle-fill me-1"></i> नया Room बनाएं</button>
+            <hr><h6 class="fw-bold mt-2">मौजूदा Room से जुड़ें</h6>
+            <div class="input-group mt-2" style="max-width:320px;margin:0 auto;"><input type="text" id="join-room-code" class="form-control text-center text-uppercase" placeholder="Code डालें" maxlength="8"><button class="btn btn-primary" onclick="PrivateChat.joinByCode()"><i class="bi bi-box-arrow-in-right"></i></button></div>
+          </div>`;
       },
       sendChat() {
         const input = document.getElementById("txt-chat");
-        const txt = input.value.trim(); if (!txt) return;
-        const msg = { room: State.activeRoomCode, sender: getUser().name, text: txt, time: new Date().toLocaleTimeString() };
-        State.chatMessages.push(msg); localStorage.setItem("app_chat", JSON.stringify(State.chatMessages));
-        if (isFirebaseReady) db.ref("chat").push(msg);
-        input.value = "";
-        this.refresh();
+        const txt = input?.value.trim();
+        if (!txt || !State.activeRoomCode || !State.user || State.user.isGuest) return;
+        const message = { sender: getUser().name, senderUid: getUser().uid, text: txt, createdAt: firebase.database.ServerValue.TIMESTAMP };
+        let ref;
+        if (State.activeRoomCode.startsWith('PRODUCT_')) {
+          const productId = State.activeRoomCode.substring(8);
+          ref = db.ref("productRooms/" + productId + "/messages").push();
+        } else {
+          const roomCode = State.activeRoomCode.replace(/^PRIVATE_/, '');
+          ref = db.ref("rooms/" + roomCode + "/messages").push();
+        }
+        ref.set(message).then(() => { input.value = ''; }).catch(err => { console.error(err); alert("Message नहीं भेजा गया: " + err.message); });
       },
       renderPosts(posts) {
         return posts.map(p => {
@@ -1383,9 +1602,12 @@
       },
       renderMarket() {
         const now = Date.now();
-        const before = State.posts.length;
-        State.posts = State.posts.filter(p => !(p.type.startsWith('market') && !p.isAdminPost && p.expiresAt && p.expiresAt <= now));
-        if (State.posts.length !== before) savePosts();
+        const expired = State.posts.filter(p => p.type.startsWith('market') && !p.isAdminPost && p.expiresAt && p.expiresAt <= now);
+        if (expired.length) {
+          State.posts = State.posts.filter(p => !expired.includes(p));
+          savePostsLocal();
+          expired.forEach(p => syncPostDelete(p.id));
+        }
         const items = State.posts.filter(p => p.type.startsWith('market') && p.status === 'APPROVED' && (p.isAdminPost || !p.expiresAt || p.expiresAt > now));
         if (items.length === 0) return `<div class="text-center mt-5 text-secondary"><i class="bi bi-bag-x fs-1 d-block mb-2"></i>मार्केट में अभी कोई approved उत्पाद नहीं है।</div>`;
         return `<div class="row g-2">${items.map(p => `<div class="col-6 col-md-4">
@@ -1401,56 +1623,157 @@
                 : `<button class="btn btn-sm btn-outline-primary mt-auto fw-bold" onclick="openUserProductChat('${p.id}')">💬 Seller से Chat</button>`}
             </div>
           </div></div>`).join("")}</div>`;
+      },
+      renderJobs() {
+        const jobs = State.posts.filter(p => p.type === 'job' && p.status === 'APPROVED')
+          .sort((a, b) => (a.lastDate && b.lastDate) ? new Date(a.lastDate) - new Date(b.lastDate) : 0);
+        return `
+          <div class="enh-hero rounded-4 p-4 mb-3">
+            <span class="badge bg-white text-primary mb-2">GOVERNMENT & PRIVATE JOBS</span>
+            <h3 class="fw-bold mb-1">💼 नौकरी व सरकारी काम</h3>
+            <p class="mb-0 opacity-75">Admin द्वारा वेरिफाइड सरकारी व प्राइवेट नौकरियों की जानकारी — योग्यता, अंतिम तारीख और Apply लिंक सहित।</p>
+          </div>
+          ${jobs.length === 0 ? `<div class="text-center mt-5 text-secondary"><i class="bi bi-briefcase fs-1 d-block mb-2"></i>अभी कोई नौकरी पोस्ट नहीं की गई है। जल्द ही यहाँ अपडेट मिलेंगे।</div>` : jobs.map(j => {
+            const lastDate = j.lastDate ? new Date(j.lastDate) : null;
+            const daysLeft = lastDate ? Math.ceil((lastDate - new Date()) / 86400000) : null;
+            const expired = daysLeft !== null && daysLeft < 0;
+            return `<div class="card glass-card p-3 mb-3 ${expired ? 'opacity-50' : 'border-primary'}">
+              <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                <div>
+                  <span class="badge ${j.jobType === 'government' ? 'bg-success' : 'bg-info text-dark'} mb-1">${j.jobType === 'government' ? 'सरकारी नौकरी' : 'प्राइवेट नौकरी'}</span>
+                  <h5 class="fw-bold mb-0">${esc(j.title)}</h5>
+                  <div class="small text-secondary">${esc(j.organization || '')}</div>
+                </div>
+                ${daysLeft !== null ? `<span class="badge ${expired ? 'bg-secondary' : daysLeft <= 3 ? 'bg-danger' : 'bg-warning text-dark'}">${expired ? 'तारीख निकल गई' : `${daysLeft} दिन बाकी`}</span>` : ''}
+              </div>
+              <p class="small mt-2 mb-2">${esc(j.desc)}</p>
+              <div class="row g-2 small">
+                ${j.qualification ? `<div class="col-6"><i class="bi bi-mortarboard-fill text-primary me-1"></i>योग्यता: <b>${esc(j.qualification)}</b></div>` : ''}
+                ${j.vacancies ? `<div class="col-6"><i class="bi bi-people-fill text-primary me-1"></i>पद: <b>${esc(j.vacancies)}</b></div>` : ''}
+                ${j.salary ? `<div class="col-6"><i class="bi bi-cash-coin text-success me-1"></i>वेतन: <b>${esc(j.salary)}</b></div>` : ''}
+                ${j.lastDate ? `<div class="col-6"><i class="bi bi-calendar-x-fill text-danger me-1"></i>अंतिम तारीख: <b>${esc(j.lastDate)}</b></div>` : ''}
+              </div>
+              ${j.applyLink ? `<a href="${esc(j.applyLink)}" target="_blank" rel="noopener" class="btn btn-primary btn-sm fw-bold mt-2 ${expired ? 'disabled' : ''}"><i class="bi bi-box-arrow-up-right me-1"></i> Apply करें / पूरी जानकारी</a>` : ''}
+            </div>`;
+          }).join('')}
+        `;
       }
     };
 
     /* Product chat routing + engagement, used by App above */
-    window.openUserProductChat = function (id) {
+    window.openUserProductChat = async function (id) {
+      if (!State.user || State.user.isGuest) { alert('Seller chat के लिए Google Login करें।'); AuthEngine.openAuthModal(); return; }
       const p = State.posts.find(x => String(x.id) === String(id));
       if (!p) return;
-      if (p.isAdminPost) { OrderEngine.openBuyModal(id); return; }
-      State.activeRoomCode = 'PRODUCT_' + id;
-      State._productChat = p;
-      App.navigate('chat');
+      if (p.isAdminPost) return OrderEngine.openBuyModal(id);
+      const sellerUid = p.ownerUid || p.uid || p.authorUid;
+      if (!sellerUid) { alert('इस पुराने product में seller UID नहीं है। Seller से नया listing बनाने को कहें।'); return; }
+      const code = 'PRODUCT_' + id;
+      try {
+        await db.ref('productRooms/' + id + '/meta').update({ productId: String(id), sellerUid: sellerUid, updatedAt: firebase.database.ServerValue.TIMESTAMP });
+        await db.ref('productRooms/' + id + '/members/' + getUser().uid).set(true);
+        State.activeRoomCode = code; State._productChat = p;
+        attachProductChatListener(id);
+        App.navigate('chat');
+      } catch (e) { alert('Seller chat शुरू नहीं हो पाई: ' + e.message); }
     };
 
-    /* Private Chat Room: two people share a short code to chat 1-to-1. */
+    let activeProductChatRef = null;
+    let activeProductChatHandler = null;
+    function detachProductChatListener() {
+      if (activeProductChatRef && activeProductChatHandler) activeProductChatRef.off('value', activeProductChatHandler);
+      activeProductChatRef = null; activeProductChatHandler = null;
+    }
+    function attachProductChatListener(productId) {
+      detachChatListener(); detachProductChatListener();
+      if (!isFirebaseReady || !State.user || State.user.isGuest) return;
+      activeProductChatRef = db.ref('productRooms/' + productId + '/messages');
+      activeProductChatHandler = snap => {
+        State.chatMessages = snap.val() ? Object.entries(snap.val()).map(([id,m]) => ({id,...m})).sort((a,b)=>Number(a.createdAt||0)-Number(b.createdAt||0)) : [];
+        App.refresh();
+      };
+      activeProductChatRef.on('value', activeProductChatHandler, err => console.warn('Product chat listener:', err.message));
+    }
+
     const PrivateChat = {
-      genCode() { return Math.random().toString(36).slice(2, 7).toUpperCase(); },
-      open() {
-        const choice = confirm("नया Private Room बनाना है?\n\nOK = नया code बनाएं\nCancel = मौजूदा code से जुड़ें");
-        if (choice) {
-          const code = this.genCode();
-          State.activeRoomCode = 'PRIVATE_' + code;
-          App.navigate('chat');
-        } else {
-          const code = prompt("Private Room का code डालें:");
-          if (!code?.trim()) return;
-          State.activeRoomCode = 'PRIVATE_' + code.trim().toUpperCase();
-          App.navigate('chat');
+      genCode() { return Math.random().toString(36).slice(2, 10).toUpperCase(); },
+      async createNew() {
+        if (!State.user || State.user.isGuest) { alert('Private Chat के लिए Google Login करें।'); AuthEngine.openAuthModal(); return; }
+        let code, ok = false;
+        for (let i=0;i<8 && !ok;i++) {
+          code = this.genCode();
+          const metaRef = db.ref('rooms/' + code + '/meta');
+          const tx = await metaRef.transaction(current => current === null ? { creatorUid:getUser().uid, createdAt:firebase.database.ServerValue.TIMESTAMP } : undefined);
+          ok = tx.committed;
         }
-      }
+        if (!ok) { alert('Room बनाने में समस्या हुई, दोबारा कोशिश करें।'); return; }
+        await db.ref('rooms/' + code + '/members/' + getUser().uid).set(true);
+        State.activeRoomCode = 'PRIVATE_' + code;
+        attachChatListener(State.activeRoomCode);
+        App.refresh();
+      },
+      async joinByCode() {
+        if (!State.user || State.user.isGuest) { alert('Private Chat के लिए Google Login करें।'); AuthEngine.openAuthModal(); return; }
+        const input = document.getElementById('join-room-code');
+        const code = input?.value.trim().toUpperCase();
+        if (!/^[A-Z0-9]{6,8}$/.test(code)) { alert('सही 6–8 character Room code डालें।'); return; }
+        try {
+          const metaSnap = await db.ref('rooms/' + code + '/meta').once('value');
+          if (!metaSnap.exists()) { alert('यह Room code मौजूद नहीं है।'); return; }
+          const membersRef = db.ref('rooms/' + code + '/members');
+          const tx = await membersRef.transaction(current => {
+            const m = current || {};
+            if (m[getUser().uid]) return m;
+            if (Object.keys(m).length >= 2) return;
+            m[getUser().uid] = true; return m;
+          });
+          if (!tx.committed) { alert('यह Private Room पहले ही 2 लोगों से भरा है।'); return; }
+          State.activeRoomCode = 'PRIVATE_' + code;
+          attachChatListener(State.activeRoomCode);
+          App.refresh();
+        } catch (e) { alert('Room join नहीं हो पाया: ' + e.message); }
+      },
+      open() { App.navigate('chat'); }
     };
 
     window.ApnaLocalEngage = {
-      like(id) {
+      async like(id) {
+        if (!State.user || State.user.isGuest) { alert('Like करने के लिए Google Login करें।'); AuthEngine.openAuthModal(); return; }
         const p = State.posts.find(x => String(x.id) === String(id)); if (!p) return;
-        p._liked = !p._liked; p.likes = Math.max(0, Number(p.likes || 0) + (p._liked ? 1 : -1));
-        savePosts(); App.refresh();
+        const ref = db.ref('engagement/likes/' + id + '/' + getUser().uid);
+        try {
+          const snap = await ref.once('value');
+          if (snap.exists()) await ref.remove(); else await ref.set({uid:getUser().uid, createdAt:firebase.database.ServerValue.TIMESTAMP});
+          const countSnap = await db.ref('engagement/likes/' + id).once('value');
+          p.likes = countSnap.numChildren();
+          p._liked = !!(countSnap.val() && countSnap.val()[getUser().uid]);
+          State.posts = State.posts.map(x => String(x.id)===String(id) ? p : x);
+          savePostsLocal(); App.refresh();
+        } catch(e) { alert('Like update नहीं हुआ: ' + e.message); }
       },
-      share(id) {
+      async share(id) {
+        if (!State.user || State.user.isGuest) { alert('Share करने के लिए Google Login करें।'); AuthEngine.openAuthModal(); return; }
         const p = State.posts.find(x => String(x.id) === String(id)); if (!p) return;
-        p.shares = Number(p.shares || 0) + 1; savePosts();
-        const text = `${p.title || "ApnaLocal Post"}\n\n${p.desc || ""}`;
-        if (navigator.share) navigator.share({ title: p.title || "ApnaLocal", text }).catch(() => {});
-        else window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
+        try {
+          await db.ref('engagement/shares/' + id).transaction(v => Number(v||0)+1);
+          p.shares = Number(p.shares||0)+1; savePostsLocal();
+        } catch(e) {}
+        const text = `${p.title || 'MyLocal Post'}\n\n${p.desc || ''}`;
+        if (navigator.share) navigator.share({title:p.title||'MyLocal',text}).catch(()=>{});
+        else window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+        App.refresh();
       },
-      comment(id) {
+      async comment(id) {
+        if (!State.user || State.user.isGuest) { alert('Comment करने के लिए Google Login करें।'); AuthEngine.openAuthModal(); return; }
         const p = State.posts.find(x => String(x.id) === String(id)); if (!p) return;
-        const c = prompt("Comment लिखें"); if (!c?.trim()) return;
-        p.comments = Array.isArray(p.comments) ? p.comments : [];
-        p.comments.push({ user: getUser().name, text: c.trim(), time: new Date().toLocaleString() });
-        savePosts(); App.refresh();
+        const c = prompt('Comment लिखें'); if (!c?.trim()) return;
+        try {
+          const ref = db.ref('engagement/comments/' + id).push();
+          await ref.set({uid:getUser().uid, user:getUser().name, avatar:getUser().avatar||'', text:c.trim(), createdAt:firebase.database.ServerValue.TIMESTAMP});
+          p.comments = Array.isArray(p.comments) ? p.comments : [];
+          p.comments.push({uid:getUser().uid,user:getUser().name,text:c.trim(),time:new Date().toLocaleString()});
+          savePostsLocal(); App.refresh();
+        } catch(e) { alert('Comment save नहीं हुआ: ' + e.message); }
       }
     };
 
@@ -1617,13 +1940,126 @@
     window.addEventListener('beforeinstallprompt', e => {
       e.preventDefault(); deferredInstallPrompt = e;
       const b = document.createElement('div'); b.className = 'install-banner';
-      b.innerHTML = '<div class="alert alert-primary shadow-lg d-flex align-items-center justify-content-between gap-2 mb-0"><div><strong>📲 App Install करें</strong><div class="small">ApnaLocal को home screen पर रखें।</div></div><button class="btn btn-primary btn-sm" id="installAppBtn">Install</button></div>';
+      b.innerHTML = '<div class="alert alert-primary shadow-lg d-flex align-items-center justify-content-between gap-2 mb-0"><div><strong>📲 App Install करें</strong><div class="small">MyLocal को home screen पर रखें।</div></div><button class="btn btn-primary btn-sm" id="installAppBtn">Install</button></div>';
       document.body.appendChild(b);
       document.getElementById('installAppBtn').onclick = async () => { deferredInstallPrompt.prompt(); await deferredInstallPrompt.userChoice; b.remove(); deferredInstallPrompt = null; };
     });
-    if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(console.warn));
+    // Note: no separate service-worker file is used — this stays a single self-contained HTML file.
+    // The install-prompt banner below still works via the browser's manifest + beforeinstallprompt event.
 
-    document.addEventListener("DOMContentLoaded", () => App.init());
+    /* ========================================================================
+       14. AREA LOCK GATE (MyLocal is built for exactly one local service area)
+       ======================================================================== */
+    const AreaGate = {
+      defaultRadiusKm: 50,
+      distanceKm(lat1, lon1, lat2, lon2) {
+        const R = 6371, toRad = d => d * Math.PI / 180;
+        const dLat = toRad(lat2 - lat1), dLon = toRad(lon2 - lon1);
+        const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      },
+      timeoutAfter(ms, label) {
+        return new Promise((_, reject) => setTimeout(() => reject(new Error(label || 'timeout')), ms));
+      },
+      async getArea() {
+        let area = null;
+        try { area = JSON.parse(localStorage.getItem('apnalocal_service_area') || 'null'); } catch (e) {}
+        if (isFirebaseReady) {
+          try {
+            const snap = await Promise.race([
+              db.ref('settings/serviceArea').once('value'),
+              this.timeoutAfter(7000, 'firebase-timeout')
+            ]);
+            if (snap && snap.val()) { area = snap.val(); localStorage.setItem('apnalocal_service_area', JSON.stringify(area)); }
+          } catch (e) { console.warn('Service-area fetch skipped (timeout/offline), using cached value.'); }
+        }
+        return area;
+      },
+      finish() {
+        const gate = document.getElementById('area-gate');
+        if (gate) gate.remove();
+        App.init();
+      },
+      showRetryScreen(message) {
+        const content = document.getElementById('area-gate-content');
+        if (!content) return;
+        content.innerHTML = `
+          <i class="bi bi-geo-alt-fill fs-1 d-block mb-2"></i>
+          <h5 class="fw-bold">Location Access चाहिए</h5>
+          <p class="small opacity-75">${message}</p>
+          <button class="btn btn-light fw-bold mt-2" onclick="AreaGate.check()"><i class="bi bi-arrow-clockwise me-1"></i> फिर से कोशिश करें</button>
+        `;
+      },
+      async check() {
+        const content = document.getElementById('area-gate-content');
+        let area;
+        try {
+          area = await Promise.race([this.getArea(), this.timeoutAfter(9000, 'get-area-timeout')]);
+        } catch (e) {
+          // Could not determine the area in time (offline / blocked) — don't trap the user, let the app open.
+          this.finish();
+          return;
+        }
+        if (!area || typeof area.lat !== 'number' || typeof area.lng !== 'number') { this.finish(); return; }
+        if (localStorage.getItem('apnalocal_area_verified') === '1') { this.finish(); return; }
+        if (!navigator.geolocation) {
+          content.innerHTML = `<i class="bi bi-geo-alt-fill fs-1 d-block mb-2"></i><h5 class="fw-bold">Location सुविधा उपलब्ध नहीं</h5><p class="small opacity-75">यह ऐप ${esc(area.label || 'तय क्षेत्र')} के लिए बना है। कृपया location-सक्षम browser का उपयोग करें।</p>`;
+          return;
+        }
+        content.innerHTML = `<i class="bi bi-shield-shaded" style="font-size:2.5rem;"></i><h4 class="fw-bold mt-2 mb-3">MyLocal</h4><div class="spinner-border text-light mb-3" style="width:2.5rem;height:2.5rem;"></div><h6 class="fw-bold">आपका स्थान जांचा जा रहा है...</h6><p class="small opacity-75 mb-0">यह ऐप केवल ${esc(area.label || 'तय क्षेत्र')} के आस-पास काम करता है।</p>`;
+
+        const geoPromise = new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+        });
+
+        let pos;
+        try {
+          pos = await Promise.race([geoPromise, this.timeoutAfter(18000, 'geo-hard-timeout')]);
+        } catch (err) {
+          this.showRetryScreen(`यह ऐप केवल ${esc(area.label || 'तय क्षेत्र')} में काम करता है। आगे बढ़ने के लिए कृपया Location की अनुमति दें और फिर से कोशिश करें। (अगर यह फाइल सीधे फोन से खोली गई है, तो कृपया इसे किसी वेबसाइट/सर्वर पर होस्ट करके browser में खोलें — इससे Location ठीक से काम करेगी।)`);
+          return;
+        }
+
+        const dist = this.distanceKm(pos.coords.latitude, pos.coords.longitude, area.lat, area.lng);
+        const radius = area.radiusKm || this.defaultRadiusKm;
+        if (dist <= radius) {
+          localStorage.setItem('apnalocal_area_verified', '1');
+          window.__gateVerifiedPosition = pos;
+          this.finish();
+        } else {
+          content.innerHTML = `
+            <i class="bi bi-slash-circle-fill fs-1 d-block mb-2 text-warning"></i>
+            <h5 class="fw-bold">यह ऐप आपके क्षेत्र में उपलब्ध नहीं है</h5>
+            <p class="small opacity-75">MyLocal सिर्फ <b>${esc(area.label || 'चुने हुए क्षेत्र')}</b> के ${radius} किमी के दायरे में काम करता है।<br>आपकी दूरी: ~${Math.round(dist)} किमी</p>
+            <button class="btn btn-light fw-bold mt-2" onclick="AreaGate.check()"><i class="bi bi-arrow-clockwise me-1"></i> फिर से जांचें</button>
+          `;
+        }
+      }
+    };
+
+    if (isFirebaseReady && auth) {
+      auth.onAuthStateChanged(async user => {
+        if (user) {
+          State.user = { uid:user.uid, name:user.displayName||'MyLocal User', phone:user.phoneNumber||'', avatar:user.photoURL||'https://picsum.photos/100', email:user.email||'', isGuest:false };
+          localStorage.setItem('app_user', JSON.stringify(State.user));
+          AuthEngine.refreshAuthUI();
+          applyEngagementToPosts();
+          if (typeof attachUserOrdersListener === 'function') attachUserOrdersListener();
+          if (State.activeRoomCode) {
+            if (State.activeRoomCode.startsWith('PRIVATE_')) attachChatListener(State.activeRoomCode);
+            else if (State.activeRoomCode.startsWith('PRODUCT_')) attachProductChatListener(State.activeRoomCode.substring(8));
+          }
+        } else if (State.user && !State.user.isGuest) {
+          detachChatListener();
+          if (typeof detachProductChatListener === 'function') detachProductChatListener();
+          if (typeof detachUserOrdersListener === 'function') detachUserOrdersListener();
+          State.user = null; State.activeRoomCode = null;
+          localStorage.removeItem('app_user');
+          AuthEngine.refreshAuthUI(); App.refresh();
+        }
+      });
+    }
+    document.addEventListener("DOMContentLoaded", () => AreaGate.check());
   </script>
 </body>
 </html>

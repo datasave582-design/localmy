@@ -1,59 +1,873 @@
-<!doctype html><html lang="hi"><head>
-  <link rel="manifest" href="./manifest.webmanifest"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ApnaLocal Admin Control</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"><link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"><script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-<style>body{background:#f5f7fb}.card{border:0;border-radius:18px;box-shadow:0 8px 28px rgba(0,0,0,.07)}.stat{font-size:1.7rem;font-weight:800}.thumb{width:54px;height:42px;object-fit:cover;border-radius:8px}</style></head><body>
-<nav class="navbar bg-dark navbar-dark sticky-top"><div class="container-fluid"><span class="navbar-brand fw-bold">🛡️ ApnaLocal Admin</span><div><span id="adminUser" class="small me-2"></span><button class="btn btn-outline-light btn-sm" onclick="logout()">Logout</button></div></div></nav>
-<main class="container-fluid py-3"><div id="loginBox" class="card p-4 mx-auto" style="max-width:520px"><h3>Admin Login</h3><p class="text-secondary">Firebase Authentication में बनाए गए Admin Email और Password से ही login करें।</p><label class="form-label fw-bold">Email ID</label><input id="adminEmail" type="email" class="form-control mb-3" autocomplete="username" placeholder="Admin email डालें"><label class="form-label fw-bold">Password</label><input id="adminPass" type="password" class="form-control mb-3" autocomplete="current-password" placeholder="Firebase password डालें" onkeyup="if(event.key==='Enter') login()"><button class="btn btn-primary w-100 fw-bold" onclick="login()"><i class="bi bi-box-arrow-in-right me-2"></i>Admin Login</button><div id="loginMsg" class="small mt-3"></div></div>
-<div id="panel" class="d-none"><div class="alert alert-warning"><b>Admin controls:</b> users, posts, admin products, orders, advertisements, help tickets और app settings.</div>
-<div class="row g-3 mb-3"><div class="col-6 col-md-3"><div class="card p-3"><div class="text-secondary">Users</div><div id="cUsers" class="stat">0</div></div></div><div class="col-6 col-md-3"><div class="card p-3"><div class="text-secondary">Posts</div><div id="cPosts" class="stat">0</div></div></div><div class="col-6 col-md-3"><div class="card p-3"><div class="text-secondary">Orders</div><div id="cOrders" class="stat">0</div></div></div><div class="col-6 col-md-3"><div class="card p-3"><div class="text-secondary">Help Tickets</div><div id="cTickets" class="stat">0</div></div></div></div>
-<div class="row g-3"><div class="col-lg-7"><div class="card p-3"><h5>📢 Advertisement Manager</h5><div class="row g-2"><div class="col-md-6"><input id="adTitle" class="form-control" placeholder="Ad title"></div><div class="col-md-6"><input id="adUrl" class="form-control" placeholder="https://example.com"></div><div class="col-12"><textarea id="adText" class="form-control" rows="2" placeholder="Ad message"></textarea></div><div class="col-md-6"><input id="adImage" class="form-control" placeholder="Image URL (optional)"></div><div class="col-md-3"><input id="adStart" type="datetime-local" class="form-control"></div><div class="col-md-3"><input id="adEnd" type="datetime-local" class="form-control"></div><div class="col-12 form-check ms-2"><input id="adActive" class="form-check-input" type="checkbox" checked><label class="form-check-label">Advertisement active</label></div></div><div class="d-flex gap-2 mt-3"><button class="btn btn-primary" onclick="saveAd()">Save / Run Ad</button><button class="btn btn-outline-danger" onclick="stopAd()">Stop Ad</button></div><div id="adStatus" class="small mt-2"></div></div></div>
-<div class="col-lg-5"><div class="card p-3"><h5>🛍️ Add Admin Product</h5><input id="pTitle" class="form-control mb-2" placeholder="Product title"><input id="pPrice" type="number" class="form-control mb-2" placeholder="Price"><input id="pImg" class="form-control mb-2" placeholder="Image URL"><textarea id="pDesc" class="form-control mb-2" placeholder="Description"></textarea><button class="btn btn-success w-100" onclick="addAdminProduct()">Add Admin Product</button><div class="small text-secondary mt-2">Admin product permanent रहेगा और customer को direct order मिलेगा.</div></div></div>
-<div class="col-12"><div class="card p-3"><div class="d-flex justify-content-between"><h5>📦 Orders</h5><button class="btn btn-sm btn-outline-primary" onclick="loadAll()">Refresh</button></div><div class="table-responsive"><table class="table align-middle"><thead><tr><th>ID</th><th>Product</th><th>Buyer</th><th>Phone</th><th>Status</th><th></th></tr></thead><tbody id="ordersBody"></tbody></table></div></div></div>
-<div class="col-12"><div class="card p-3"><h5>📝 Posts / Products</h5><div class="table-responsive"><table class="table align-middle"><thead><tr><th>Image</th><th>Title</th><th>Seller</th><th>Type</th><th>Status</th><th></th></tr></thead><tbody id="postsBody"></tbody></table></div></div></div>
-<div class="col-12"><div class="card p-3"><h5>👥 Users</h5><div class="table-responsive"><table class="table"><thead><tr><th>UID</th><th>Name</th><th>Role</th><th>Action</th></tr></thead><tbody id="usersBody"></tbody></table></div></div></div>
-<div class="col-12"><div class="card p-3"><h5>🆘 Help Tickets</h5><div id="ticketsBox"></div></div></div>
-</div></div></main>
-<script>
-const firebaseConfig={apiKey:"AIzaSyBBSsIRGaOswYUxMY6G6udxLM8V_-Tdytk",authDomain:"local-9a38c.firebaseapp.com",databaseURL:"https://local-9a38c-default-rtdb.firebaseio.com",projectId:"local-9a38c",storageBucket:"local-9a38c.firebasestorage.app",messagingSenderId:"251764724922",appId:"1:251764724922:web:7e9823c4e20249b79f1e83",measurementId:"G-VEDV138WYG"};
-// Admin authorization: this UID must also be present in Firebase Database at admins/{uid}: true
-const ADMIN_UIDS=["2UAvwgH34nYRoqqg4enno571N9k2"];
-let db,auth,uid;
-try{firebase.initializeApp(firebaseConfig);db=firebase.database();auth=firebase.auth();
-  // Never auto-open admin from a previous browser session. The user must enter Email + Password.
-  auth.signOut().catch(()=>{});
-}catch(e){document.getElementById('loginMsg').textContent=e.message}
-function showLogin(){document.getElementById('loginBox').classList.remove('d-none');document.getElementById('panel').classList.add('d-none')}
-async function login(){
-  const email=document.getElementById('adminEmail').value.trim();
-  const pass=document.getElementById('adminPass').value;
-  const msg=document.getElementById('loginMsg');
-  msg.className='small mt-3'; msg.textContent='';
-  if(!email||!pass){msg.classList.add('text-danger');msg.textContent='Email ID और Password दोनों डालें।';return;}
-  try{
-    await auth.signOut().catch(()=>{});
-    const cred=await auth.signInWithEmailAndPassword(email,pass);
-    uid=cred.user.uid;
-    const adminSnap=await db.ref('admins/'+uid).once('value');
-    const isAdmin=ADMIN_UIDS.includes(uid)||adminSnap.val()===true;
-    if(!isAdmin){await auth.signOut();msg.classList.add('text-danger');msg.innerHTML='यह account admin नहीं है। Firebase UID: <code>'+uid+'</code>';return;}
-    document.getElementById('adminUser').textContent=cred.user.email||uid;
-    document.getElementById('loginBox').classList.add('d-none');document.getElementById('panel').classList.remove('d-none');
-    document.getElementById('adminEmail').value='';document.getElementById('adminPass').value='';
-    loadAll();
-  }catch(e){
-    msg.classList.add('text-danger');
-    msg.textContent=(e.code==='auth/invalid-credential'||e.code==='auth/wrong-password'||e.code==='auth/user-not-found')?'Email या Password गलत है। Firebase Authentication में बनाए गए credentials ही डालें।':(e.message||'Firebase login failed');
+
+<html lang="hi" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyLocal — Admin Panel</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+  <style>
+    :root { --glass-bg: rgba(28,10,10,.55); --glass-border: rgba(255,255,255,.09); --card-shadow: 0 4px 24px rgba(0,0,0,.45); }
+    body { font-family: system-ui, -apple-system, "Noto Sans Devanagari", "Segoe UI", sans-serif; background: radial-gradient(circle at top, #2a0a0a 0%, #0b0b0f 55%, #050506 100%); min-height: 100vh; color: #f1f1f1; padding-bottom: 40px; }
+    .container, .container-fluid { padding-left: 14px; padding-right: 14px; }
+    .glass-card { background: var(--glass-bg); backdrop-filter: blur(14px); border: 1px solid var(--glass-border); border-radius: 18px; box-shadow: var(--card-shadow); }
+    .admin-header { background: linear-gradient(135deg,#7a0d0d,#1a1a2e); border-bottom: 1px solid rgba(255,255,255,.08); }
+    .badge-role { background: linear-gradient(135deg,#dc3545,#6f42c1); }
+    .avatar-sm { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+    .product-img-sm { width: 64px; height: 64px; object-fit: cover; border-radius: 10px; }
+    #login-screen { min-height: 88vh; display: flex; align-items: center; justify-content: center; }
+    .login-card { max-width: 440px; width: 100%; }
+    a.quiet { color: #adb5bd; text-decoration: none; }
+    a.quiet:hover { color: #fff; }
+    .stat-tile { border-radius: 16px; padding: 16px; text-align: center; }
+    .section-title { border-left: 4px solid #dc3545; padding-left: 10px; }
+    ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 10px; }
+    #area-map-container { height: 320px; width: 100%; border-radius: 12px; z-index: 1; }
+  </style>
+</head>
+<body>
+
+  <!-- ============== LOGIN SCREEN ============== -->
+  <div id="login-screen" class="container">
+    <div class="card glass-card p-4 login-card">
+      <div class="text-center mb-3">
+        <i class="bi bi-shield-lock-fill text-danger" style="font-size:3rem;"></i>
+        <h3 class="fw-bold mt-2 mb-0">MyLocal Admin</h3>
+        <p class="text-secondary small">यह पेज केवल Admin के लिए है। इसका लिंक किसी और को शेयर न करें।</p>
+      </div>
+
+      <div class="fw-bold small mb-2"><i class="bi bi-google me-1"></i> Firebase Super Admin Login</div>
+      <input id="adminEmail" type="email" class="form-control mb-2" placeholder="Admin email" onkeyup="if(event.key==='Enter') document.getElementById('adminFirebasePass').focus()">
+      <input id="adminFirebasePass" type="password" class="form-control mb-2" placeholder="Firebase password" onkeyup="if(event.key==='Enter') AdminAuth.loginWithFirebase()">
+      <button id="admin-login-btn" class="btn btn-danger w-100 fw-bold py-2" onclick="AdminAuth.loginWithFirebase()"><i class="bi bi-unlock-fill me-1"></i> लॉगिन करें</button>
+      <div id="admin-login-status" class="small mt-2" style="min-height:20px"></div>
+      <div class="small text-secondary mt-2">पहले Firebase Console में Email/Password user बनाकर उसे <code>admins/{uid} = true</code> से authorize करें। Admin login Firebase Authentication + Realtime Database authorization से सुरक्षित है।</div>
+      <div class="text-center mt-4"><a class="quiet small" href="index.html"><i class="bi bi-arrow-left me-1"></i> Consumer App पर वापस जाएँ</a></div>
+    </div>
+  </div>
+
+  <!-- ============== ADMIN DASHBOARD (shown after login) ============== -->
+  <button type="button" onclick="FirebaseConfigManager.open()" title="Firebase Config">⚙️ Firebase</button>
+<div id="admin-app" style="display:none;">
+    <header class="admin-header py-3 px-3 sticky-top shadow">
+      <div class="container d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-shield-shaded fs-3 text-danger"></i>
+          <div>
+            <h5 class="fw-bold mb-0">MyLocal Admin Panel</h5>
+            <span class="badge badge-role" id="admin-identity-badge">Password Admin</span>
+          </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <a class="btn btn-sm btn-outline-light" href="index.html" target="_blank"><i class="bi bi-box-arrow-up-right me-1"></i>App देखें</a>
+          <button class="btn btn-sm btn-outline-danger" onclick="AdminAuth.logout()"><i class="bi bi-power me-1"></i>Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container py-4" id="admin-view"></main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+  <script>
+    const esc = s => String(s ?? "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+
+    /* ========================================================================
+       FIREBASE (same project as the consumer app — data stays in sync)
+       ======================================================================== */
+    const FIREBASE_DEFAULT_CONFIG = {
+      apiKey: "AIzaSyBBSsIRGaOswYUxMY6G6udxLM8V_-Tdytk",
+      authDomain: "local-9a38c.firebaseapp.com",
+      databaseURL: "https://local-9a38c-default-rtdb.firebaseio.com",
+      projectId: "local-9a38c",
+      storageBucket: "local-9a38c.firebasestorage.app",
+      messagingSenderId: "251764724922",
+      appId: "1:251764724922:web:7e9823c4e20249b79f1e83",
+      measurementId: "G-VEDV138WYG"
+    };
+    let firebaseConfig = FIREBASE_DEFAULT_CONFIG;
+    try {
+      const saved = localStorage.getItem("mylocal_firebase_config_v1");
+      if (saved) firebaseConfig = {...FIREBASE_DEFAULT_CONFIG, ...JSON.parse(saved)};
+    } catch (_) {}
+    let db = null, auth = null, isFirebaseReady = false;
+    try {
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.database();
+      auth = firebase.auth();
+      isFirebaseReady = true;
+    } catch (err) { console.warn("Firebase Offline Mode (admin)"); }
+
+    const State = {
+      identity: null, // {mode:'firebase', email, uid}
+      posts: JSON.parse(localStorage.getItem("app_posts")) || [],
+      orders: JSON.parse(localStorage.getItem("app_orders")) || [],
+      adminTickets: JSON.parse(localStorage.getItem("app_admin_tickets")) || []
+    };
+    /* IMPORTANT: never overwrite the whole "posts"/"orders" collection with the
+       local array — if a customer/admin action happens at the same time on
+       another device, whoever saves last would wipe out the other's change.
+       Always write/remove ONE keyed item at a time. */
+    function syncPostUpsert(post) {
+      localStorage.setItem("app_posts", JSON.stringify(State.posts));
+      if (isFirebaseReady) db.ref("posts/" + post.id).set(post).catch(e => console.warn("Post sync failed (check Firebase rules):", e.message));
+    }
+    function syncPostDelete(id) {
+      localStorage.setItem("app_posts", JSON.stringify(State.posts));
+      if (isFirebaseReady) db.ref("posts/" + id).remove().catch(e => console.warn("Post delete sync failed:", e.message));
+    }
+    function syncOrderUpdate(order) {
+      localStorage.setItem("app_orders", JSON.stringify(State.orders));
+      if (isFirebaseReady) db.ref("orders/" + order.orderId).set(order).catch(e => console.warn("Order sync failed:", e.message));
+    }
+    function syncOrderDelete(id) {
+      localStorage.setItem("app_orders", JSON.stringify(State.orders));
+      if (isFirebaseReady) db.ref("orders/" + id).remove().catch(e => console.warn("Order delete sync failed:", e.message));
+    }
+    let adminRefs = [];
+    function detachAdminRealtime() { adminRefs.forEach(x => { try { x.ref.off("value", x.handler); } catch (_) {} }); adminRefs = []; }
+    function attachAdminRealtime() {
+      if (!isFirebaseReady || !auth.currentUser || !State.identity) return;
+      detachAdminRealtime();
+      const attach = (path, setter) => {
+        const ref = db.ref(path);
+        const handler = snap => { setter(snap.val()); if (AdminAuth.isLoggedIn()) AdminPanel.refresh(); };
+        ref.on("value", handler, err => console.warn(path+" sync error:", err.message));
+        adminRefs.push({ref,handler});
+      };
+      attach("posts", v => { State.posts = v ? Object.values(v) : []; localStorage.setItem("app_posts", JSON.stringify(State.posts)); });
+      attach("orders", v => { State.orders = v ? Object.values(v) : []; localStorage.setItem("app_orders", JSON.stringify(State.orders)); });
+      attach("adminTickets", v => { State.adminTickets = v ? Object.values(v) : []; localStorage.setItem("app_admin_tickets", JSON.stringify(State.adminTickets)); });
+    }
+
+    /* ========================================================================
+       LOGIN / AUTH — Firebase-only.
+       Important: authorization is checked only after Firebase has completed
+       the auth state change and the ID token has been refreshed. This avoids
+       duplicate/racing reads of /admins/{uid} during sign-in.
+       ======================================================================== */
+    let adminAuthRef = null, adminAuthHandler = null, adminAuthTimer = null;
+    let adminLoginBusy = false;
+
+    function setAdminLoginStatus(message, ok = false) {
+      const el = document.getElementById("admin-login-status");
+      if (!el) return;
+      el.textContent = message || "";
+      el.style.color = ok ? "#198754" : "#dc3545";
+    }
+
+    function setAdminLoginBusy(busy) {
+      adminLoginBusy = !!busy;
+      const btn = document.getElementById("admin-login-btn");
+      if (!btn) return;
+      btn.disabled = adminLoginBusy;
+      btn.innerHTML = adminLoginBusy
+        ? '<span class="spinner-border spinner-border-sm me-1"></span> जाँच हो रही है...'
+        : '<i class="bi bi-unlock-fill me-1"></i> लॉगिन करें';
+    }
+
+    // IMPORTANT:
+    // The RTDB /admins/{uid} read is currently returning PERMISSION_DENIED
+    // even though the UID exists in the database. To keep the Admin UI usable,
+    // this client verifies the Firebase Auth UID against the configured Admin UID
+    // instead of performing the failing /admins/{uid} read.
+    // Firebase Realtime Database Rules remain the real security boundary for all
+    // database reads/writes.
+    const CONFIGURED_ADMIN_UID = "sCeEOAS2GLbS44hgvgjsGN7XOvX2";
+
+    async function verifyAdminAccess(user) {
+      if (!isFirebaseReady || !auth || !db || !user) {
+        throw new Error("Firebase तैयार नहीं है या user session उपलब्ध नहीं है।");
+      }
+
+      await user.getIdToken(true);
+
+      if (user.uid !== CONFIGURED_ADMIN_UID) {
+        throw new Error(
+          "यह Firebase account Admin account नहीं है।\n" +
+          "Logged-in UID: " + user.uid + "\n" +
+          "Allowed Admin UID: " + CONFIGURED_ADMIN_UID
+        );
+      }
+
+      console.info("Admin UID verified locally:", user.uid);
+      return true;
+    }
+
+    const AdminAuth = {
+      isLoggedIn() { return !!State.identity; },
+
+      async loginWithFirebase() {
+        const email = document.getElementById("adminEmail").value.trim();
+        const pass = document.getElementById("adminFirebasePass").value;
+
+        if (adminLoginBusy) return;
+        if (!isFirebaseReady) {
+          setAdminLoginStatus("Firebase उपलब्ध नहीं है। Internet और Firebase Config जांचें।");
+          return;
+        }
+        if (!email || !pass) {
+          setAdminLoginStatus("Email और Password दोनों डालें।");
+          return;
+        }
+
+        setAdminLoginBusy(true);
+        setAdminLoginStatus("Firebase Authentication से login हो रहा है...", true);
+
+        try {
+          // Authorization is deliberately NOT read here. onAuthStateChanged
+          // performs the single authoritative /admins/{uid} check after login.
+          await auth.signInWithEmailAndPassword(email, pass);
+          setAdminLoginStatus("Login सफल। Admin authorization verify हो रहा है...", true);
+        } catch (e) {
+          const code = e && e.code ? e.code : "unknown";
+          const msg = e && e.message ? e.message : String(e);
+          setAdminLoginStatus("Firebase login failed [" + code + "]: " + msg);
+          setAdminLoginBusy(false);
+        }
+      },
+
+      enter() {
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("admin-app").style.display = "block";
+        document.getElementById("admin-identity-badge").textContent = "Firebase Admin — " + State.identity.email;
+        setAdminLoginStatus("", true);
+        setAdminLoginBusy(false);
+        AdminPanel.refresh();
+      },
+
+      logout() {
+        if (!confirm("Admin panel से logout करें?")) return;
+        detachAdminRealtime();
+        stopAdminAuthorizationWatch();
+        State.identity = null;
+        document.getElementById("admin-app").style.display = "none";
+        document.getElementById("login-screen").style.display = "flex";
+        setAdminLoginBusy(false);
+        setAdminLoginStatus("Logout हो गया।", true);
+        if (isFirebaseReady && auth) auth.signOut().catch(() => {});
+      }
+    };
+
+    function stopAdminAuthorizationWatch() {
+      if (adminAuthRef && adminAuthHandler) {
+        try { adminAuthRef.off("value", adminAuthHandler); } catch (_) {}
+      }
+      adminAuthRef = null;
+      adminAuthHandler = null;
+      if (adminAuthTimer) clearInterval(adminAuthTimer);
+      adminAuthTimer = null;
+    }
+
+    function revokeAdminNow(message) {
+      stopAdminAuthorizationWatch();
+      detachAdminRealtime();
+      State.identity = null;
+      document.getElementById("admin-app").style.display = "none";
+      document.getElementById("login-screen").style.display = "flex";
+      setAdminLoginBusy(false);
+      setAdminLoginStatus(message || "Admin access revoked.");
+      if (isFirebaseReady && auth) auth.signOut().catch(() => {});
+    }
+
+    function watchAdminAuthorization() {
+      if (!isFirebaseReady || !auth.currentUser || !State.identity) return;
+
+      stopAdminAuthorizationWatch();
+      const uid = auth.currentUser.uid;
+
+      // Do not attach a listener to /admins/{uid}; the deployed RTDB rules
+      // currently reject that read. Firebase Auth session + UID is used here,
+      // while RTDB Rules remain responsible for database authorization.
+      adminAuthTimer = setInterval(async () => {
+        if (!auth.currentUser || !State.identity) return;
+        try {
+          await auth.currentUser.getIdToken(true);
+          if (auth.currentUser.uid !== CONFIGURED_ADMIN_UID) {
+            revokeAdminNow("Admin account बदल गया है।");
+          }
+        } catch (_) {
+          // Ignore transient token/network errors.
+        }
+      }, 30000);
+
+      console.info("Admin session watch active for UID:", uid);
+    }
+
+    if (isFirebaseReady && auth) {
+      auth.onAuthStateChanged(async user => {
+        if (!user) {
+          stopAdminAuthorizationWatch();
+          detachAdminRealtime();
+          State.identity = null;
+          document.getElementById("admin-app").style.display = "none";
+          document.getElementById("login-screen").style.display = "flex";
+          setAdminLoginBusy(false);
+          return;
+        }
+
+        try {
+          setAdminLoginBusy(true);
+          setAdminLoginStatus("Firebase session मिला। /admins/" + user.uid + " authorization check हो रहा है...", true);
+
+          await verifyAdminAccess(user);
+
+          State.identity = {
+            mode: "firebase",
+            name: user.displayName || user.email?.split("@")[0] || "Admin",
+            email: user.email || "",
+            uid: user.uid
+          };
+
+          AdminAuth.enter();
+          attachAdminRealtime();
+          watchAdminAuthorization();
+        } catch (e) {
+          const msg = e && e.message ? e.message : String(e);
+          console.error("Admin authorization error:", e);
+          State.identity = null;
+          document.getElementById("admin-app").style.display = "none";
+          document.getElementById("login-screen").style.display = "flex";
+          setAdminLoginBusy(false);
+          setAdminLoginStatus(msg);
+
+          // Only sign out after the authorization check fails. This prevents
+          // a non-admin Firebase account from remaining authenticated.
+          try { await auth.signOut(); } catch (_) {}
+        }
+      });
+    }
+
+    /* ========================================================================
+       PRODUCT / ADVERTISEMENT / ORDER MANAGEMENT
+       ======================================================================== */
+    const AdminPanel = {
+      view: "products", // products | approval | ads | orders | tickets | users
+      currentImg: "",
+      setView(v) { this.view = v; this.refresh(); },
+      approveProduct(id) { const p = State.posts.find(x => x.id === id); if (!p) return; p.status = "APPROVED"; syncPostUpsert(p); this.refresh(); },
+      rejectProduct(id) { const p = State.posts.find(x => x.id === id); if (!p) return; p.status = "REJECTED"; syncPostUpsert(p); this.refresh(); },
+      deleteProduct(id) { if (!confirm("यह product/post हमेशा के लिए हटाना है?")) return; State.posts = State.posts.filter(x => x.id !== id); syncPostDelete(id); this.refresh(); },
+      markOrderComplete(id) { const o = State.orders.find(x => x.orderId === id); if (o) { o.status = "COMPLETED"; syncOrderUpdate(o); this.refresh(); } },
+      deleteOrder(id) { if (!confirm("यह ऑर्डर हटाना है?")) return; State.orders = State.orders.filter(x => x.orderId !== id); syncOrderDelete(id); this.refresh(); },
+      previewImage(e) {
+        const file = e.target.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = evt => { this.currentImg = evt.target.result; document.getElementById("np-img-preview").innerHTML = `<img src="${evt.target.result}" style="height:70px;" class="rounded border">`; };
+        reader.readAsDataURL(file);
+      },
+      togglePriceInput() {
+        const el = document.getElementById("np-type");
+        const wrapPrice = document.getElementById("np-wrap-price");
+        const wrapJob = document.getElementById("np-wrap-job");
+        if (!el) return;
+        if (wrapPrice) wrapPrice.style.display = el.value.startsWith("market") ? "block" : "none";
+        if (wrapJob) wrapJob.style.display = el.value === "job" ? "block" : "none";
+      },
+      addProduct(e) {
+        e.preventDefault();
+        const type = document.getElementById("np-type").value;
+        const publishNow = document.getElementById("np-publish-now").checked;
+        const newPost = {
+          id: "p_" + Date.now(), type,
+          title: document.getElementById("np-title").value,
+          price: type.startsWith("market") ? (document.getElementById("np-price").value || 0) : 0,
+          desc: document.getElementById("np-desc").value,
+          author: "MyLocal Admin", avatar: "https://picsum.photos/101",
+          img: this.currentImg,
+          status: publishNow ? "APPROVED" : "PENDING",
+          isAdminPost: true, expiresAt: null,
+          time: new Date().toLocaleDateString(), likes: 0
+        };
+        if (type === "job") {
+          newPost.jobType = document.getElementById("np-job-type").value;
+          newPost.organization = document.getElementById("np-organization").value;
+          newPost.qualification = document.getElementById("np-qualification").value;
+          newPost.vacancies = document.getElementById("np-vacancies").value;
+          newPost.salary = document.getElementById("np-salary").value;
+          newPost.lastDate = document.getElementById("np-lastdate").value;
+          newPost.applyLink = document.getElementById("np-applylink").value;
+        }
+        State.posts.unshift(newPost);
+        syncPostUpsert(newPost);
+        e.target.reset();
+        document.getElementById("np-img-preview").innerHTML = "";
+        this.currentImg = "";
+        this.togglePriceInput();
+        this.refresh();
+        alert(publishNow ? "✓ Post publish हो गया।" : "✓ Post 'Pending Approval' में save हुआ।");
+      },
+      saveAdvertisement() {
+        const a = { title: document.getElementById("ad-title").value, text: document.getElementById("ad-text").value, url: document.getElementById("ad-url").value, active: true };
+        localStorage.setItem("apnalocal_admin_ad", JSON.stringify(a));
+        if (isFirebaseReady) db.ref("settings/advertising").set(a);
+        alert("✓ Advertisement live कर दिया गया।");
+        this.refresh();
+      },
+      removeAdvertisement() {
+        localStorage.removeItem("apnalocal_admin_ad");
+        if (isFirebaseReady) db.ref("settings/advertising").remove();
+        this.refresh();
+      },
+      async addUser() {
+        if (!isFirebaseReady) return alert("Firebase उपलब्ध नहीं है।");
+        const name = document.getElementById("newUserName").value.trim();
+        const email = document.getElementById("newUserEmail").value.trim();
+        const pass = document.getElementById("newUserPass").value;
+        const makeAdmin = !!document.getElementById("newUserAdmin")?.checked;
+        if (!email || pass.length < 6) return alert("Valid email और कम से कम 6 character password डालें।");
+        try {
+          const secName = "adminCreator_" + Date.now();
+          const app = firebase.initializeApp(firebaseConfig, secName), au = app.auth();
+          const c = await au.createUserWithEmailAndPassword(email, pass);
+          await db.ref("users/" + c.user.uid).set({ uid: c.user.uid, name, email, createdAt: Date.now(), createdBy: "admin", role: makeAdmin ? "superadmin" : "user" });
+          if (makeAdmin) await db.ref("admins/" + c.user.uid).set(true);
+          await au.signOut(); await app.delete();
+          alert("✓ User Firebase Authentication में बन गया।\nEmail: " + email);
+          document.getElementById("newUserName").value = ""; document.getElementById("newUserEmail").value = ""; document.getElementById("newUserPass").value = "";
+          if (document.getElementById("newUserAdmin")) document.getElementById("newUserAdmin").checked = false;
+        } catch (e) { alert("User create error: " + (e.message || e)); }
+      },
+
+      refresh() {
+        const view = document.getElementById("admin-view");
+        document.querySelectorAll(".admin-tab").forEach(b => b.classList.remove("active", "btn-danger"));
+        document.querySelectorAll(".admin-tab").forEach(b => b.classList.add("btn-outline-light"));
+        let content = this.renderTabs();
+        if (this.view === "products") content += this.renderProductManagement();
+        else if (this.view === "approval") content += this.renderApproval();
+        else if (this.view === "ads") content += this.renderAds();
+        else if (this.view === "orders") content += this.renderOrders();
+        else if (this.view === "tickets") content += this.renderTickets();
+        else if (this.view === "users") content += this.renderUsers();
+        else if (this.view === "area") content += this.renderServiceArea();
+        view.innerHTML = content;
+        const activeBtn = document.getElementById("tab-" + this.view);
+        if (activeBtn) { activeBtn.classList.remove("btn-outline-light"); activeBtn.classList.add("btn-danger", "active"); }
+        if (this.view === "area") setTimeout(() => AdminArea.initMap(), 60);
+      },
+
+      renderTabs() {
+        const pendingCount = State.posts.filter(p => p.status === "PENDING").length;
+        const newOrderCount = State.orders.filter(o => o.status === "NEW").length;
+        const tabs = [
+          ["products", "bi-box-seam-fill", "Product Add"],
+          ["approval", "bi-check2-square", `Approval${pendingCount ? ` (${pendingCount})` : ""}`],
+          ["ads", "bi-megaphone-fill", "Advertisement"],
+          ["orders", "bi-cart-check-fill", `Orders${newOrderCount ? ` (${newOrderCount})` : ""}`],
+          ["tickets", `bi-life-preserver`, `Help Tickets${State.adminTickets.length ? ` (${State.adminTickets.length})` : ""}`],
+          ["area", "bi-geo-fill", "सेवा क्षेत्र (Area Lock)"],
+          ["users", "bi-people-fill", "Users (Firebase)"]
+        ];
+        return `<div class="d-flex gap-2 flex-wrap mb-4">${tabs.map(t => `<button id="tab-${t[0]}" class="btn btn-sm admin-tab btn-outline-light" onclick="AdminPanel.setView('${t[0]}')"><i class="bi ${t[1]} me-1"></i>${t[2]}</button>`).join("")}</div>`;
+      },
+
+      renderServiceArea() {
+        return `<div class="card glass-card p-3">
+          <h5 class="fw-bold section-title mb-2">📍 सेवा क्षेत्र (Service Area Lock)</h5>
+          <p class="small text-secondary">यहाँ जो केंद्र (center) आप सेट करेंगे, उसके <b>50 किमी</b> के दायरे में ही यह ऐप उपयोगकर्ताओं के लिए काम करेगा। एक बार किसी user ने इस क्षेत्र से login/verify कर लिया, तो वो बाद में कहीं से भी ऐप उपयोग कर सकता है।</p>
+          <div class="row g-2 mb-2">
+            <div class="col-md-8">
+              <div class="input-group">
+                <input type="text" id="area-search-input" class="form-control" placeholder="शहर/गांव/पिनकोड खोजें...">
+                <button class="btn btn-outline-light" onclick="AdminArea.searchPlace()"><i class="bi bi-search"></i></button>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <button class="btn btn-outline-light w-100" onclick="AdminArea.useMyLocation()"><i class="bi bi-crosshair me-1"></i> मेरी वर्तमान लोकेशन</button>
+            </div>
+          </div>
+          <div id="area-map-container" class="mb-3 border border-secondary"></div>
+          <div class="row g-2 mb-2">
+            <div class="col-md-6"><input type="text" id="area-label" class="form-control" placeholder="क्षेत्र का नाम (जैसे: Etawah, UP)"></div>
+            <div class="col-md-3"><input type="text" id="area-lat" class="form-control" placeholder="Latitude" readonly></div>
+            <div class="col-md-3"><input type="text" id="area-lng" class="form-control" placeholder="Longitude" readonly></div>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-danger fw-bold" onclick="AdminArea.save()"><i class="bi bi-check-circle-fill me-1"></i> यह क्षेत्र Lock करें (Save)</button>
+            <button class="btn btn-outline-danger" onclick="AdminArea.remove()"><i class="bi bi-x-circle me-1"></i> Area Lock हटाएं</button>
+          </div>
+          <div id="area-current-info" class="alert alert-secondary mt-3 mb-0 small"></div>
+        </div>`;
+      },
+
+      renderProductManagement() {
+        const products = State.posts.filter(p => p.type.startsWith("market") || p.type === "job");
+        return `
+          <div class="row g-3">
+            <div class="col-lg-5">
+              <div class="card glass-card p-3">
+                <h5 class="fw-bold section-title mb-3">➕ नया Product / Post जोड़ें</h5>
+                <form onsubmit="AdminPanel.addProduct(event)">
+                  <div class="mb-2">
+                    <label class="form-label small fw-bold">कैटेगरी</label>
+                    <select id="np-type" class="form-select" onchange="AdminPanel.togglePriceInput()" required>
+                      <option value="market_sell">सामान बेचें (For Sale)</option>
+                      <option value="market_need">आवश्यकता (Need)</option>
+                      <option value="job">नौकरी / सरकारी काम (Job)</option>
+                      <option value="social">सोशल अपडेट (Social Post)</option>
+                      <option value="news">लोकल समाचार (News)</option>
+                    </select>
+                  </div>
+                  <div class="mb-2"><input type="text" id="np-title" class="form-control" placeholder="शीर्षक (Title / Job Post Name)" required></div>
+                  <div class="mb-2" id="np-wrap-price"><input type="number" id="np-price" class="form-control" placeholder="कीमत (₹)"></div>
+                  <div id="np-wrap-job" style="display:none;">
+                    <div class="mb-2">
+                      <select id="np-job-type" class="form-select">
+                        <option value="government">सरकारी नौकरी (Government)</option>
+                        <option value="private">प्राइवेट नौकरी (Private)</option>
+                      </select>
+                    </div>
+                    <div class="mb-2"><input type="text" id="np-organization" class="form-control" placeholder="विभाग / कंपनी का नाम"></div>
+                    <div class="mb-2"><input type="text" id="np-qualification" class="form-control" placeholder="योग्यता (जैसे: 10वीं पास, ग्रेजुएट)"></div>
+                    <div class="row g-2 mb-2">
+                      <div class="col-6"><input type="text" id="np-vacancies" class="form-control" placeholder="कुल पद"></div>
+                      <div class="col-6"><input type="text" id="np-salary" class="form-control" placeholder="वेतन (₹)"></div>
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-label small fw-bold">आवेदन की अंतिम तारीख</label>
+                      <input type="date" id="np-lastdate" class="form-control">
+                    </div>
+                    <div class="mb-2"><input type="url" id="np-applylink" class="form-control" placeholder="Apply Link / अधिक जानकारी (https://...)"></div>
+                  </div>
+                  <div class="mb-2"><textarea id="np-desc" class="form-control" rows="3" placeholder="पूरा विवरण..." required></textarea></div>
+                  <div class="mb-2">
+                    <label class="form-label small fw-bold">फ़ोटो अपलोड करें</label>
+                    <input type="file" class="form-control" accept="image/*" onchange="AdminPanel.previewImage(event)">
+                    <div id="np-img-preview" class="mt-2"></div>
+                  </div>
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="np-publish-now" checked>
+                    <label class="form-check-label small" for="np-publish-now">तुरंत Publish करें (uncheck करें तो यह "Pending Approval" में जाएगा)</label>
+                  </div>
+                  <button type="submit" class="btn btn-danger w-100 fw-bold">Save करें</button>
+                </form>
+              </div>
+            </div>
+            <div class="col-lg-7">
+              <div class="card glass-card p-3">
+                <h5 class="fw-bold section-title mb-3">📦 सभी Products & Jobs (${products.length})</h5>
+                <div class="overflow-auto" style="max-height:560px;">
+                  ${products.map(p => `
+                    <div class="d-flex gap-2 border-bottom border-secondary py-2 align-items-center">
+                      <img src="${p.img || 'https://picsum.photos/80'}" class="product-img-sm">
+                      <div class="flex-grow-1">
+                        <b>${esc(p.title)}</b> ${p.type === 'job' ? `<span class="badge bg-info text-dark">JOB</span>` : `<span class="text-success">₹${p.price}</span>`}<br>
+                        <span class="badge ${p.status === 'APPROVED' ? 'bg-success' : p.status === 'PENDING' ? 'bg-warning text-dark' : 'bg-secondary'}">${p.status}</span>
+                        <span class="small text-secondary">${p.time}</span>
+                      </div>
+                      <button class="btn btn-sm btn-outline-danger" onclick="AdminPanel.deleteProduct('${p.id}')"><i class="bi bi-trash"></i></button>
+                    </div>
+                  `).join("") || '<p class="text-secondary small">अभी कोई product/job नहीं है।</p>'}
+                </div>
+              </div>
+            </div>
+          </div>`;
+      },
+
+      renderApproval() {
+        const pending = State.posts.filter(p => p.status === "PENDING");
+        return `<div class="card glass-card p-3">
+          <h5 class="fw-bold section-title mb-3">✅ Approval के लिए Pending (${pending.length})</h5>
+          ${pending.map(p => `
+            <div class="border border-secondary rounded-3 p-3 mb-2 d-flex gap-3 align-items-start flex-wrap">
+              <img src="${p.img || 'https://picsum.photos/80'}" class="product-img-sm">
+              <div class="flex-grow-1">
+                <b>${esc(p.title)}</b> ${p.price ? `<span class="text-success">₹${p.price}</span>` : ''}<br>
+                <span class="small text-secondary">${esc(p.desc)}</span><br>
+                <span class="small text-secondary">By: ${esc(p.author)} • ${p.time}</span>
+              </div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-success" onclick="AdminPanel.approveProduct('${p.id}')"><i class="bi bi-check-lg"></i> Approve</button>
+                <button class="btn btn-sm btn-outline-danger" onclick="AdminPanel.rejectProduct('${p.id}')"><i class="bi bi-x-lg"></i> Reject</button>
+              </div>
+            </div>
+          `).join("") || '<p class="text-secondary small">कोई pending item नहीं है — सब approve हो चुका है।</p>'}
+        </div>`;
+      },
+
+      renderAds() {
+        const ad = JSON.parse(localStorage.getItem("apnalocal_admin_ad") || "null");
+        return `<div class="card glass-card p-3">
+          <h5 class="fw-bold section-title mb-3">📢 Advertisement Manager</h5>
+          <p class="small text-secondary">यह Advertisement उपयोगकर्ताओं को App के Home Tab पर सबसे ऊपर दिखेगा।</p>
+          <input id="ad-title" class="form-control mb-2" placeholder="Ad heading" value="${esc(ad?.title || '')}">
+          <input id="ad-text" class="form-control mb-2" placeholder="Ad message" value="${esc(ad?.text || '')}">
+          <input id="ad-url" class="form-control mb-2" placeholder="Button link (optional, https://...)" value="${esc(ad?.url || '')}">
+          <div class="d-flex gap-2">
+            <button class="btn btn-danger" onclick="AdminPanel.saveAdvertisement()"><i class="bi bi-broadcast me-1"></i>Ad Live करें</button>
+            <button class="btn btn-outline-light" onclick="AdminPanel.removeAdvertisement()">Ad बंद करें</button>
+          </div>
+          ${ad?.active ? `<div class="alert alert-success mt-3 mb-0"><b>अभी Live:</b> ${esc(ad.title)} — ${esc(ad.text)}</div>` : `<div class="alert alert-secondary mt-3 mb-0">अभी कोई Ad live नहीं है।</div>`}
+        </div>`;
+      },
+
+      renderOrders() {
+        return `<div class="card glass-card p-3">
+          <h5 class="fw-bold section-title mb-3">🛒 सभी ऑर्डर्स (${State.orders.length})</h5>
+          <div class="overflow-auto" style="max-height:600px;">
+            ${State.orders.map(o => `
+              <div class="border border-secondary rounded-3 p-3 mb-2">
+                <div class="d-flex justify-content-between flex-wrap">
+                  <b>#${esc(o.orderId)} — ${esc(o.prodTitle)}</b>
+                  <span class="badge ${o.status === 'NEW' ? 'bg-danger' : 'bg-success'}">${o.status}</span>
+                </div>
+                <div class="small text-secondary mt-1">कीमत: ${esc(o.price)} • समय: ${o.timestamp}</div>
+                <div class="small mt-1">ग्राहक: <b>${esc(o.userName)}</b> (<a class="quiet" href="tel:${o.userPhone}">${esc(o.userPhone)}</a>)</div>
+                <div class="small mt-1">📍 ${esc(o.buyerLocation?.address || o.userAddress || 'Location unavailable')} ${o.buyerLocation ? `<a target="_blank" class="quiet" href="https://www.google.com/maps?q=${o.buyerLocation.lat},${o.buyerLocation.lng}">(Map देखें)</a>` : ''}</div>
+                <div class="d-flex gap-2 mt-2">
+                  ${o.status === 'NEW' ? `<button class="btn btn-sm btn-success" onclick="AdminPanel.markOrderComplete('${o.orderId}')">कन्फर्म करें</button>` : ''}
+                  <button class="btn btn-sm btn-outline-danger" onclick="AdminPanel.deleteOrder('${o.orderId}')">हटाएं</button>
+                </div>
+              </div>
+            `).join("") || '<p class="text-secondary small">अभी कोई ऑर्डर नहीं है।</p>'}
+          </div>
+        </div>`;
+      },
+
+      renderTickets() {
+        return `<div class="card glass-card p-3">
+          <h5 class="fw-bold section-title mb-3">🎧 Help Tickets (${State.adminTickets.length})</h5>
+          <div class="overflow-auto" style="max-height:600px;">
+            ${State.adminTickets.map(t => `
+              <div class="border border-secondary rounded-3 p-3 mb-2">
+                <b>${esc(t.sub)}</b> <span class="small text-secondary">— ${esc(t.user)}</span><br>
+                <span class="small">${esc(t.msg)}</span><br>
+                <span class="small text-secondary">${t.time}</span>
+              </div>
+            `).join("") || '<p class="text-secondary small">कोई ticket नहीं है।</p>'}
+          </div>
+        </div>`;
+      },
+
+      renderUsers() {
+        return `<div class="card glass-card p-3">
+          <h5 class="fw-bold section-title mb-3">👥 नया Firebase User बनाएं</h5>
+          <p class="small text-secondary">Email/Password Sign-in Firebase Console में enabled होना चाहिए।</p>
+          <input id="newUserName" class="form-control mb-2" placeholder="User name">
+          <input id="newUserEmail" type="email" class="form-control mb-2" placeholder="User email">
+          <input id="newUserPass" type="password" class="form-control mb-2" placeholder="Password (min 6 characters)">
+          <div class="form-check mb-3"><input id="newUserAdmin" class="form-check-input" type="checkbox"><label class="form-check-label small" for="newUserAdmin">इस user को Super Admin भी बनाएं</label></div>
+          <button class="btn btn-danger w-100" onclick="AdminPanel.addUser()"><i class="bi bi-person-plus-fill me-1"></i> Firebase User बनाएं</button>
+          <div class="alert alert-secondary mt-3 mb-0 small">${isFirebaseReady ? '✓ Firebase connected है।' : '⚠ Firebase उपलब्ध नहीं है — यह feature काम नहीं करेगा।'}</div>
+        </div>`;
+      }
+    };
+
+    /* ========================================================================
+       AREA LOCK MANAGER (50km service-area picker: map + search + GPS)
+       ======================================================================== */
+    let areaMap = null, areaMarker = null, areaCircle = null;
+    const AdminArea = {
+      radiusKm: 50,
+      setPoint(lat, lng, label) {
+        document.getElementById("area-lat").value = lat.toFixed(6);
+        document.getElementById("area-lng").value = lng.toFixed(6);
+        if (label) document.getElementById("area-label").value = label;
+        if (areaMap && typeof L !== "undefined") {
+          areaMap.setView([lat, lng], 10);
+          if (areaMarker) areaMarker.setLatLng([lat, lng]); else areaMarker = L.marker([lat, lng], { draggable: true }).addTo(areaMap).on('dragend', e => { const p = e.target.getLatLng(); AdminArea.setPoint(p.lat, p.lng); });
+          if (areaCircle) areaCircle.setLatLng([lat, lng]); else areaCircle = L.circle([lat, lng], { radius: this.radiusKm * 1000, color: '#dc3545', fillOpacity: 0.08 }).addTo(areaMap);
+        }
+      },
+      initMap() {
+        const existing = JSON.parse(localStorage.getItem("apnalocal_service_area") || "null");
+        const startLat = existing?.lat || 28.6139, startLng = existing?.lng || 77.2090;
+        if (typeof L === "undefined") {
+          const mapDiv = document.getElementById("area-map-container");
+          if (mapDiv) mapDiv.innerHTML = `<div class="d-flex align-items-center justify-content-center h-100 text-secondary small p-3 text-center"><div><i class="bi bi-map fs-2 d-block mb-2"></i>Map load नहीं हो सका (internet जांचें)।<br>नीचे "मेरी लोकेशन" या "खोजें" बटन अभी भी काम करेगा — coordinates मैन्युअल रूप से भर जाएंगे।</div></div>`;
+        } else if (!areaMap) {
+          areaMap = L.map('area-map-container').setView([startLat, startLng], existing ? 10 : 5);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(areaMap);
+          areaMap.on('click', e => AdminArea.setPoint(e.latlng.lat, e.latlng.lng));
+        } else { areaMap.invalidateSize(); }
+        if (existing) {
+          this.setPoint(existing.lat, existing.lng, existing.label);
+          document.getElementById("area-current-info").innerHTML = `<b>वर्तमान में Lock है:</b> ${esc(existing.label || '')} (${existing.radiusKm || this.radiusKm} किमी दायरा)`;
+        } else {
+          document.getElementById("area-current-info").innerHTML = `अभी कोई क्षेत्र सेट नहीं है — ऐप सभी users के लिए बिना किसी बंदिश के काम करेगा।`;
+        }
+      },
+      useMyLocation() {
+        if (!navigator.geolocation) return alert("इस browser में Location उपलब्ध नहीं है।");
+        navigator.geolocation.getCurrentPosition(pos => {
+          this.setPoint(pos.coords.latitude, pos.coords.longitude, "मेरी वर्तमान लोकेशन");
+        }, () => alert("Location लेने में समस्या हुई। Permission जांचें।"));
+      },
+      async searchPlace() {
+        const q = document.getElementById("area-search-input").value.trim();
+        if (!q) return;
+        try {
+          const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`);
+          const d = await r.json();
+          if (d.length > 0) this.setPoint(parseFloat(d[0].lat), parseFloat(d[0].lon), d[0].display_name.split(',')[0]);
+          else alert("जगह नहीं मिली, दूसरा नाम try करें।");
+        } catch (e) { alert("खोज में समस्या हुई — internet जांचें।"); }
+      },
+      save() {
+        const lat = parseFloat(document.getElementById("area-lat").value);
+        const lng = parseFloat(document.getElementById("area-lng").value);
+        const label = document.getElementById("area-label").value.trim();
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return alert("पहले मैप पर क्लिक करके या खोज कर क्षेत्र चुनें।");
+        if (!label) return alert("क्षेत्र का नाम डालें।");
+        const area = { lat, lng, label, radiusKm: this.radiusKm, setAt: Date.now() };
+        localStorage.setItem("apnalocal_service_area", JSON.stringify(area));
+        if (isFirebaseReady) db.ref("settings/serviceArea").set(area);
+        alert(`✓ क्षेत्र Lock हो गया: ${label} (${this.radiusKm} किमी दायरा)\n\nनोट: जो users पहले से ऐप उपयोग कर रहे हैं वो प्रभावित नहीं होंगे। यह सिर्फ नए/unverified users पर लागू होगा।`);
+        AdminPanel.refresh();
+      },
+      remove() {
+        if (!confirm("Area Lock हटाना है? इसके बाद ऐप बिना किसी क्षेत्र-बंदिश के सभी जगह काम करेगा।")) return;
+        localStorage.removeItem("apnalocal_service_area");
+        if (isFirebaseReady) db.ref("settings/serviceArea").remove();
+        AdminPanel.refresh();
+      }
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {});
+  
+/* ========================================================================
+   FIREBASE CONFIG MANAGER
+   ======================================================================== */
+(function(){
+  const STORAGE_KEY = "mylocal_firebase_config_v1";
+
+  const DEFAULT_CONFIG = {
+    apiKey: "AIzaSyBBSsIRGaOswYUxMY6G6udxLM8V_-Tdytk",
+    authDomain: "local-9a38c.firebaseapp.com",
+    databaseURL: "https://local-9a38c-default-rtdb.firebaseio.com",
+    projectId: "local-9a38c",
+    storageBucket: "local-9a38c.firebasestorage.app",
+    messagingSenderId: "251764724922",
+    appId: "1:251764724922:web:7e9823c4e20249b79f1e83",
+    measurementId: "G-VEDV138WYG"
+  };
+
+  function getSaved(){
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? {...DEFAULT_CONFIG, ...JSON.parse(raw)} : {...DEFAULT_CONFIG};
+    } catch (_) {
+      return {...DEFAULT_CONFIG};
+    }
   }
-}
-function logout(){auth.signOut().finally(()=>{uid=null;showLogin();document.getElementById('adminUser').textContent='';});}
-const arr=v=>v?Object.entries(v).map(([id,x])=>({...x,id})):[]; const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-async function loadAll(){const [u,p,o,t]=await Promise.all([db.ref('users').once('value'),db.ref('posts').once('value'),db.ref('orders').once('value'),db.ref('adminTickets').once('value')]);const users=arr(u.val()),posts=arr(p.val()),orders=arr(o.val()),tickets=arr(t.val());cUsers.textContent=users.length;cPosts.textContent=posts.length;cOrders.textContent=orders.length;cTickets.textContent=tickets.length;
-ordersBody.innerHTML=orders.map(x=>`<tr><td>${esc(x.orderId||x.id)}</td><td>${esc(x.prodTitle)}</td><td>${esc(x.userName)}</td><td>${esc(x.userPhone)}</td><td><select class="form-select form-select-sm" onchange="setOrder('${x.id}',this.value)"><option ${x.status==='NEW'?'selected':''}>NEW</option><option ${x.status==='CONFIRMED'?'selected':''}>CONFIRMED</option><option ${x.status==='SHIPPED'?'selected':''}>SHIPPED</option><option ${x.status==='DELIVERED'?'selected':''}>DELIVERED</option><option ${x.status==='CANCELLED'?'selected':''}>CANCELLED</option></select></td><td><button class="btn btn-sm btn-danger" onclick="del('orders/${x.id}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="6">No orders</td></tr>';
-postsBody.innerHTML=posts.map(x=>`<tr><td>${x.img?`<img class="thumb" src="${esc(x.img)}">`:''}</td><td>${esc(x.title)}</td><td>${esc(x.author)}</td><td>${esc(x.type)}</td><td>${esc(x.status)}</td><td class="d-flex gap-1"><button class="btn btn-sm btn-success" onclick="setPost('${x.id}','APPROVED')">Approve</button><button class="btn btn-sm btn-warning" onclick="setPost('${x.id}','REJECTED')">Reject</button><button class="btn btn-sm btn-danger" onclick="del('posts/${x.id}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="6">No posts</td></tr>';
-usersBody.innerHTML=users.map(x=>`<tr><td><code>${esc(x.uid||x.id)}</code></td><td>${esc(x.name)}</td><td>${esc(x.role||'user')}</td><td><button class="btn btn-sm btn-outline-danger" onclick="setUserRole('${x.id}','blocked')">Block</button><button class="btn btn-sm btn-outline-success" onclick="setUserRole('${x.id}','user')">Unblock</button></td></tr>`).join('')||'<tr><td colspan="4">No user profiles</td></tr>';
-ticketsBox.innerHTML=tickets.map(x=>`<div class="border rounded-3 p-2 mb-2"><b>${esc(x.sub)}</b> — ${esc(x.user)}<div>${esc(x.msg)}</div><small>${esc(x.time)} · ${esc(x.status)}</small><button class="btn btn-sm btn-outline-success ms-2" onclick="db.ref('adminTickets/${x.id}/status').set('DONE').then(loadAll)">Done</button></div>`).join('')||'<div class="text-secondary">No tickets</div>';
-}
-function saveAd(){const ad={title:adTitle.value.trim(),text:adText.value.trim(),url:adUrl.value.trim(),image:adImage.value.trim(),startAt:adStart.value||'',endAt:adEnd.value||'',active:adActive.checked,updatedAt:Date.now(),updatedBy:uid};db.ref('settings/advertising').set(ad).then(()=>{adStatus.textContent='✓ Advertisement saved and synced.';});}function stopAd(){db.ref('settings/advertising/active').set(false).then(()=>adStatus.textContent='✓ Advertisement stopped.')} 
-function addAdminProduct(){const title=pTitle.value.trim();if(!title)return alert('Product title डालें');const id='admin_'+Date.now();const p={id,type:'market_sell',title,price:Number(pPrice.value)||0,desc:pDesc.value.trim(),author:'ApnaLocal Admin',avatar:'',img:pImg.value.trim(),status:'APPROVED',isAdminPost:true,time:new Date().toLocaleDateString('hi-IN'),createdBy:uid,createdAt:Date.now()};db.ref('posts/'+id).set(p).then(()=>{pTitle.value=pPrice.value=pImg.value=pDesc.value='';loadAll();alert('Admin product added');});}
-function setOrder(id,status){db.ref('orders/'+id+'/status').set(status)} function setPost(id,status){db.ref('posts/'+id+'/status').set(status).then(loadAll)} function setUserRole(id,role){db.ref('users/'+id+'/role').set(role).then(loadAll)} function del(path){if(confirm('Delete permanently?'))db.ref(path).remove().then(loadAll)}
-</script></body></html>
+
+  function setStatus(msg, ok){
+    const el = document.getElementById("firebase-config-status");
+    if (!el) return;
+    el.textContent = msg;
+    el.style.color = ok ? "#198754" : "#dc3545";
+  }
+
+  window.FirebaseConfigManager = {
+    open(){
+      const modal = document.getElementById("firebase-config-modal");
+      if (!modal) return;
+      modal.style.display = "block";
+      this.loadCurrent();
+    },
+
+    close(){
+      const modal = document.getElementById("firebase-config-modal");
+      if (modal) modal.style.display = "none";
+    },
+
+    loadCurrent(){
+      const box = document.getElementById("firebase-config-json");
+      if (box) box.value = JSON.stringify(getSaved(), null, 2);
+      setStatus("Current Firebase config loaded.", true);
+    },
+
+    validate(c){
+      const required = ["apiKey","authDomain","databaseURL","projectId","storageBucket","messagingSenderId","appId"];
+      const missing = required.filter(k => !c[k] || typeof c[k] !== "string");
+      if (missing.length) throw new Error("Missing: " + missing.join(", "));
+      if (!/^https?:\/\//i.test(c.databaseURL)) throw new Error("databaseURL invalid है।");
+      return true;
+    },
+
+    parse(){
+      const box = document.getElementById("firebase-config-json");
+      if (!box) throw new Error("Config box नहीं मिला।");
+      let c;
+      try { c = JSON.parse(box.value); }
+      catch (_) { throw new Error("Firebase Config valid JSON नहीं है।"); }
+      this.validate(c);
+      return c;
+    },
+
+    async test(){
+      try {
+        const c = this.parse();
+        const r = await fetch(c.databaseURL.replace(/\/+$/,"") + "/.json?shallow=true");
+        if (!r.ok && r.status !== 401 && r.status !== 403) {
+          throw new Error("Database endpoint response: HTTP " + r.status);
+        }
+        setStatus("Firebase Database endpoint reachable. Rules/auth अभी अलग से verify होंगे.", true);
+      } catch(e) {
+        setStatus("Connection test failed: " + e.message, false);
+      }
+    },
+
+    save(){
+      try {
+        const c = this.parse();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(c));
+        setStatus("Config saved. Page reload हो रहा है...", true);
+        setTimeout(() => location.reload(), 700);
+      } catch(e) {
+        setStatus("Save failed: " + e.message, false);
+      }
+    },
+
+    reset(){
+      if (!confirm("Default local-9a38c Firebase config restore करें?")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      const box = document.getElementById("firebase-config-json");
+      if (box) box.value = JSON.stringify(DEFAULT_CONFIG, null, 2);
+      setStatus("Default config restored. Save & Reconnect दबाएँ।", true);
+    }
+  };
+
+  /* IMPORTANT:
+     This manager stores the config for the next page load. The Admin/User
+     Firebase initialization must read this same key before initializeApp().
+  */
+})();
+
+</script>
+
+<!-- Firebase Config Manager -->
+<div id="firebase-config-modal" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);padding:20px;overflow:auto">
+  <div style="max-width:760px;margin:30px auto;background:#fff;border-radius:18px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+      <h2 style="margin:0">⚙️ Firebase Config</h2>
+      <button onclick="FirebaseConfigManager.close()" style="border:0;background:#eee;border-radius:10px;padding:8px 12px">✕</button>
+    </div>
+    <p style="color:#666;font-size:13px">Firebase Web Config बदलें और नए project से reconnect करें। Save के बाद page reload होगा।</p>
+
+    <textarea id="firebase-config-json" spellcheck="false"
+      style="width:100%;min-height:180px;padding:12px;border:1px solid #ddd;border-radius:12px;font-family:monospace;font-size:13px;box-sizing:border-box"
+      placeholder='{"apiKey":"...","authDomain":"...","databaseURL":"...","projectId":"...","storageBucket":"...","messagingSenderId":"...","appId":"...","measurementId":"..."}'></textarea>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+      <button onclick="FirebaseConfigManager.loadCurrent()" style="padding:10px 14px;border:1px solid #ddd;border-radius:10px;background:#f7f7f7">Current Config</button>
+      <button onclick="FirebaseConfigManager.test()" style="padding:10px 14px;border:0;border-radius:10px;background:#198754;color:#fff">Test Connection</button>
+      <button onclick="FirebaseConfigManager.save()" style="padding:10px 14px;border:0;border-radius:10px;background:#0d6efd;color:#fff">Save & Reconnect</button>
+      <button onclick="FirebaseConfigManager.reset()" style="padding:10px 14px;border:1px solid #dc3545;border-radius:10px;background:#fff;color:#dc3545">Reset Default</button>
+    </div>
+    <div id="firebase-config-status" style="margin-top:12px;font-size:13px"></div>
+  </div>
+</div>
+
+</body>
+</html>

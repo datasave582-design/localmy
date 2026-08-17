@@ -1,0 +1,13 @@
+MyLocal FINAL
+Firebase: local-9a38c
+Google user login: Authentication > Google ENABLED
+Admin login: Authentication > Email/Password ENABLED
+Authorized domain: datasave582-design.github.io
+Admin DB: admins/YOUR_UID = true
+Paste firebase-rules.json completely into Realtime Database Rules and Publish. Do not mix old numChildren rules.
+
+
+FIREBASE CONFIG MANAGER:
+Admin dashboard now has a "⚙️ Firebase" button.
+It saves a Firebase Web Config in browser localStorage and reloads the admin page.
+It includes Current Config, Test Connection, Save & Reconnect, and Reset Default.
