@@ -52,6 +52,26 @@ html,body{background:var(--ml-bg)!important;color:var(--ml-ink)!important;font-f
 .btn-danger{background:linear-gradient(135deg,var(--ml-orange),var(--ml-red))!important;border:0!important}.btn-outline-danger{color:var(--ml-red)!important;border-color:#f2b6a7!important}.btn-outline-warning{color:#c85a00!important;border-color:#f2c09d!important}.section-title{border-left-color:var(--ml-orange)!important}.stat-tile{background:#fff!important;border:1px solid var(--ml-line)!important;box-shadow:var(--ml-shadow)}
 .nav-tabs .nav-link.active{color:var(--ml-orange)!important;border-color:#ffd1b0 #ffd1b0 #fff!important}.table{--bs-table-bg:#fff}.table thead th{background:#fff7f0!important;color:#75401f;border-bottom:1px solid #f0dfd2}.product-img-sm{border-radius:12px!important}
 
+
+/* FINAL ADMIN CONTRAST POLISH */
+:root{--ml-orange:#ff6a00;--ml-red:#e53935;--ml-bg:#f7f7f5;--ml-card:#fff;--ml-ink:#171717;--ml-line:#e8e5e1}
+body{background:var(--ml-bg)!important;color:var(--ml-ink)!important}
+.admin-header{background:#fff!important;color:#171717!important;border-bottom:1px solid var(--ml-line)!important}
+.admin-header .text-white{color:#171717!important}
+.admin-header .text-danger{color:var(--ml-orange)!important}
+.admin-header .btn-outline-danger{color:var(--ml-orange)!important;border-color:#ffc7a5!important;background:#fff!important}
+.admin-header .btn-outline-warning{color:#a84a00!important;border-color:#f1c29f!important;background:#fff!important}
+.glass-card,.stat-tile{background:#fff!important;color:#171717!important;border-color:var(--ml-line)!important}
+.section-title{color:#171717!important}
+.table{color:#222!important}
+.table td,.table th{color:#222!important}
+.text-secondary{color:#686868!important}
+.form-control,.form-select{background:#fff!important;color:#222!important}
+.form-control::placeholder{color:#858585!important}
+.btn-danger{background:linear-gradient(135deg,#ff6a00,#e53935)!important;border:0!important}
+.app-toast{background:#fff!important;color:#222!important;border:1px solid #e5e1dc!important}
+.app-toast .app-toast-msg{color:#222!important}
+
 </style>
 </head>
 <body>
@@ -594,6 +614,9 @@ html,body{background:var(--ml-bg)!important;color:var(--ml-ink)!important;font-f
           price: type.startsWith("market") ? (document.getElementById("np-price").value || 0) : 0,
           stock: type.startsWith("market") && document.getElementById("np-stock").value !== "" ? Number(document.getElementById("np-stock").value) : null,
           category: type.startsWith("market") ? (document.getElementById("np-category").value || '') : '',
+          locationLabel: type.startsWith("market") ? (document.getElementById("np-location-label")?.value || 'Local') : '',
+          featured: type.startsWith("market") ? !!document.getElementById("np-featured")?.checked : false,
+          availability: type.startsWith("market") ? 'available' : '',
           oneOrderPerMonth: type.startsWith("market") ? !!document.getElementById("np-monthly-limit").checked : false,
           desc: document.getElementById("np-desc").value,
           author: "MyLocal Admin", avatar: "https://picsum.photos/101",
@@ -656,7 +679,11 @@ html,body{background:var(--ml-bg)!important;color:var(--ml-ink)!important;font-f
         document.getElementById("np-img-preview").innerHTML = p.img ? `<img src="${p.img}" class="img-fluid rounded mt-2" style="max-height:150px;" alt="Current image">` : '';
         document.getElementById("np-monthly-limit").checked = !!p.oneOrderPerMonth;
         this.togglePriceInput();
-        if (p.type.startsWith("market")) document.getElementById("np-category").value = p.category || '';
+        if (p.type.startsWith("market")) {
+  document.getElementById("np-category").value = p.category || '';
+  const locEl=document.getElementById("np-location-label"); if(locEl) locEl.value=p.locationLabel||'';
+  const featEl=document.getElementById("np-featured"); if(featEl) featEl.checked=!!p.featured;
+}
         if (p.type === "job") {
           document.getElementById("np-job-type").value = p.jobType || 'government';
           document.getElementById("np-organization").value = p.organization || '';
@@ -858,7 +885,14 @@ html,body{background:var(--ml-bg)!important;color:var(--ml-ink)!important;font-f
                   <div class="mb-2"><input type="text" id="np-title" class="form-control" placeholder="शीर्षक (Title / Job Post Name)" required></div>
                   <div class="mb-2" id="np-wrap-price"><input type="number" id="np-price" class="form-control" placeholder="कीमत (₹)"></div>
                   <div class="mb-2" id="np-wrap-stock"><input type="number" min="0" id="np-stock" class="form-control" placeholder="स्टॉक मात्रा (खाली छोड़ें अगर track नहीं करना)"><small class="text-secondary">0 डालने पर यह अपने आप "Out of Stock" दिखेगा।</small></div>
-                  <div class="mb-2" id="np-wrap-category">
+                  <div class="row g-2 mb-2" id="np-wrap-localmarket">
+  <div class="col-md-6"><input type="text" id="np-location-label" class="form-control" placeholder="इलाका / मोहल्ला (जैसे Sadabad)"></div>
+  <div class="col-md-6 d-flex align-items-center"><div class="form-check">
+    <input type="checkbox" class="form-check-input" id="np-featured">
+    <label class="form-check-label small fw-bold" for="np-featured">🔥 Featured Listing</label>
+  </div></div>
+</div>
+<div class="mb-2" id="np-wrap-category">
                     <label class="form-label small fw-bold">उप-श्रेणी</label>
                     <select id="np-category" class="form-select">
                       <option value="वाहन">वाहन (Vehicle)</option>

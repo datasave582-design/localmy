@@ -1,0 +1,22 @@
+<?php
+declare(strict_types=1);
+require_once __DIR__.'/api/auth.php';
+$u=current_user(true);
+if($_SERVER['REQUEST_METHOD']!=='POST') json_response(['success'=>false,'error'=>'POST required'],405);
+if(empty($_FILES['photo']) || $_FILES['photo']['error']!==UPLOAD_ERR_OK) json_response(['success'=>false,'error'=>'Image upload failed'],400);
+$f=$_FILES['photo'];
+if((int)$f['size']>8*1024*1024) json_response(['success'=>false,'error'=>'Maximum image size is 8MB'],413);
+$fi=new finfo(FILEINFO_MIME_TYPE); $mime=$fi->file($f['tmp_name']);
+$allowed=['image/jpeg'=>'jpg','image/png'=>'png','image/webp'=>'webp'];
+if(!isset($allowed[$mime])) json_response(['success'=>false,'error'=>'Only JPG, PNG and WebP images are allowed'],415);
+$dir='listings';
+$type=(string)($_POST['type']??'listings');
+if(in_array($type,['shops','services','products','avatars','chat','lost-found','events','ads'],true)) $dir=$type;
+if(($u['role']??'user')!=='admin' && in_array($dir,['shops','services','products','events','ads'],true)) json_response(['success'=>false,'error'=>'Admin upload required'],403);
+$root=__DIR__.'/uploads/'.$dir;
+if(!is_dir($root)) mkdir($root,0755,true);
+$name=bin2hex(random_bytes(16)).'.'.$allowed[$mime];
+$dest=$root.'/'.$name;
+if(!move_uploaded_file($f['tmp_name'],$dest)) json_response(['success'=>false,'error'=>'Could not save image'],500);
+$url=rtrim(APP_BASE_URL,'/').'/uploads/'.$dir.'/'.$name;
+json_response(['success'=>true,'url'=>$url,'path'=>'uploads/'.$dir.'/'.$name]);
