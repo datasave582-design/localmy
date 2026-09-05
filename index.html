@@ -351,9 +351,93 @@ main.container{max-width:1180px!important;padding-top:24px!important}
 @media(max-width:600px){main.container{padding:14px 12px 18px!important}.navbar{height:60px!important}.hero-art{display:none}.home-hero-premium{min-height:auto;border-radius:22px}.hero-content{padding:24px 20px 23px}.home-hero-premium h1{font-size:2rem;letter-spacing:-.035em}.home-hero-premium p{font-size:.9rem}.hero-primary-btn,.hero-secondary-btn{padding:11px 14px}.trust-strip{margin-left:-1px;margin-right:-1px}.cat-chip-row{display:flex!important}.cat-chip{min-width:92px;min-height:78px;padding:9px 6px!important}.cat-chip-label{font-size:.67rem}.home-search-card{margin-top:-2px}.navbar .weather-header-badge{display:none!important}}
 @media(min-width:992px){.mobile-bottom-nav{display:none!important}}
 
+
+/* =========================================================
+   MYLOCAL FINAL POLISH — LOCAL MARKET 2026
+   Orange is an accent, not the whole UI. Fixes low-contrast
+   text and adds local-market UI states.
+   ========================================================= */
+:root{
+  --ml-orange:#ff6a00;
+  --ml-orange-dark:#d94f00;
+  --ml-orange-soft:#fff2e8;
+  --ml-red:#e53935;
+  --ml-ink:#171717;
+  --ml-muted:#6f6f6f;
+  --ml-bg:#f7f7f5;
+  --ml-card:#ffffff;
+  --ml-line:#e8e5e1;
+  --ml-green:#16823b;
+  --ml-shadow:0 8px 26px rgba(35,25,18,.07);
+}
+body{background:var(--ml-bg)!important;color:var(--ml-ink)!important}
+body, body *{--bs-body-color:var(--ml-ink)}
+.text-secondary{color:#666!important}
+.text-muted{color:#6b6b6b!important}
+.text-dark{color:#202020!important}
+.bg-light{background:#f5f5f3!important;color:#202020!important}
+.card,.glass-card{background:var(--ml-card)!important;color:var(--ml-ink)!important;border-color:var(--ml-line)!important}
+.card p,.card h1,.card h2,.card h3,.card h4,.card h5,.card h6,
+.glass-card p,.glass-card h1,.glass-card h2,.glass-card h3,.glass-card h4,.glass-card h5,.glass-card h6{color:inherit}
+.navbar{background:rgba(255,255,255,.97)!important;color:var(--ml-ink)!important}
+.navbar *{color:inherit}
+.navbar .btn-primary,.navbar .btn-outline-primary{color:var(--ml-orange)!important;background:#fff7f0!important;border-color:#ffd1b0!important}
+.btn-primary,.btn-market{background:var(--ml-orange)!important;border-color:var(--ml-orange)!important;color:#fff!important}
+.btn-primary:hover,.btn-market:hover{background:var(--ml-orange-dark)!important;border-color:var(--ml-orange-dark)!important}
+.btn-outline-primary{color:var(--ml-orange)!important;border-color:#ffbf91!important;background:#fff!important}
+.btn-outline-primary:hover{background:var(--ml-orange-soft)!important;color:var(--ml-orange-dark)!important}
+.btn-success{background:#16823b!important;border-color:#16823b!important}
+.form-control,.form-select,.input-group-text{background:#fff!important;color:#222!important;border-color:#ddd8d2!important}
+.form-control::placeholder{color:#858585!important;opacity:1}
+.form-control:focus,.form-select:focus{color:#111!important;border-color:#ffad78!important;box-shadow:0 0 0 .2rem rgba(255,106,0,.12)!important}
+.badge.bg-warning,.badge.bg-warning *{color:#5c3b00!important}
+.listing-card{background:#fff!important;color:#171717!important;border-color:#e5e1dc!important}
+.listing-card *{--bs-text-opacity:1}
+.listing-title{color:#202020!important}
+.listing-meta{color:#6f6f6f!important}
+.listing-price{color:var(--ml-orange-dark)!important}
+.listing-card .btn-outline-secondary{color:#555!important;border-color:#d8d4cf!important;background:#fff!important}
+.listing-card .btn-outline-secondary:hover{background:#f5f3f0!important}
+.listing-card .btn-outline-success{color:#16823b!important}
+.app-toast{background:#fff!important;color:#202020!important;border:1px solid #e5e1dc!important}
+.app-toast .app-toast-msg{color:#202020!important}
+[data-bs-theme="dark"] body{background:#151515!important;color:#f1f1f1!important}
+[data-bs-theme="dark"] .card,[data-bs-theme="dark"] .glass-card,
+[data-bs-theme="dark"] .listing-card{background:#202225!important;color:#f1f1f1!important;border-color:#34373b!important}
+[data-bs-theme="dark"] .listing-title{color:#f4f4f4!important}
+[data-bs-theme="dark"] .listing-meta{color:#b8b8b8!important}
+[data-bs-theme="dark"] .form-control,[data-bs-theme="dark"] .form-select{background:#25282c!important;color:#f1f1f1!important;border-color:#444!important}
+[data-bs-theme="dark"] .navbar{background:#202225!important;color:#f1f1f1!important}
+.ml-market-tools{background:#fff;border:1px solid var(--ml-line);border-radius:18px;padding:12px;box-shadow:var(--ml-shadow)}
+.ml-filter-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.ml-filter-row::-webkit-scrollbar{display:none}
+.ml-filter-btn{flex:0 0 auto;border:1px solid #e2ddd7;background:#fff;color:#444;border-radius:999px;padding:7px 12px;font-size:.76rem;font-weight:750}
+.ml-filter-btn.active{background:var(--ml-orange-soft);color:var(--ml-orange-dark);border-color:#ffc29b}
+.ml-distance{font-size:.68rem;font-weight:700;color:#555;display:flex;align-items:center;gap:4px}
+.ml-featured{position:absolute;top:8px;right:8px;background:#ff9f1c;color:#3b2300;padding:4px 8px;border-radius:999px;font-size:.62rem;font-weight:900}
+.ml-sold{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(20,20,20,.48);color:#fff;font-size:1.15rem;font-weight:900;letter-spacing:.08em}
+.ml-save-btn{position:absolute;right:8px;bottom:8px;width:36px;height:36px;border:0;border-radius:50%;background:#fff;color:#555;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:3}
+.ml-save-btn.saved{color:#e53935}
+.ml-status-chip{font-size:.65rem;font-weight:800;border-radius:999px;padding:3px 7px}
+.ml-negotiable{color:#16823b;font-weight:800;font-size:.68rem}
+.ml-seller-mini{display:flex;align-items:center;gap:6px;font-size:.68rem;color:#555;margin-top:3px}
+.ml-seller-mini i{color:#16823b}
+.ml-owner-tools{display:flex;gap:5px;margin-top:6px}
+.ml-owner-tools .btn{font-size:.67rem;padding:4px 7px}
+@media(max-width:575px){
+  .home-hero-premium{border-radius:20px}
+  .hero-content{padding:26px 20px}
+  .ml-market-tools{border-radius:14px}
+}
+
+
+/* FINAL SAFETY + ACCESSIBILITY */
+.ml-safety-box{background:#fffaf3!important;border:1px solid #ffd5a8!important;border-left:5px solid #ff6a00!important;color:#2a2a2a!important;border-radius:16px;padding:14px 15px;box-shadow:0 5px 18px rgba(60,35,10,.06)}
+.ml-safety-box h6{color:#a94300!important}.ml-safety-box p,.ml-safety-box li{color:#424242!important}.ml-safety-box strong{color:#242424!important}.ml-safety-rule{background:#fff!important;border:1px solid #eee3d8;border-radius:10px;padding:8px 10px;margin-top:8px;font-size:.82rem}.ml-consent{background:#f8f8f7!important;border:1px solid #dedbd7!important;border-radius:12px;padding:10px;color:#252525!important}.ml-consent .form-check-label{color:#252525!important;font-size:.78rem;line-height:1.4}.ml-consent .form-check-input:checked{background-color:#ff6a00!important;border-color:#ff6a00!important}[data-bs-theme="dark"] .ml-safety-box{background:#2a2119!important;color:#eee!important}[data-bs-theme="dark"] .ml-safety-box h6{color:#ffb37e!important}[data-bs-theme="dark"] .ml-consent{background:#26282b!important;border-color:#414449!important;color:#eee!important}[data-bs-theme="dark"] .ml-consent .form-check-label{color:#eee!important}
 </style>
 </head>
 <body>
+<noscript><div style="padding:16px;text-align:center;background:#fff3e8;color:#7a3200;font-family:system-ui">इस website को सही तरीके से चलाने के लिए JavaScript चालू करें।</div></noscript>
 
   <!-- Toast stack: replaces native alert() popups app-wide -->
   <div id="app-toast-stack"></div>
@@ -624,10 +708,11 @@ main.container{max-width:1180px!important;padding-top:24px!important}
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
+          <div class="ml-safety-box mb-3" role="note"><h6 class="fw-bold mb-1">⚠️ Local Market Safety Warning</h6><p class="small mb-1">यह platform केवल Buyer और Seller को आपस में संपर्क कराने का माध्यम है। किसी भी सामान, व्यक्ति, भुगतान, सौदे या लेन-देन की जिम्मेदारी website/platform की नहीं होगी।</p><div class="ml-safety-rule">🔴 <strong>पहले जांच करें → फिर मिलें → सामान देखें → उसके बाद ही भुगतान करें।</strong></div><ul class="small mb-0 mt-2 ps-3"><li>Advance payment, OTP, UPI PIN, password या bank details साझा न करें।</li><li>मुलाकात सुरक्षित <strong>public place</strong> में करें।</li><li>Product और Seller/Buyer की पहचान स्वयं verify करें।</li></ul></div>
           <form id="sellForm" onsubmit="SellEngine.submit(event)">
             <div class="mb-2">
               <label class="form-label small fw-bold">फोटो जोड़ें</label>
-              <input type="file" id="sell-photo" class="form-control" accept="image/*" onchange="SellEngine.onPhotoChange(event)">
+              <input type="file" id="sell-photo" class="form-control" accept="image/*" multiple onchange="SellEngine.onPhotoChange(event)">
               <div id="sellPhotoStatus" class="small text-secondary mt-1"></div>
               <div id="sellPhotoPreview"></div>
             </div>
@@ -647,8 +732,22 @@ main.container{max-width:1180px!important;padding-top:24px!important}
             <div class="mb-2"><input type="text" id="sell-title" class="form-control" placeholder="सामान का नाम (जैसे: Honda Activa 6G)" required></div>
             <div class="mb-2"><input type="number" min="0" id="sell-price" class="form-control" placeholder="कीमत (₹)" required></div>
             <div class="mb-2"><input type="number" min="0" id="sell-stock" class="form-control" placeholder="स्टॉक मात्रा (कितने उपलब्ध हैं) — खाली छोड़ें अगर track नहीं करना"><small class="text-secondary">0 डालने पर listing अपने आप "Out of Stock" दिखेगी।</small></div>
-            <div class="mb-2"><textarea id="sell-desc" class="form-control" rows="3" placeholder="विवरण (हालत, कारण, आदि)..." required></textarea></div>
+            
+<div class="row g-2 mb-2">
+  <div class="col-7">
+    <select id="sell-price-type" class="form-select">
+      <option value="fixed">₹ Fixed Price</option>
+      <option value="negotiable">🤝 बातचीत संभव</option>
+    </select>
+  </div>
+  <div class="col-5">
+    <input type="text" id="sell-location" class="form-control" placeholder="इलाका / मोहल्ला">
+  </div>
+</div>
+<div class="mb-2"><textarea id="sell-desc" class="form-control" rows="3" placeholder="विवरण (हालत, कारण, आदि)..." required></textarea></div>
+
             <div class="mb-3"><input type="tel" id="sell-phone" class="form-control" placeholder="संपर्क मोबाइल नंबर" pattern="[0-9]{10}" required></div>
+            <div class="ml-consent mb-2"><div class="form-check"><input class="form-check-input" type="checkbox" id="sell-safety-consent" required><label class="form-check-label" for="sell-safety-consent">मैंने Local Market Safety Warning पढ़ लिया है और listing/सौदे की जानकारी स्वयं verify करूँगा।</label></div></div>
             <button type="submit" class="btn btn-success w-100 fw-bold"><i class="bi bi-tag-fill me-1"></i> बेचने के लिए पोस्ट करें</button>
             <p class="small text-secondary text-center mt-2 mb-0">आपकी listing 30 दिन तक market में दिखेगी।</p>
           </form>
@@ -717,9 +816,8 @@ main.container{max-width:1180px!important;padding-top:24px!important}
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js" defer></script>
-  <!-- Optional Firebase Cloud Messaging: delivery only; app data remains on Hostinger -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js" defer></script>
-  <script src="./host-db.js" defer></script>
   <!-- Leaflet (map) ab yahan se load nahi hota — sirf tab load hoga jab
        user location-picker modal kholega. Isse har page-load par ~150KB
        kam data lagta hai (LazyLibs.ensureLeaflet() dekhein). -->
@@ -906,14 +1004,12 @@ main.container{max-width:1180px!important;padding-top:24px!important}
     // Photos ab Firebase database mein base64 ki jagah Hostinger pe upload
     // hoti hain (upload.php ke through) — sirf chhota sa URL Firebase mein
     // jaata hai. Ye SECRET yahan aur upload.php dono jagah SAME hona chahiye.
-    async function uploadImageToHost(blob, type='listings') {
+    const UPLOAD_SECRET = "nml_b77580c91b9e414cbc50f6018c1d3ff63a84774e30d0517e";
+    async function uploadImageToHost(blob) {
       const fd = new FormData();
       fd.append('photo', blob, 'upload.jpg');
-      fd.append('type', type);
-      let token = '';
-      if (auth && auth.currentUser) token = await auth.currentUser.getIdToken();
-      const headers = token ? { Authorization: 'Bearer ' + token } : {};
-      const res = await fetch('./upload.php', { method: 'POST', body: fd, headers });
+      fd.append('key', UPLOAD_SECRET);
+      const res = await fetch('./upload.php', { method: 'POST', body: fd });
       let j;
       try { j = await res.json(); } catch (e) { throw new Error('Server से सही जवाब नहीं मिला।'); }
       if (!res.ok || !j.success) throw new Error(j.error || ('Upload failed (' + res.status + ')'));
@@ -932,7 +1028,7 @@ main.container{max-width:1180px!important;padding-top:24px!important}
     function initFirebase() {
       try {
         firebase.initializeApp(firebaseConfig);
-        db = window.HostingerDB;
+        db = firebase.database();
         auth = firebase.auth();
         isFirebaseReady = true;
         attachFoodRadiusListener();
@@ -1002,7 +1098,7 @@ main.container{max-width:1180px!important;padding-top:24px!important}
             // Ab safely anonymous sign-in karo (sirf ek baar, jab confirm ho
             // chuka hai ki koi persisted session nahi hai) — taaki guest/naye
             // users ke liye bhi DB reads allowed rahein.
-            // Guest mode stays local; Hostinger API calls require a real Firebase login.
+            auth.signInAnonymously().catch(e => console.warn("Anonymous auth failed (check Firebase Auth > Sign-in method > Anonymous is enabled):", e.message));
           }
         });
       }
@@ -2150,131 +2246,126 @@ main.container{max-width:1180px!important;padding-top:24px!important}
        the form could never submit. That's exactly why selling was broken.
        ======================================================================== */
     const SellEngine = {
-      photoData: null,
-      open(presetCategory) {
-        this.photoData = null;
-        const form = document.getElementById('sellForm');
-        if (form) form.reset();
-        const cat = document.getElementById('sell-category');
-        if (cat && presetCategory) cat.value = presetCategory;
-        const status = document.getElementById('sellPhotoStatus'); if (status) status.textContent = '';
-        const prev = document.getElementById('sellPhotoPreview'); if (prev) prev.innerHTML = '';
-        const modal = new bootstrap.Modal(document.getElementById('sellModal'));
-        modal.show();
-      },
-      onPhotoChange(e) {
-        const file = e.target.files && e.target.files[0];
-        const status = document.getElementById('sellPhotoStatus');
-        const prev = document.getElementById('sellPhotoPreview');
-        if (!file) return;
-        this.photoData = null;
-        if (status) status.textContent = 'फोटो तैयार हो रही है...';
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          const img = new Image();
-          img.onload = () => {
-            // Photo ko resize/compress karke, phir Hostinger pe upload karte
-            // hain — Firebase mein sirf URL jaata hai (poori photo nahi),
-            // isse database halka rehta hai aur listing jaldi load hoti hai.
-            const maxW = 800;
-            const scale = Math.min(1, maxW / img.width);
-            const canvas = document.createElement('canvas');
-            canvas.width = Math.round(img.width * scale);
-            canvas.height = Math.round(img.height * scale);
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            canvas.toBlob(async (blob) => {
-              if (!blob) { if (status) status.textContent = '⚠ फोटो process नहीं हो पाई, दोबारा कोशिश करें।'; return; }
-              if (status) status.textContent = '⬆️ फोटो अपलोड हो रही है...';
-              try {
-                const url = await uploadImageToHost(blob);
-                this.photoData = url;
-                if (prev) prev.innerHTML = `<img src="${url}" class="img-fluid rounded mt-2" style="max-height:150px;" alt="Photo preview">`;
-                if (status) status.textContent = '✓ फोटो अपलोड हो गई।';
-              } catch (err) {
-                if (status) status.textContent = '⚠ फोटो अपलोड नहीं हो पाई (' + err.message + ')। दोबारा कोशिश करें।';
-              }
-            }, 'image/jpeg', 0.72);
-          };
-          img.onerror = () => { if (status) status.textContent = 'फोटो पढ़ने में समस्या हुई, दोबारा कोशिश करें।'; };
-          img.src = ev.target.result;
+  photoData: null,
+  photoDataList: [],
+  open(presetCategory) {
+    this.photoData = null; this.photoDataList = [];
+    const form = document.getElementById('sellForm'); if (form) form.reset();
+    const cat = document.getElementById('sell-category'); if (cat && presetCategory) cat.value = presetCategory;
+    const status = document.getElementById('sellPhotoStatus'); if (status) status.textContent = '';
+    const prev = document.getElementById('sellPhotoPreview'); if (prev) prev.innerHTML = '';
+    const loc = document.getElementById('sell-location');
+    if (loc && State.location?.label) loc.value = State.location.label;
+    const modal = new bootstrap.Modal(document.getElementById('sellModal')); modal.show();
+  },
+  onPhotoChange(e) {
+    const allFiles = Array.from(e.target.files || []);
+    if(allFiles.length>5){showToast('अधिकतम 5 फोटो चुनें।','warn'); e.target.value=''; return;}
+    const files = allFiles.filter(f=>f.type && f.type.startsWith('image/') && f.size<=8*1024*1024);
+    if(files.length!==allFiles.length){showToast('केवल image और अधिकतम 8MB प्रति फोटो allowed है।','warn'); e.target.value=''; return;}
+    const status = document.getElementById('sellPhotoStatus');
+    const prev = document.getElementById('sellPhotoPreview');
+    this.photoDataList = [];
+    if (!files.length) { if(status) status.textContent=''; if(prev) prev.innerHTML=''; return; }
+    if(status) status.textContent = `${files.length}/5 फोटो तैयार हो रही हैं...`;
+    if(prev) prev.innerHTML = '';
+    const processOne = (file, idx) => new Promise((resolve,reject)=>{
+      const reader = new FileReader();
+      reader.onload = ev => {
+        const img = new Image();
+        img.onload = () => {
+          const maxW = 1000, scale = Math.min(1, maxW / img.width);
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.round(img.width * scale); canvas.height = Math.round(img.height * scale);
+          canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+          canvas.toBlob(async blob=>{
+            try{
+              const url = await uploadImageToHost(blob);
+              this.photoDataList[idx] = url;
+              if(prev) prev.insertAdjacentHTML('beforeend', `<img src="${url}" class="rounded me-1 mt-2" style="width:72px;height:72px;object-fit:cover" alt="Photo ${idx+1}">`);
+              resolve(url);
+            }catch(err){ reject(err); }
+          },'image/jpeg',.76);
         };
-        reader.onerror = () => { if (status) status.textContent = 'फोटो पढ़ने में समस्या हुई, दोबारा कोशिश करें।'; };
-        reader.readAsDataURL(file);
-      },
-      async submit(e) {
-        e.preventDefault();
-        const btn = e.target.querySelector('button[type=submit]');
-        const title = document.getElementById('sell-title').value.trim();
-        const priceRaw = document.getElementById('sell-price').value.trim();
-        const stockRaw = document.getElementById('sell-stock').value.trim();
-        const category = document.getElementById('sell-category').value;
-        const desc = document.getElementById('sell-desc').value.trim();
-        const phone = document.getElementById('sell-phone').value.trim();
-        if (!title || !priceRaw || !desc || !phone) { showToast('कृपया सभी जरूरी fields भरें।'); return; }
-        const photoInput = document.getElementById('sell-photo');
-        if (photoInput && photoInput.files && photoInput.files[0] && !this.photoData) {
-          showToast('फोटो अभी अपलोड हो रही है, कृपया थोड़ा इंतज़ार करें और दोबारा Post दबाएं।');
-          return;
+        img.onerror=()=>reject(new Error('फोटो पढ़ी नहीं जा सकी'));
+        img.src=ev.target.result;
+      };
+      reader.onerror=()=>reject(new Error('फोटो पढ़ी नहीं जा सकी'));
+      reader.readAsDataURL(file);
+    });
+    (async()=>{
+      try{
+        for(let i=0;i<files.length;i++){
+          await processOne(files[i],i);
+          if(status) status.textContent=`${i+1}/${files.length} फोटो अपलोड हो गई`;
         }
-        if (['खाना-पीना', 'किराना'].includes(category)) {
-          showToast('माफ़ कीजिए — खाना-पीना और किराना केवल Admin द्वारा ही जोड़े जाते हैं। यह सुविधा अभी users के लिए उपलब्ध नहीं है।');
-          return;
-        }
-        const post = {
-          id: 'us_' + Date.now(),
-          type: 'market_sell',
-          title, price: Number(priceRaw) || priceRaw, category, desc, phone,
-          stock: stockRaw === '' ? null : Number(stockRaw),
-          img: this.photoData || '',
-          author: getUser().name, avatar: getUser().avatar,
-          ownerUid: getUser().uid,
-          status: 'APPROVED', isAdminPost: false,
-          time: new Date().toLocaleDateString(),
-          expiresAt: Date.now() + 30 * 86400000,
-          likes: 0
-        };
-        if (btn) { btn.disabled = true; btn.innerHTML = 'पोस्ट हो रहा है...'; }
-        try {
-          State.posts.unshift(post);
-          syncPostUpsert(post);
-          const modalEl = document.getElementById('sellModal');
-          const inst = bootstrap.Modal.getInstance(modalEl); if (inst) inst.hide();
-          e.target.reset(); this.photoData = null;
-          const prev = document.getElementById('sellPhotoPreview'); if (prev) prev.innerHTML = '';
-          App.navigate('market');
-        } catch (err) {
-          showToast('पोस्ट करने में समस्या हुई: ' + (err && err.message ? err.message : err));
-        } finally {
-          if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-tag-fill me-1"></i> बेचने के लिए पोस्ट करें'; }
-        }
-      },
-      deleteListing(id) {
-        if (!confirm('क्या आप यह listing हटाना चाहते हैं?')) return;
-        State.posts = State.posts.filter(p => p.id !== id);
-        syncPostDelete(id);
-        App.refresh();
-      },
-      updateStock(id) {
-        const p = State.posts.find(x => x.id === id);
-        if (!p) return;
-        const myUid = State.user && !State.user.isGuest ? State.user.uid : null;
-        if (!myUid || p.ownerUid !== myUid) return;
-        const current = (p.stock === null || p.stock === undefined) ? '' : p.stock;
-        const input = prompt('नई स्टॉक मात्रा डालें (0 डालने पर "Out of Stock" दिखेगा):', current);
-        if (input === null) return; // cancelled
-        const n = Number(input.trim());
-        if (input.trim() === '' || isNaN(n) || n < 0) { showToast('कृपया 0 या उससे बड़ी संख्या डालें।'); return; }
-        p.stock = n;
-        syncPostUpsert(p);
-        App.refresh();
-      }
+        this.photoDataList=this.photoDataList.filter(Boolean);
+        this.photoData=this.photoDataList[0]||'';
+        if(status) status.textContent=`✓ ${this.photoDataList.length} फोटो तैयार हैं`;
+      }catch(err){ if(status) status.textContent='⚠ फोटो अपलोड नहीं हो पाई: '+err.message; }
+    })();
+  },
+  async submit(e) {
+    e.preventDefault();
+    const btn=e.target.querySelector('button[type=submit]');
+    const title=document.getElementById('sell-title').value.trim();
+    const priceRaw=document.getElementById('sell-price').value.trim();
+    const stockRaw=document.getElementById('sell-stock').value.trim();
+    const category=document.getElementById('sell-category').value;
+    const desc=document.getElementById('sell-desc').value.trim();
+    const phone=document.getElementById('sell-phone').value.trim();
+    const priceType=document.getElementById('sell-price-type')?.value||'fixed';
+    const locationLabel=document.getElementById('sell-location')?.value.trim() || State.location?.label || 'Local';
+    const safety=document.getElementById('sell-safety-consent'); if(!safety?.checked){showToast('पहले Safety Warning स्वीकार करें।','warn'); safety?.focus(); return;}
+    if(!title||!priceRaw||!desc||!phone){showToast('कृपया सभी जरूरी fields भरें।','warn');return;}
+    if(['खाना-पीना','किराना'].includes(category)){showToast('खाना-पीना और किराना केवल Admin द्वारा जोड़े जाते हैं।','warn');return;}
+    if(!this.photoDataList.length && this.photoData) this.photoDataList=[this.photoData];
+    if(btn){btn.disabled=true;btn.innerHTML='<span class="spinner-border spinner-border-sm me-1"></span> पोस्ट हो रही है...';}
+    const u=getUser();
+    const post={
+      id:'us_'+Date.now(), type:'market_sell', title, price:Number(priceRaw)||priceRaw, category, desc, phone,
+      priceType, negotiable:priceType==='negotiable', locationLabel,
+      lat:State.location?.lat??null, lng:State.location?.lng??null,
+      stock:stockRaw===''?null:Number(stockRaw), img:this.photoDataList[0]||'', imgs:this.photoDataList,
+      author:u.name, avatar:u.avatar, ownerUid:u.uid, status:'APPROVED', availability:'available',
+      isAdminPost:false, featured:false, createdAt:Date.now(), time:new Date().toLocaleDateString(),
+      expiresAt:Date.now()+30*86400000, likes:0, views:0
     };
-
-    /* ========================================================================
+    State.posts.unshift(post); syncPostUpsert(post);
+    bootstrap.Modal.getInstance(document.getElementById('sellModal'))?.hide();
+    e.target.reset(); this.photoData=null; this.photoDataList=[];
+    if(btn){btn.disabled=false;btn.innerHTML='<i class="bi bi-tag-fill me-1"></i> बेचने के लिए पोस्ट करें';}
+    App.refresh(); showToast('✓ Listing live हो गई।','success');
+  },
+  markSold(id){
+    const p=State.posts.find(x=>String(x.id)===String(id)); if(!p) return;
+    if(p.ownerUid!==getUser()?.uid) return showToast('यह आपकी listing नहीं है।','warn');
+    p.availability='sold'; p.status='SOLD'; syncPostUpsert(p); App.refresh(); showToast('✓ Product SOLD mark कर दिया।','success');
+  },
+  renew(id){
+    const p=State.posts.find(x=>String(x.id)===String(id)); if(!p) return;
+    if(p.ownerUid!==getUser()?.uid) return;
+    p.availability='available'; p.status='APPROVED'; p.expiresAt=Date.now()+30*86400000;
+    syncPostUpsert(p); App.refresh(); showToast('↻ Listing अगले 30 दिन के लिए active है।','success');
+  },
+  deleteListing(id){
+    const p=State.posts.find(x=>String(x.id)===String(id)); if(!p || p.ownerUid!==getUser()?.uid) return;
+    if(!confirm('यह listing हटाएँ?')) return;
+    State.posts=State.posts.filter(x=>String(x.id)!==String(id)); syncPostDelete(id); App.refresh(); showToast('Listing हट गई।','success');
+  },
+  updateStock(id){
+    const p=State.posts.find(x=>String(x.id)===String(id)); if(!p) return;
+    const v=prompt('नई stock quantity:',p.stock??''); if(v===null) return;
+    p.stock=v===''?null:Number(v); if(p.stock===0)p.availability='sold';
+    syncPostUpsert(p); App.refresh();
+  }
+};
+/* ========================================================================
        10. APP ROUTER & VIEWS
        ======================================================================== */
     const App = {
+      marketSort:'new', marketCategory:'all', marketQuery:'',
+
       currentTab: "feed",
       pageSize: 30,
       pageCounts: { feed: 30, market: 30, food: 30, business: 30, service: 30 },
@@ -2509,47 +2600,51 @@ main.container{max-width:1180px!important;padding-top:24px!important}
         }
         ref.set(message).then(() => { input.value = ''; }).catch(err => { console.error(err); showToast("Message नहीं भेजा गया: " + err.message); });
       },
-      renderListingCard(p, opts) {
-        opts = opts || {};
-        const myUid = State.user && !State.user.isGuest ? State.user.uid : null;
-        const isOwner = myUid && p.ownerUid === myUid;
-        const share = `shareListing('${String(p.id).replace(/'/g,"\\'")}')`;
-        const tracksStock = p.stock !== null && p.stock !== undefined && p.stock !== '';
-        const outOfStock = tracksStock && Number(p.stock) <= 0;
-        const cta = outOfStock
-          ? `<span class="btn btn-outline-danger btn-sm w-100 fw-bold disabled"><i class="bi bi-x-circle me-1"></i>स्टॉक खत्म</span>`
+      renderListingCard(p, opts={}) {
+        const isOwner=!!State.user && !State.user.isGuest && p.ownerUid===State.user.uid;
+        const isVerified=!p.isAdminPost&&!!p.ownerUid;
+        const saved=this.isSavedListing(p.id);
+        const sold=p.availability==='sold'||p.status==='SOLD'||(p.stock===0);
+        const dist=this.getListingDistance(p);
+        const imgList=(Array.isArray(p.imgs)&&p.imgs.length?p.imgs:[p.img].filter(Boolean));
+        const mainImg=imgList[0]||'';
+        const priceText=p.price===''?'कीमत पूछें':`₹ ${esc(p.price)}`;
+        const cta=sold
+          ? `<span class="btn btn-outline-secondary btn-sm w-100 fw-bold disabled">SOLD</span>`
           : (p.isAdminPost
-            ? `<button class="btn btn-market btn-sm" onclick="OrderEngine.openBuyModal('${p.id}')"><i class="bi bi-bag-check-fill me-1"></i>Order Now</button>`
+            ? `<button class="btn btn-market btn-sm w-100" onclick="OrderEngine.openBuyModal('${p.id}')"><i class="bi bi-bag-check-fill me-1"></i>Order Now</button>`
             : (isOwner
-              ? `<span class="btn btn-outline-secondary btn-sm disabled">आपकी listing है</span>`
+              ? `<span class="btn btn-outline-secondary btn-sm disabled w-100">आपकी listing</span>`
               : `<button class="btn btn-outline-primary btn-sm w-100 fw-bold" onclick="openUserProductChat('${p.id}')"><i class="bi bi-chat-dots-fill me-1"></i>Chat Seller</button>`));
-        // Sirf woh listings jo asli logged-in (Firebase Auth) user ne synced ki
-        // hain unhi ka ownerUid hota hai — DB rules guest/anonymous write allow
-        // nahi karte, isliye ownerUid hona hi ek real verified account ka proof hai.
-        const isVerified = !p.isAdminPost && !!p.ownerUid;
-        const reportBtn = !isOwner ? `<button class="btn btn-sm btn-outline-secondary listing-report-btn" title="Report करें" onclick="ReportEngine.open('${String(p.id).replace(/'/g,"\\'")}','${esc(p.title || '').replace(/'/g,"\\'")}')"><i class="bi bi-flag"></i></button>` : '';
-        const stockEditBtn = isOwner && tracksStock ? `<button class="btn btn-sm btn-outline-primary" title="स्टॉक अपडेट करें" onclick="SellEngine.updateStock('${p.id}')"><i class="bi bi-boxes"></i></button>` : '';
+        const ownerTools=isOwner?`<div class="ml-owner-tools">
+          <button class="btn btn-outline-success" onclick="SellEngine.markSold('${p.id}')">${sold?'':'✓ Sold'}</button>
+          ${sold?`<button class="btn btn-outline-primary" onclick="SellEngine.renew('${p.id}')">↻ Renew</button>`:''}
+          <button class="btn btn-outline-danger" onclick="SellEngine.deleteListing('${p.id}')"><i class="bi bi-trash"></i></button>
+        </div>`:'';
+        const reportBtn=!isOwner?`<button class="btn btn-sm btn-outline-secondary" title="Report" onclick="ReportEngine.open('${String(p.id).replace(/'/g,"\\'")}','${esc(p.title||'').replace(/'/g,"\\'")}')"><i class="bi bi-flag"></i></button>`:'';
         return `<div class="listing-card">
           <div class="listing-img-wrap">
-            ${p.img ? `<img src="${p.img}" alt="${esc(p.title || 'Product image')}" loading="lazy" style="${outOfStock ? 'filter:grayscale(1);opacity:0.6;' : ''}">` : `<div class="listing-noimg"><i class="bi bi-image"></i></div>`}
-            <span class="listing-tag ${p.isAdminPost ? 'tag-admin' : 'tag-user'}">${p.isAdminPost ? 'ADMIN' : 'USER'}</span>
-            ${outOfStock ? `<span class="listing-tag" style="left:auto;right:8px;background:#dc3545;color:#fff;">OUT OF STOCK</span>` : ''}
-            ${opts.showDelete && isOwner ? `<button class="btn btn-danger listing-del-btn" onclick="SellEngine.deleteListing('${p.id}')" title="हटाएं"><i class="bi bi-trash"></i></button>` : ''}
+            ${mainImg?`<img src="${mainImg}" alt="${esc(p.title||'Product image')}" loading="lazy" style="${sold?'filter:grayscale(1);opacity:.68':''}">`:`<div class="listing-noimg"><i class="bi bi-image"></i></div>`}
+            ${p.featured?`<span class="ml-featured">🔥 FEATURED</span>`:''}
+            ${sold?`<span class="ml-sold">SOLD</span>`:''}
+            <button class="ml-save-btn ${saved?'saved':''}" onclick="App.toggleSavedListing('${String(p.id).replace(/'/g,"\\'")}')" title="Save">${saved?'♥':'♡'}</button>
           </div>
           <div class="listing-body">
             <div class="d-flex align-items-center justify-content-between gap-1">
-              <div class="listing-price">₹ ${esc(p.price)}</div>
-              ${isVerified ? `<span class="badge bg-success bg-opacity-10 text-success small" title="Verified account से पोस्ट किया गया"><i class="bi bi-patch-check-fill me-1"></i>Verified</span>` : ''}
+              <div class="listing-price">${priceText}</div>
+              ${p.negotiable?`<span class="ml-negotiable">बातचीत</span>`:''}
             </div>
             <div class="listing-title" title="${esc(p.title)}">${esc(p.title)}</div>
-            <div class="listing-meta"><i class="bi bi-clock-history"></i>${p.isAdminPost ? 'Admin listing' : 'User listing · 30 दिन'}${tracksStock && !outOfStock ? ` · स्टॉक: ${esc(p.stock)}` : ''}</div>
+            <div class="listing-meta"><i class="bi bi-geo-alt"></i>${esc(p.locationLabel||'Local area')}${dist!=null?` · ${dist.toFixed(1)} km`:''}</div>
+            <div class="ml-seller-mini"><i class="bi bi-patch-check-fill"></i>${isVerified?'Verified Seller':'Local Seller'} ${p.author?`· ${esc(p.author)}`:''}</div>
+            <div class="listing-meta"><i class="bi bi-clock"></i>${p.isAdminPost?'Admin listing':p.expiresAt?`Active till ${new Date(p.expiresAt).toLocaleDateString('en-IN')}`:'Local listing'}</div>
             <div class="listing-cta">${cta}</div>
             <div class="d-flex gap-1 mt-1">
-              <button class="btn btn-sm btn-outline-success" title="WhatsApp पर Share करें" onclick="shareListingWhatsapp('${String(p.id).replace(/'/g,"\\'")}')"><i class="bi bi-whatsapp"></i></button>
-              <button class="btn btn-sm btn-outline-secondary flex-grow-1" onclick="${share}"><i class="bi bi-share me-1"></i>Share</button>
-              ${stockEditBtn}
+              <button class="btn btn-sm btn-outline-success" title="WhatsApp Share" onclick="shareListingWhatsapp('${String(p.id).replace(/'/g,"\\'")}')"><i class="bi bi-whatsapp"></i></button>
+              <button class="btn btn-sm btn-outline-secondary flex-grow-1" onclick="shareListing('${String(p.id).replace(/'/g,"\\'")}')"><i class="bi bi-share me-1"></i>Share</button>
               ${reportBtn}
             </div>
+            ${ownerTools}
           </div>
         </div>`;
       },
@@ -2579,25 +2674,67 @@ main.container{max-width:1180px!important;padding-top:24px!important}
         }
         return out;
       },
-      renderMarket() {
-        const now = Date.now();
-        const expired = State.posts.filter(p => p.type.startsWith('market') && !p.isAdminPost && p.expiresAt && p.expiresAt <= now);
-        if (expired.length) {
-          State.posts = State.posts.filter(p => !expired.includes(p));
-          savePostsLocal();
-          expired.forEach(p => syncPostDelete(p.id));
-        }
-        const items = State.posts.filter(p => p.type.startsWith('market') && p.status === 'APPROVED' && (p.isAdminPost || !p.expiresAt || p.expiresAt > now));
-        const sellBar = `
-          <div class="card glass-card p-3 mb-3 d-flex flex-row align-items-center justify-content-between flex-wrap gap-2">
-            <div><h5 class="fw-bold mb-0"><i class="bi bi-shop text-success me-1"></i>मार्केट</h5><small class="text-secondary">खरीदें या अपना सामान बेचें</small></div>
-            <div class="d-flex gap-2 flex-wrap">
-              <button class="btn btn-outline-primary fw-bold" onclick="App.navigate('businesses')"><i class="bi bi-shop-window me-1"></i> लोकल दुकानें देखें</button>
-              <button class="btn btn-success fw-bold" onclick="SellEngine.open()"><i class="bi bi-tag-fill me-1"></i> अपना सामान बेचें</button>
+
+      renderMarketTools(items){
+        const cats=[...new Set(items.map(p=>p.category).filter(Boolean))];
+        return `<div class="ml-market-tools mb-3">
+          <div class="d-flex gap-2 align-items-center mb-2">
+            <div class="input-group input-group-sm flex-grow-1">
+              <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+              <input class="form-control" value="${esc(this.marketQuery||'')}" oninput="App.marketQuery=this.value;App.refresh()" placeholder="क्या ढूँढ रहे हैं? जैसे Activa, Mobile">
             </div>
-          </div>`;
-        if (items.length === 0) return sellBar + `<div class="text-center mt-5 text-secondary"><i class="bi bi-bag-x fs-1 d-block mb-2"></i>मार्केट में अभी कोई approved उत्पाद नहीं है।<br>सबसे पहले अपना सामान पोस्ट करें!</div>`;
-        return sellBar + this.paginateHtml(items, 'market', (shown) => `<div class="row g-2 g-md-3">${shown.map(p => `<div class="col-6 col-md-4 col-lg-3">${this.renderListingCard(p, { showDelete: true })}</div>`).join("")}</div>`);
+            <select class="form-select form-select-sm" style="max-width:135px" onchange="App.marketSort=this.value;App.refresh()">
+              <option value="new" ${this.marketSort==='new'?'selected':''}>नया पहले</option>
+              <option value="low" ${this.marketSort==='low'?'selected':''}>कम कीमत</option>
+              <option value="high" ${this.marketSort==='high'?'selected':''}>ज्यादा कीमत</option>
+              <option value="near" ${this.marketSort==='near'?'selected':''}>सबसे पास</option>
+            </select>
+          </div>
+          <div class="ml-filter-row">
+            <button class="ml-filter-btn ${this.marketCategory==='all'?'active':''}" onclick="App.marketCategory='all';App.refresh()">सभी</button>
+            ${cats.map(c=>`<button class="ml-filter-btn ${this.marketCategory===c?'active':''}" onclick="App.marketCategory=${JSON.stringify(c)};App.refresh()">${esc(c)}</button>`).join('')}
+            <button class="ml-filter-btn ${this.marketCategory==='saved'?'active':''}" onclick="App.marketCategory='saved';App.refresh()">❤️ Saved</button>
+          </div>
+        </div>`;
+      },
+      getListingDistance(p){
+        if(p.lat==null||p.lng==null||State.location?.lat==null) return null;
+        return AreaGate.distanceKm(Number(State.location.lat),Number(State.location.lng),Number(p.lat),Number(p.lng));
+      },
+      isSavedListing(id){ try{return JSON.parse(localStorage.getItem('mylocal_saved')||'[]').includes(String(id));}catch(e){return false;} },
+      toggleSavedListing(id){
+        let a=[]; try{a=JSON.parse(localStorage.getItem('mylocal_saved')||'[]')}catch(e){}
+        const s=String(id), i=a.indexOf(s); if(i>=0)a.splice(i,1);else a.unshift(s);
+        localStorage.setItem('mylocal_saved',JSON.stringify(a)); this.refresh();
+      },
+      renderMarket() {
+        const now=Date.now();
+        const expired=State.posts.filter(p=>p.type?.startsWith('market')&&!p.isAdminPost&&p.expiresAt&&p.expiresAt<=now&&p.availability!=='sold');
+        if(expired.length){State.posts=State.posts.filter(p=>!expired.includes(p));savePostsLocal();expired.forEach(p=>syncPostDelete(p.id));}
+        let items=State.posts.filter(p=>p.type?.startsWith('market')&&p.status==='APPROVED'&&(p.isAdminPost||!p.expiresAt||p.expiresAt>now||p.availability==='sold'));
+        if(this.marketQuery) {
+          const q=this.marketQuery.toLowerCase();
+          items=items.filter(p=>[p.title,p.category,p.desc,p.locationLabel].some(v=>String(v||'').toLowerCase().includes(q)));
+        }
+        if(this.marketCategory==='saved') items=items.filter(p=>this.isSavedListing(p.id));
+        else if(this.marketCategory!=='all') items=items.filter(p=>p.category===this.marketCategory);
+        const distance=(p)=>this.getListingDistance(p);
+        items.sort((a,b)=>{
+          if(this.marketSort==='low') return Number(a.price||0)-Number(b.price||0);
+          if(this.marketSort==='high') return Number(b.price||0)-Number(a.price||0);
+          if(this.marketSort==='near') return (distance(a)??99999)-(distance(b)??99999);
+          return Number(b.createdAt||0)-Number(a.createdAt||0);
+        });
+        const sellBar=`<div class="card glass-card p-3 mb-3 d-flex flex-row align-items-center justify-content-between flex-wrap gap-2">
+          <div><h5 class="fw-bold mb-0"><i class="bi bi-shop text-primary me-1"></i>Local Market</h5><small class="text-secondary">अपने आसपास खरीदें, बेचें और bargain करें</small></div>
+          <div class="d-flex gap-2 flex-wrap">
+            <button class="btn btn-outline-primary fw-bold" onclick="App.navigate('businesses')"><i class="bi bi-shop-window me-1"></i>दुकानें</button>
+            <button class="btn btn-primary fw-bold" onclick="SellEngine.open()"><i class="bi bi-plus-circle me-1"></i>सामान बेचें</button>
+          </div>
+        </div>`;
+        const tools=this.renderMarketTools(items);
+        if(!items.length) return sellBar+tools+`<div class="text-center mt-5 text-secondary"><i class="bi bi-search fs-1 d-block mb-2"></i>इस filter में कोई listing नहीं मिली।</div>`;
+        return sellBar+tools+this.paginateHtml(items,'market',(shown)=>`<div class="row g-2 g-md-3">${shown.map(p=>`<div class="col-6 col-md-4 col-lg-3">${this.renderListingCard(p,{showDelete:true})}</div>`).join('')}</div>`);
       },
       renderFoodGrocery() {
         const now = Date.now();
@@ -3195,7 +3332,7 @@ main.container{max-width:1180px!important;padding-top:24px!important}
        14. AREA LOCK GATE (MyLocal is built for exactly one local service area)
        ======================================================================== */
     const AreaGate = {
-      defaultRadiusKm: 50,
+      defaultRadiusKm: 30,
       pendingResolve: null,
       distanceKm(lat1, lon1, lat2, lon2) {
         const R = 6371, toRad = d => d * Math.PI / 180;
@@ -3360,30 +3497,22 @@ main.container{max-width:1180px!important;padding-top:24px!important}
    ============================================================ */
 (function(){
   const ML = {
-    radiusDefault: 50,
+    radiusDefault: 30,
     areaCache: null,
     dataCache: {},
     esc: window.esc || (s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))),
     async getLocalArea(){
       if(this.areaCache) return this.areaCache;
-      let a=null;
-      try {
-        if(isFirebaseReady){
-          const s=await db.ref("settings/localArea").once("value");
-          a=s.val();
-        }
-      } catch(e){}
-      if(!a){
-        try {
-          const cached=JSON.parse(localStorage.getItem("apnalocal_service_areas")||"{}");
-          const arr=Array.isArray(cached)?cached:Object.values(cached||{});
-          a=arr.sort((x,y)=>(y.setAt||0)-(x.setAt||0))[0]||null;
-        } catch(e){}
-      }
-      if(a && Number.isFinite(Number(a.lat)) && Number.isFinite(Number(a.lng))){
-        a.radiusKm=Math.max(1,Number(a.radiusKm)||this.radiusDefault);
-        this.areaCache=a;
-      }
+      // Temporary fixed service area: Sadabad, Hathras — 30 KM radius.
+      // App browsing remains public; this area is enforced only for listing/post actions.
+      const SADABAD_AREA = {
+        id: "sadabad-primary",
+        label: "Sadabad, Hathras",
+        lat: 27.44663,
+        lng: 78.04008,
+        radiusKm: 30
+      };
+      this.areaCache = SADABAD_AREA;
       return this.areaCache;
     },
     distanceKm(a,b,c,d){
@@ -3404,12 +3533,8 @@ main.container{max-width:1180px!important;padding-top:24px!important}
     },
     async authorizeCurrentUser(){
       if(!State.user || State.user.isGuest) return false;
-      try{
-        const s=await db.ref("users/"+State.user.uid+"/localAuthorization").once("value");
-        if(s.val() && s.val().authorized===true){
-          State.user.localAuthorized=true; localStorage.setItem("app_user",JSON.stringify(State.user)); return true;
-        }
-      }catch(e){}
+      // Never trust an old authorization record: re-check current GPS so a user
+      // who has moved outside the 30 KM service area cannot create a new listing.
       const r=await this.inArea();
       if(r.ok){
         const area=r.area;
@@ -3504,7 +3629,6 @@ main.container{max-width:1180px!important;padding-top:24px!important}
   AuthEngine.loginEmail=async function(){
     const email=document.getElementById("authEmail")?.value.trim(), pass=document.getElementById("authPassword")?.value||"";
     if(!email||pass.length<6)return showToast("Email और कम से कम 6 character password डालें।");
-    if(!(await ML.ensureForAuth()))return;
     try{
       const r=await auth.signInWithEmailAndPassword(email,pass);
       State.user={uid:r.user.uid,name:r.user.displayName||email.split("@")[0],phone:r.user.phoneNumber||"",avatar:r.user.photoURL||"https://picsum.photos/100",email,isGuest:false};
@@ -3517,7 +3641,6 @@ main.container{max-width:1180px!important;padding-top:24px!important}
   AuthEngine.registerEmail=async function(){
     const email=document.getElementById("authEmail")?.value.trim(), pass=document.getElementById("authPassword")?.value||"";
     if(!email||pass.length<6)return showToast("Valid email और कम से कम 6 character password डालें।");
-    if(!(await ML.ensureForAuth()))return;
     try{
       const r=await auth.createUserWithEmailAndPassword(email,pass);
       State.user={uid:r.user.uid,name:email.split("@")[0],phone:"",avatar:"https://picsum.photos/100",email,isGuest:false,localAuthorized:true};
@@ -3536,23 +3659,13 @@ main.container{max-width:1180px!important;padding-top:24px!important}
 
   // Re-wrap Google login to enforce local authorization before account creation.
   const oldGoogle=AuthEngine.loginGoogle.bind(AuthEngine);
-  AuthEngine.loginGoogle=async function(){
-    if(!(await ML.ensureForAuth()))return;
-    await oldGoogle();
-  };
+  AuthEngine.loginGoogle=async function(){ await oldGoogle(); };
 
-  // On authenticated session: previously authorized users stay usable outside the radius.
+  // App is always browsable from anywhere. Location is checked only when a
+  // restricted action such as creating a listing is attempted.
+  // This prevents an out-of-area visitor from being locked out of the app.
   const oldAppInit=App.init.bind(App);
-  App.init=function(){
-    oldAppInit();
-    setTimeout(async()=>{
-      if(State.user && !State.user.isGuest){
-        const ok=await ML.authorizeCurrentUser();
-        if(!ok) return;
-        document.getElementById("area-gate").style.display="none";
-      }
-    },800);
-  };
+  App.init=function(){ oldAppInit(); };
 
 
   // Local discovery engine.
